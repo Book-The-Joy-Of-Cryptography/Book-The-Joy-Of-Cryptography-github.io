@@ -158,8 +158,13 @@ layout: table_wrappers
           <footer>
             {% if site.back_to_top %}
               <p><a href="#top" id="back-to-top">{{ site.back_to_top_text }}</a></p>
-            {% endif %}
 
+            {% endif %}
+						For a mobile device, touch
+      			<a href="#" id="menu-button" class="site-button">
+      				<svg viewBox="0 0 24 24" class="icon"><use xlink:href="#svg-menu"></use></svg>
+      			</a>
+						on the top to view table of contents.
             {{ footer_custom }}
 
             {% if site.last_edit_timestamp or site.gh_edit_link %}
