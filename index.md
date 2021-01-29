@@ -1,14 +1,14 @@
 ---
 layout: default
-title: 1984
+title: Ethical Hacking 
 has_children: true
 nav_order: 1
-description: "1984, By George Orwell"
+description: "Ethical Hacking, By Alana Maurushat"
 permalink: /
 ---
 
-This is a mobile-friendly version of the [original article](http://gutenberg.net.au/ebooks01/0100021.txt)
+This is a mobile-friendly version of the [original Book](https://ruor.uottawa.ca/bitstream/10393/39080/1/9780776627922_WEB.pdf)
 
-# 1984
+# Ethical Hacking 
 
-## By George Orwell
+## Alana Maurushat 
