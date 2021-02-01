@@ -1,14 +1,14 @@
 ---
 layout: default
-title: Ethical Hacking 
+title: The Joy of Cryptography 
 has_children: true
 nav_order: 1
-description: "Ethical Hacking, By Alana Maurushat"
+description: "The Joy of Cryptography, by Mike Rosulek"
 permalink: /
 ---
 
-This is a mobile-friendly version of the [original Book](https://ruor.uottawa.ca/bitstream/10393/39080/1/9780776627922_WEB.pdf)
+This is a mobile-friendly version of the [original Book](https://web.engr.oregonstate.edu/~rosulekm/crypto/crypto.pdf)
 
-# Ethical Hacking 
+# The Joy of Cryptography 
 
-## Alana Maurushat 
+## by Mike Rosulek 
