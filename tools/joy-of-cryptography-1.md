@@ -112,7 +112,7 @@ $$
 \end{array}
 $$
 
-Note that Enc and Dec are essentially the same algorithm (return the XOR of the two arguments). This results in some small level of convenience and symmetry when implementing one-time pad, but it is more of a coincidence than something truly fundamental about encryption (see Exercises 1.12 & 2.5). Later on you’ll see encryption schemes whose encryption & decryption algorithms look very different.
+Note that Enc and Dec are essentially the same algorithm (return the XOR of the two arguments). This results in some small level of convenience and symmetry when implementing one-time pad, but it is more of a coincidence than something truly fundamental about encryption (see Exercises $\textcolor{green}{1.12}$  & $\textcolor{green}{2.5}$). Later on you’ll see encryption schemes whose encryption & decryption algorithms look very different.
 
 ### Correctness
 
@@ -122,7 +122,7 @@ The first property of one-time pad that we should confirm is that the receiver d
 *For all $k$, $m \in \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$, it is true that $\text{Dec}(k, \text{Enc}(k,m)) = m$.*
 
 **Proof** 
-This follows by substituting the definitions of OTP Enc and Dec, then applying the properties of XOR listed in Chapter 0.3. For all $k$, $m \in \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$, we have:
+This follows by substituting the definitions of OTP Enc and Dec, then applying the properties of XOR listed in $\textcolor{green}{Chapter \ 0.3}$. For all $k$, $m \in \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$, we have:
 
 $$
 \begin{aligned}
@@ -141,7 +141,7 @@ $$
 \begin{array}{lll} 
 & \textcolor{brown}{00110100110110001111} & (m) \\
 \oplus & \textcolor{brown}{11101010011010001101} & (k) \\
-\hline & \textcolor{brown}{11101010011010001101} & (c)
+\hline & \textcolor{brown}{11011110101100000010} & (c)
 \end{array}
 $$
 
@@ -229,7 +229,7 @@ $$
 c = k \oplus m \Longleftrightarrow k = m \oplus c.
 $$
 
-The equivalence follows from the properties of XOR given in Section 0.3. That is,
+The equivalence follows from the properties of XOR given in $\textcolor{green}{Section \ 0.3}$. That is,
 
 $$
 \text{Pr[EAVESDROP}(m) = c] = \text{Pr}[k = m \oplus c].
@@ -245,22 +245,22 @@ One way to interpret this statement of security in more down-to-earth terms:
 
 >If an attacker sees a *single* ciphertext, encrypted with one-time pad, where the key is chosen uniformly and kept secret from the attacker, then the ciphertext appears uniformly distributed.
 
-Why is this significant? Taking the eavesdropper’s point of view, suppose someone chooses a plaintext $m$ and you get to see the resulting ciphertext—a sample from the distribution EAVESDROP($m$). But this is a distribution that you can sample from yourself, even if you don’t know $m$! You could have chosen a totally different $m'$ and run EAVESDROP($m$)in your imagination, and this would have produced the same distribution as EAVESDROP($m$). The “real” ciphertext that you see *doesn’t carry any information about* $m$ if it is possible to sample from the same distribution without even knowing $m$!
+Why is this significant? Taking the eavesdropper’s point of view, suppose someone chooses a plaintext $m$ and you get to see the resulting ciphertext—a sample from the distribution EAVESDROP($m$). But this is a distribution that you can sample from yourself, even if you don’t know $m$! You could have chosen a totally different $m'$ and run EAVESDROP($m'$)in your imagination, and this would have produced the same distribution as EAVESDROP($m$). The “real” ciphertext that you see *doesn’t carry any information about* $m$ if it is possible to sample from the same distribution without even knowing $m$!
 
 ### Discussion
 
- - **Isn’t there a paradox?** Claim 1.2 says that $c$ can always be decrypted to get $m$, but Claim 1.3 says that c contains no information about $m$! The answer to this riddle is that Claim 1.2 talks about what can be done with knowledge of the key $k$ (Alice & Bob’s perspective). Claim 1.3 talks about the output distribution of the eavesdrop algorithm, which doesn’t include k (Eve’s perspective). In short, if you know $k$, then you can decrypt $c$ to obtain $m$, if you don’t know $k$, then $c$ carries no information about $m$ (in fact, it looks uniformly distributed). This is because $m$, $c$, $k$ are all *correlated* in a delicate way.[^9]
+ - **Isn’t there a paradox?** $\textcolor{green}{Claim \ 1.2}$ says that $c$ can always be decrypted to get $m$, but $\textcolor{green}{Claim \ 1.3}$ says that c contains no information about $m$! The answer to this riddle is that $\textcolor{green}{Claim \ 1.2}$ talks about what can be done with knowledge of the key $k$ (Alice & Bob’s perspective). $\textcolor{green}{Claim \ 1.3}$ talks about the output distribution of the eavesdrop algorithm, which doesn’t include k (Eve’s perspective). In short, if you know $k$, then you can decrypt $c$ to obtain $m$, if you don’t know $k$, then $c$ carries no information about $m$ (in fact, it looks uniformly distributed). This is because $m$, $c$, $k$ are all *correlated* in a delicate way.[^9]
 
 [^9]: This correlation is explored further in Chapter 3.
 
- - **Isn’t there another paradox?** Claim 1.3 says that the output of EAVESDROP($m$) doesn’t depend on $m$, but we can see the eavesdrop algorithm literally using its argument $m$ right there in the last line! The answer to this riddle is perhaps best illustrated by the previous illustrations of the EAVESDROP($\textcolor{brown}{010}$) and EAVESDROP($\textcolor{brown}{111}$) distributions. The two tables of values are indeed different (so the choice of $m \in \{\textcolor{brown}{010}, \textcolor{brown}{111}\}$ clearly has some effect), but they represent the *same probability distribution* (since order doesn’t matter). Claim 1.3 considers only the resulting probability distribution.
- - You probably think about security in terms of a concrete “goal” for the attacker: recover the key, recover the plaintext, etc. Claim 1.3 doesn’t really refer to attackers in that way, and it certainly doesn’t specify a goal. Rather, we are thinking about security by comparing to some hypothetical “ideal” world. I would be satisfied if the attacker sees only a source of uniform bits, because in this hypothetical world there are no keys and no plaintexts to recover! Claim 1.3 says that when we actually use OTP, it looks just like this hypothetical world, from the attacker’s point of view. If we imagine any “goal” at all for the attacker in this kind of reasoning, it’s to detect that ciphertexts don’t follow a uniform distribution. By showing that the attacker can’t even achieve this modest goal, it shows that the attacker couldn’t possibly achieve other, more natural, goals like key recovery and plaintext recovery.
+ - **Isn’t there another paradox?** $\textcolor{green}{Claim \ 1.3}$ says that the output of EAVESDROP($m$) doesn’t depend on $m$, but we can see the eavesdrop algorithm literally using its argument $m$ right there in the last line! The answer to this riddle is perhaps best illustrated by the previous illustrations of the EAVESDROP($\textcolor{brown}{010}$) and EAVESDROP($\textcolor{brown}{111}$) distributions. The two tables of values are indeed different (so the choice of $m \in \{\textcolor{brown}{010}, \textcolor{brown}{111}\}$ clearly has some effect), but they represent the *same probability distribution* (since order doesn’t matter). $\textcolor{green}{Claim \ 1.3}$ considers only the resulting probability distribution.
+ - You probably think about security in terms of a concrete “goal” for the attacker: recover the key, recover the plaintext, etc. $\textcolor{green}{Claim \ 1.3}$ doesn’t really refer to attackers in that way, and it certainly doesn’t specify a goal. Rather, we are thinking about security by comparing to some hypothetical “ideal” world. I would be satisfied if the attacker sees only a source of uniform bits, because in this hypothetical world there are no keys and no plaintexts to recover! $\textcolor{green}{Claim \ 1.3}$ says that when we actually use OTP, it looks just like this hypothetical world, from the attacker’s point of view. If we imagine any “goal” at all for the attacker in this kind of reasoning, it’s to detect that ciphertexts don’t follow a uniform distribution. By showing that the attacker can’t even achieve this modest goal, it shows that the attacker couldn’t possibly achieve other, more natural, goals like key recovery and plaintext recovery.
 
 ### Limitations
 
 One-time pad is incredibly limited in practice. Most notably:
- - Its keys are as long as the plaintexts they encrypt. This is basically unavoidable (see Exercise 2.11) and leads to a kind of chicken-and-egg dilemma in practice: If two users want to privately convey a $\lambda$-bit message, they first need to privately agree on a $\lambda$-bit string.
- - A key can be used to encrypt only one plaintext (hence, “one-time” pad); see Exercise 1.6. Indeed, we can see that the eavesdrop subroutine in Claim 1.3 provides no way for a caller to guarantee that two plaintexts are encrypted with the same key, so it is not clear how to use Claim 1.3 to argue about what happens in one-time pad when keys are intentionally reused in this way.
+ - Its keys are as long as the plaintexts they encrypt. This is basically unavoidable (see $\textcolor{green}{Exercise \ 2.11}$) and leads to a kind of chicken-and-egg dilemma in practice: If two users want to privately convey a $\lambda$-bit message, they first need to privately agree on a $\lambda$-bit string.
+ - A key can be used to encrypt only one plaintext (hence, “one-time” pad); see $\textcolor{green}{Exercise \ 1.6}$. Indeed, we can see that the eavesdrop subroutine in $\textcolor{green}{Claim \ 1.3}$ provides no way for a caller to guarantee that two plaintexts are encrypted with the same key, so it is not clear how to use $\textcolor{green}{Claim \ 1.3}$ to argue about what happens in one-time pad when keys are intentionally reused in this way.
 
 Despite these limitations, one-time pad illustrates fundamental ideas that appear in most forms of encryption in this course.
 
@@ -274,11 +274,11 @@ $$
 
 What is the one-time pad encryption of $\textcolor{brown}{\texttt{luigi}}$ under the same key?
 
-1.2. Alice is using one-time pad and notices that when her key is the all-zeroes string $k = \textcolor{brown}{0}^{\lambda}$, then Enc$(k,m) = m$ and her message is sent in the clear! To avoid this problem, she decides to modify KeyGen to exclude the all-zeroes key. She modifies KeyGen to choose a key uniformly from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda} \ \{\textcolor{brown}{0}\}^{\lambda}$, the set of all $\lambda$-bit strings except $\textcolor{brown}{0}^{\lambda}$. In this way, she guarantees that her plaintext is never sent in the clear.
+1.2. Alice is using one-time pad and notices that when her key is the all-zeroes string $k = \textcolor{brown}{0}^{\lambda}$, then Enc$(k,m) = m$ and her message is sent in the clear! To avoid this problem, she decides to modify KeyGen to exclude the all-zeroes key. She modifies KeyGen to choose a key uniformly from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$ \ $\{\textcolor{brown}{0}\}^{\lambda}$, the set of all $\lambda$-bit strings except $\textcolor{brown}{0}^{\lambda}$. In this way, she guarantees that her plaintext is never sent in the clear.
 
 Is it still true that the eavesdropper’s ciphertext distribution is uniformly distributed on $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$? Justify your answer.
 
-1.3. When Alice encrypts the key k itself using one-time pad, the ciphertext will always be the all-zeroes string! So if an eavesdropper sees the all-zeroes ciphertext, she learns that Alice encrypted the key itself. Does this contradict Claim 1.3? Why or why not?
+1.3. When Alice encrypts the key k itself using one-time pad, the ciphertext will always be the all-zeroes string! So if an eavesdropper sees the all-zeroes ciphertext, she learns that Alice encrypted the key itself. Does this contradict $\textcolor{green}{Claim \ 1.3}$? Why or why not?
 
 1.4. What is so special about defining OTP using the XOR operation? Suppose we use the bitwise-AND operation (which we will write as ‘&’) and define a variant of OTP as follows:
 
@@ -295,9 +295,9 @@ Is this still a good choice for encryption? Why / why not?
 
 1.5. Describe the aw in this argument:
 
-> Consider the following attack against one-time pad: upon seeing a ciphertext $c$, the eavesdropper tries every candidate key $k \in \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$ until she has found the one that was used, at which point she outputs the plaintext $m$. This contradicts the argument in Section 1.2 that the eavesdropper can obtain no information about $m$ by seeing the ciphertext.
+> Consider the following attack against one-time pad: upon seeing a ciphertext $c$, the eavesdropper tries every candidate key $k \in \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$ until she has found the one that was used, at which point she outputs the plaintext $m$. This contradicts the argument in $\textcolor{green}{Section \ 1.2}$ that the eavesdropper can obtain no information about $m$ by seeing the ciphertext.
 
-Suppose Alice encrypts two plaintexts $m$ and $m'$ using one-time pad with the same key $k$. What information about $m$ and $m'$ is leaked to an eavesdropper by doing this (assume the eavesdropper knows that Alice has reused $k$)? Be as specific as you can!
+1.6. Suppose Alice encrypts two plaintexts $m$ and $m'$ using one-time pad with the same key $k$. What information about $m$ and $m'$ is leaked to an eavesdropper by doing this (assume the eavesdropper knows that Alice has reused $k$)? Be as specific as you can!
 
 1.7. You (Eve) have intercepted two ciphertexts:
 
@@ -316,7 +316,7 @@ Which of these two possibilities is correct, and why? What was the key $k$?
 	(a) Show that a known-plaintext attack on OTP results in the attacker learning the key $k$.
 	(b) Can OTP be secure if it allows an attacker to recover the encryption key? Is this a contradiction to the security we showed for OTP? Explain.
 
-1.9. Suppose we modify the subroutine discussed in Claim 1.3 so that it also returns $k$:
+1.9. Suppose we modify the subroutine discussed in $\textcolor{green}{Claim \ 1.3}$ so that it also returns $k$:
 
 $$
 \def\arraystretch{1.5} 
@@ -347,7 +347,7 @@ $$
 Show that the output of this subroutine is uniformly distributed in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$.
 (b) What security is provided by performing one-time pad encryption twice with the *same key*?
 
-1.11. We mentioned that one-time pad keys can be used to encrypt only one plaintext, and how this was reflected in the eavesdrop subroutine of Claim 1.3. Is there a similar restriction about re-using *plaintexts* in OTP (but with independently random keys for different ciphertexts)? If an eavesdropper *knows* that the same plaintext is encrypted twice (but doesn’t know what the plaintext is), can she learn anything? Does Claim 1.3 have anything to say about a situation where the same plaintext is encrypted more than once?
+1.11. We mentioned that one-time pad keys can be used to encrypt only one plaintext, and how this was reflected in the eavesdrop subroutine of $\textcolor{green}{Claim \ 1.3}$. Is there a similar restriction about re-using *plaintexts* in OTP (but with independently random keys for different ciphertexts)? If an eavesdropper *knows* that the same plaintext is encrypted twice (but doesn’t know what the plaintext is), can she learn anything? Does $\textcolor{green}{Claim \ 1.3}$ have anything to say about a situation where the same plaintext is encrypted more than once?
 
 1.12. There is nothing exclusively special about strings and XOR in OTP. We can get the same properties using integers mod $n$ and addition mod $n$.
 This problem considers a variant of one-time pad, in which the keys, plaintexts, and ciphertexts are all elements of $\mathbb{Z}_n$ instead of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$.

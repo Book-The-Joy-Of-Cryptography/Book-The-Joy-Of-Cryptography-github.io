@@ -1,4 +1,3 @@
-
 # 2. The Basics of Provable Security
 
 Edgar Allan Poe was not only an author, but also a cryptography enthusiast. He once wrote, in a discussion on the state of the art in cryptography:[^10]
@@ -9,7 +8,7 @@ Edgar Allan Poe was not only an author, but also a cryptography enthusiast. He o
 
 This was an accurate assessment of the cryptography that existed in 1841. Whenever someone would come up with an encryption method, someone else would inevitably find a way to break it, and the cat-and-mouse game would repeat again and again.
 
-Modern 21st-century cryptography, however, is different. This book will introduce you to many schemes whose security we can prove in a very specific sense. The codemakers *can* win against the code-breakers.
+Modern 21st-century cryptography, however, is different. This book will introduce you to many schemes whose security we can **prove** in a very specific sense. The code-makers *can* win against the code-breakers.
 
 It’s only possible to *prove* things about security by having *formal definitions* of what it means to be “secure.” This chapter is about the fundamental skills that revolve around security definitions: how to write them, how to understand & interpret them, how to prove security using the *hybrid technique*, and how to demonstrate insecurity using attacks against the security definition.
 
@@ -193,7 +192,7 @@ Is this a better/worse way to define security than the previous way? One securit
 So far, we’ve defined security in terms of a single, self-contained subroutine, and imagined the attacker as a program that calls this subroutine. Later in the course we will need to generalize beyond a single subroutine, to a *collection* of subroutines that share common (private) state information. Staying with the software terminology, we call this collection a **library**:
 
 **Definition 2.3 (Libraries)**
-*A **library** $\mathcal{L}$ is a collection of subroutines and private/static variables. A library’s interface consists of the names, argument types, and output type of all of its subroutines (just like a Java interface). If a program $\mathcal{A}$ includes calls to subroutines in the interface of $\mathcal{L}$, then we write $\mathcal{A} \diamond \mathcal{L}$ to denote the result of **linking** $\mathcal{A}$ to $\mathcal{L}$ in the natural way (answering those subroutine calls using the implementation specified in $\mathcal{L}$). We write $\mathcal{A} \diamond \mathcal{L} \Rightarrow z$ to denote the event that program $\mathcal{A} \diamond \mathcal{L}$ outputs the value $z$.*
+*A **library** $\mathcal{L}$ is a collection of subroutines and private/static variables. A library’s **interface** consists of the names, argument types, and output type of all of its subroutines (just like a Java interface). If a program $\mathcal{A}$ includes calls to subroutines in the interface of $\mathcal{L}$, then we write $\mathcal{A} \diamond \mathcal{L}$ to denote the result of **linking** $\mathcal{A}$ to $\mathcal{L}$ in the natural way (answering those subroutine calls using the implementation specified in $\mathcal{L}$). We write $\mathcal{A} \diamond \mathcal{L} \Rightarrow z$ to denote the event that program $\mathcal{A} \diamond \mathcal{L}$ outputs the value $z$.*
 
 If $\mathcal{A}$ or $\mathcal{L}$ is a program that makes random choices, then the output of $\mathcal{A} \diamond \mathcal{L}$ is a random variable. It is often useful to consider probabilities like Pr[$\mathcal{A} \diamond \mathcal{L} \Rightarrow$ true].
 
@@ -441,7 +440,7 @@ $$
 $$
 
 In other words, if you fill in the specifics of $\Sigma$ (*i.e.*, the behavior of its KeyGen and Enc) into these two library “templates,” and you get two libraries that are interchangeable (*i.e.*, have the same effect on all calling programs), we will say that $\Sigma$ has one-time uniform ciphertexts.
-Throughout this course, we will use the “\$” symbol to denote randomness (as in realvs-random).[^12]
+Throughout this course, we will use the “\$” or $\varPhi$ symbol to denote randomness (as in realvs-random).[^12]
 
 [^12]: It is quite common in CS literature to use the “\$” symbol when referring to randomness. This stems from thinking of randomized algorithms as algorithms that “toss coins.” Hence, randomized algorithms need to have spare change (i.e., money) sitting around. By convention, randomness comes in US dollars.
 
@@ -490,6 +489,8 @@ $$
 $$
 
 Because this property of OTP is quite useful throughout the course, I’ve given these two libraries special names (apart from $\mathcal{L}^{OTP}_{\text{ots}\varPhi-\text{real}}$ and $\mathcal{L}^{OTP}_{\text{ots}\varPhi-\text{rand}}$).
+
+p.s Symbols $\varPhi$ and $ are equivalent throughout this book.
 
 ### Discussion, Pitfalls
 
