@@ -1,46 +1,205 @@
+# 5 Pseudorandom Generators
+One-time pad requires a key that’s as long as the plaintext. Let’s forget that we know about this limitation. Suppose Alice & Bob share only a short $\lambda$-bit secret $k$, but they want to encrypt a 2$\lambda$-bit plaintext $m$. They don’t know that (perfect) one-time secrecy is impossible in this setting (Exercise 2.11), so they try to get it to work anyway using the
+following reasoning:
+
+ - The only encryption scheme they know about is one-time pad, so they decide that the ciphertext will have the form $c = m\ \oplus \colorbox{grey}{??}$ . This means that the unknown value $\colorbox{grey}{??}$ must be 2$\lambda$ bits long.
+ - In order for the security of one-time pad to apply, the unknown value  $\colorbox{grey}{??}$ should be uniformly distributed.
+ - The process of obtaining the unknown value $\colorbox{grey}{??}$ from the shared key $k$ should be *deterministic*, so that the sender and receiver compute the same  value and decryption works correctly.
+
+Let $G$ denote the process that transforms the key $k$ into this mystery value. Then $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$, and the encryption scheme is $\text{Enc}(k,m)=m\oplus\ G(k)$. 
+
+It is not hard to see that if $G$ is a deterministic function, then there are only $2^\lambda$ possible outputs of $G$, so the distribution of $G(k)$ cannot be uniform in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ . We therefore cannot argue that the scheme is secure in the same way as one-time pad.
+
+However, what if the distribution of $G(k)$ values is not perfectly uniform but only “close enough” to uniform? Suppose no polynomial-time algorithm can distinguish the distribution of $G(k)$ values from the uniform distribution. Then surely this ought to be “close enough” to uniform for practical purposes. This is exactly the idea of **pseudorandomness**.
+It turns out that if $G$ has a pseudorandomness property, then the encryption scheme described above is actually secure (against polynomial-time adversaries, in the sense discussed in the previous chapter).
+
+## 5.1 Definitions
+A **pseudorandom generator (PRG)** is a deterministic function $G$ whose outputs are longer than its inputs. When the input to $G$ is chosen uniformly at random, it induces a certain distribution over the possible output. As discussed above, this output distribution cannot be uniform. However, the distribution is *pseudorandom* if it is **indistinguishable from the uniform distribution**. More formally:
+
+**Definition 5.1 (PRG security)** Let  $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ be a deterministic function with $\ell>0$. We say that $G$ is a **secure pseudorandom generator (PRG)** if $\mathcal{L}_{\text{prg-real}}^G\approx \mathcal{L}_{prg-rand}^G$, where:
+
+$$
+\def\arraystretch{1.5}
+\begin{array}{|c|}\hline
+\mathcal{L}_{\text{prg-real}}^G\\
+\underline{\text{QUERY():}}\\
+r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\text{return}\ G(s) \\\hline
+\end{array}
+\quad
+\begin{array}{|c|}\hline
+\mathcal{L}_{\text{prg-rand}}^G\\
+\underline{\text{QUERY():}}\\
+r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}\\
+\text{return}\ r \\\hline
+\end{array}
+$$
+The value $\ell$ is called the **stretch** of the PRG. The input to the PRG is typically called a **seed**.
+
+Below is an illustration of the distributions sampled by these libraries, for a **lengthdoubling** $(\ell=\lambda)$ PRG (not drawn to scale) :
+ 
+$$
+\textcolor{red}{\text{Image screenshot here}}
+$$
+ $\mathcal{L}_{\text{prg-real}}$ samples from distribution of red dots, by first sampling a uniform element of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ and performing the action of $G$ on that value to get a red result in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$. The other library  $\mathcal{L}_{\text{prg-rand}}$ directly samples the uniform distribution on $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ (in green above). 
+
+To understand PRGs, you must simultaneously appreciate two ways to compare the PRG’s output distribution with the uniform distribution:
+
+ - From a relative perspective, the PRG’s output distribution is tiny. Out of the $2^{2\lambda}$ strings in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$, only $2^\lambda$ are possible outputs of $G$. These strings make up a $2^\lambda/2^{2\lambda}=1/2^\lambda$ fraction of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$, only $2^\lambda$-a **negligible fraction!**
+ - From an *absolute* perspective, the PRG’s output distribution is huge. There are $2^\lambda$ possible outputs of $G$, which is an **exponential amount!**
+
+The illustration above only captures the *relative* perspective (comparing the red dots to the entire extent of  $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$,  so it can lead to some misunderstanding. Just looking at this picture, it is hard to imagine how the two distributions could be indistinguishable. How could a calling program *not* notice whether it’s seeing the whole set or just a negligible fraction of the whole set? Well, if you run in polynomial-time in $\lambda$, the $2\lambda$ and $2^{2\lambda}$ are both so enormous that it doesn’t really matter that one is vastly bigger than the other. The relative *sizes* of the distribution don’t really help distinguish, since it is not a viable strategy for the distinguisher to “measure” the size of the distribution it’s sampling.
+
+Consider: there are about $2^{75}$ molecules in a teaspoon of water, and about $2^{2.75}$ molecules of water in Earth’s oceans. Suppose you dump a teaspoon of water into the ocean and let things mix for a few thousand years. Even though the teaspoon accounts for only $1/2^{75}$ of the ocean’s contents, that doesn’t make it easy to keep track of all $2^{75}$ water molecules that originated in the teaspoon! If you are small enough to see individual water molecules, then a teaspoon of water looks as big as the ocean.
+
+### Discussion & Pitfalls
+
+ - Do not confuse the interface of a PRG (it takes in a seed as input) with the interface of the security libraries $\mathcal{L}_{\text{prg}-\star}$ (their QUERRY subroutine doesn’t take any input)! A PRG is indeed an algorithm into which you can feed any string you like. However, **security is only guaranteed** when the PRG is being used exactly as described in the security libraries — in particular, when the seed is chosen uniformly/secretly and not used for anything else.
+ Nothing prevents a user from putting an adversarially-chosen s into a PRG, or revealing a PRG seed to an adversary, etc. You just get no security guarantee from doing it, since it’s not the situation reflected in the PRG security libraries.
+ 
+ - It doesn’t really make sense to say that "$\textcolor{brown}{0010110110}$ is a random string” or "$\textcolor{brown}{0000000001}$ is a pseudorandom string.”  Randomness and pseudorandomness are **properties of the process used to generate a string**, not properties of the individual strings themselves. When we have a value $z=G(s)$ where $G$ is a PRG and $s$ is chosen uniformly, you could say that $z$ was “chosen pseudorandomly.” You could say that the output of some process is a “pseudorandom distribution.” But it is slightly sloppy (although common) to say that a string $z$ “is pseudorandom”.
+ - There are common statistical tests you can run, which check whether some data has various properties that you would expect from a uniform distribution. For example, are there roughly an equal number of $\textcolor{brown}{0}$s and $\textcolor{brown}{1}$s? Does the substring $\textcolor{brown}{01010}$ occur with roughly the frequency I would expect? If I interpret the string as a series of points in the unit square$[0,1)^2$, is it true that roughly $\pi/4$ of them are within
+Euclidean distance 1 of the origin?
+The definition of pseudorandomness is kind of a “master” definition that encompasses all of these statistical tests and more. After all, what is a statistical test, but a polynomial-time procedure that obtains samples from a distribution and outputs a yes/no decision? Pseudorandomness means that every statistical test that “passes” uniform data will also “pass” pseudorandomly generated data.
 
 
+## 5.2 Pseudorandom Generators in Practice
+
+You are probably expecting to nowsee at least one example of a secure PRG. Unfortunately, things are not so simple. We have no examples of secure PRGs! If it were possible to prove that some function $G$ is a secure PRG, **it would resolve the famous P vs NP problem** —the most famous unsolved problem in computer science (and arguably, all of mathematics).
+
+The next best thing that cryptographic research can offer are **candidate PRGs,** which are *conjectured* to be secure. The best examples of such PRGs are the ones that have been subjected to significant public scrutiny and resisted all attempts at attacks so far.
+
+In fact, the entire rest of this book is based on cryptography that is only conjectured to be secure. How is this possible, given the book’s stated focus on *provable* security? As you progress through the book, pay attention to how all of the provable security claims are *conditional* — if $X$ is secure then $Y$ is secure. You will be able to trace back through this web of implications and discover that there are only a small number of underlying cryptographic primitives whose security is merely *conjectured* (PRGs are one example of such a primitive). Everything else builds on these primitives in a provably secure way.
+
+With that disclaimer out of the way, surely *now* you can be shown an example of a conjectured secure PRG, right? There are indeed some conjectured PRGs that are simple enough to show you at this point, but you won’t find them in the book. The problem is that none of these PRG candidates are really used in practice. When you really need a PRG in
+practice, you would actually use a PRG that is built from something called a block cipher (which we won’t see until Chapter 6). A block cipher is *conceptually* more complicated than a PRG, and can even be built from a PRG (in principle). That explains why this book starts with PRGs. In practice, a block cipher is just a more useful object, so that is what you would find easily available (even implemented with specialized CPU instructions in
+most CPUs). When we introduce block ciphers (and pseudorandom functions), we will discuss how they can be used to construct PRGs.
+
+## How NOT to Build a PRG
+
+We can appreciate the challenges involved in building a PRG “from scratch” by first looking at an obvious idea for a PRG and understanding why it’s insecure.
+
+**Example**
+*Let’s focus on the case of a length-doubling PRG. It should take in $\lambda$ bits and output $2\lambda$ bits. The output should look random when the input is sampled uniformly. A natural idea is for the candidate PRG to simply repeat the input twice. After all, if the input s is random, then $s||s$ is also random, too, right?*
+$$
+\def\arraystretch{1.5}
+\begin{array}{|l|}\hline
+\underline{G(s):}\\
+\text{return}\ s||s\\\hline
+\end{array}
+$$
+*To understand why this PRG is insecure, first let me ask you whether the following strings look like they were sampled uniformly from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^8$:*
+
+$$\textcolor{brown}{11011101},\textcolor{brown}{01010101},\textcolor{brown}{01110111},\textcolor{brown}{01000100},\ldots$$
+Do you see any patterns? Every string has its first half equal to its second half. That is a conspicuous pattern because it is relatively rare for a uniformly chosen string to have this property.
+
+*Of course, this is exactly what is wrong with this simplistic PRG $G$ defined above. Every output of $G$ has equal first/second halves. But it is rare for uniformly sampled strings to have this property. We can formalize this observation as an attack against the PRG-security of $G$:*
+
+$$
+\def\arraystretch{1.5}
+\begin{array}{|c|}\hline
+\mathcal{A}\\
+x||y:=\text{QUERRY()}\\
+\text{return}\ x\stackrel{?}{=} y\\\hline
+\end{array}
+$$
+
+*The first line means to obtain the result of query and set its first half to be the string $x$ and its second half to be $y$. This calling program simply checks whether the output of query has equal halves.*
+
+*To complete the attack, we must show that this calling program has non-negligible bias distinguishing the $\mathcal{L}_{\text{prg}-\star}$ libraries.*
+
+ - *When linked to $\mathcal{L}_{\text{prg-real}}$, the calling program receives outputs of $G$, which always have matching first/second halves. So $\text{Pr}[\mathcal{A}\diamond\mathcal{L}_{\text{prg-real}}^G\Rightarrow 1]=1$. Below we have filled in  $\mathcal{L}_{\text{prg-real}}$ with the details of our $G$ algorithm:*
+$$
+\def\arraystretch{1.5}
+\begin{array}{|c|}\hline
+\mathcal{A}\\
+x||y:=\text{QUERRY()}\\
+\text{return}\ x\stackrel{?}{=} y\\\hline
+\end{array}
+\diamond
+\begin{array}{|c|}\hline
+\mathcal{L}_{\text{prg-real}}^G\\
+\underline{\text{QUERRY():}}\\
+s\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\text{return}\  s||s \\\hline
+\end{array}
+$$
+ 
+ - *When linked to $\mathcal{L}_{\text{prg-rand}}$, the calling program receives uniform samples from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$*.
+$$
+\def\arraystretch{1.5}
+\begin{array}{|c|}\hline
+\mathcal{A}\\
+x||y:=\text{QUERRY()}\\
+\text{return}\ x\stackrel{?}{=} y\\\hline
+\end{array}
+\diamond
+\begin{array}{|c|}\hline
+\mathcal{L}_{\text{prg-rand}}^G\\
+\underline{\text{QUERRY():}}\\
+r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
+\text{return}\  r \\\hline
+\end{array}
+$$
+
+*$\mathcal{A}$ outputs 1 whenever we sample a string from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ with equal first/second halves. What exactly is the probability of this happening? There are several ways to see that the probability is $1/2^\lambda$ (this is like asking the probability of rolling doubles with two dice, but each die has $2^\lambda$ sides instead of 6). Therefore, $\text{Pr}[\mathcal{A}\diamond\mathcal{L}_{\text{prg-rand}}^G \Rightarrow 1]=1/2^\lambda$.*
+
+The advantage of this adversary is $1-1/2^\lambda$ which is certainly non-negligible — it does not even approach $0$ as $\lambda$ grows. This shows that $G$ is not a secure PRG. This example illustrates how randomness/ pseudorandomness is a property of the *entire process*, not of individual strings. If you take a string of $\textcolor{brown}{1}$s and concatenate it with another string of $\textcolor{brown}{1}$s, you get a long string of $\textcolor{brown}{1}$s. “Containing only $\textcolor{brown}{1}$s" is a property of individual strings. If you take a “random string” and concatenate it with another “random string,” you might not get a “random long string.” Being random is not a property of an  individual string, but of the entire process that generates it.
+
+Outputs from this $G$ have equal first/second halves, which is an obvious pattern. The challenge of desiging a secure PRG is that its outputs must have *no discernable* pattern! Any pattern will lead to an attack similar to the one shown above.
+
+### Related Concept: Random Number Generation
+The security of a PRG requires the seed to be chosen uniformly. In practice, the seed has to come from somewhere. Generally a source of “randomness” is provided by the hardware or operating system, and the process that generates these random bits is (confusingly) called a random *number* generator (RNG).
+
+In this course we won’t cover low-level random *number* generation, but merely point out what makes it different than the PRGs that we study:
+
+ - The job of a PRG is to take a small amount of “ideal” (in other words, uniform) randomness and extend it.
+ - By contrast, an RNG usually takes many inputs over time and maintains an internal state. These inputs are often from physical/hardware sources. While these inputs are “noisy” in some sense, it is hard to imagine that they would be statistically *uniform*. So the job of the RNG is to “refine” (sometimes many) sources of noisy data into uniform outputs.
 ## 5.3 Application: Shorter Keys in One-Time-Secret Encryption
 
-We revisit the motivating example from the beginning of this chapter. Alice & Bob share only a $\lambda$-bit key but want to encrypt a message of length $\lambda + \ell$. The main idea is to expand the key $k$ into a longer string using a PRG $G$, and use the result as a one-time pad on the (longer) plaintext. More precisely, let $G : \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ be a PRG, and define the following encryption scheme:
+We revisit the motivating example from the beginning of this chapter. Alice & Bob share only a $\lambda$-bit key but want to encrypt a message of length $\lambda+\ell$. The main idea is to expand the key $k$ into a longer string using a PRG $G$, and use the result as a one-time pad on the (longer) plaintext. More precisely, let $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ be a PRG, and define the following encryption scheme:
 
 **Construction 5.2 (Pseudo-OTP)**
 $$
 \def\arraystretch{1.5}
-\begin{array}{|llll|}\hline
-\ \ \mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda & \underline{\text{KeyGen:}} & \underline{\text{Enc}(k,m):} & \underline{\text{Dec}(k,c):}\\
-\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell} &\quad  k\leftarrow \mathcal{K} & \quad \text{return}G(k)\oplus m & \quad\text{return}G(k)\oplus c\\
-\ \ \mathcal{C}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}  & \quad \text{return}\ k\\\hline
+\begin{array}{|cccc|}\hline
+\mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda & \underline{\text{KeyGen:}} & \underline{\text{Enc}(k,m):} &\underline{\text{Dec}(k,c):}\\
+\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell} & k\leftarrow \mathcal{K} & \text{return}\ G(k)\ \oplus\ m &  \text{return}\ G(k)\ \oplus\ c\\
+\mathcal{C}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell} & \text{return}\ k\\\hline
 \end{array}
 $$
 The resulting scheme will not have (perfect) one-time secrecy. That is, encryptions of $m_L$ and $m_R$ will not be identically distributed in general. However, the distributions will be *indistinguishable* if $G$ is a secure PRG. The precise flavor of security obtained by this construction is the following.
 
 **Definition 5.3**
-Let $\Sigma$ be an encryption scheme, and let $\mathcal{L}_{\text{ots-L}}^{\Sigma}$ and $\mathcal{L}_{\text{ots-R}}^{\Sigma}$ be defined as in Definition 2.6 (and repeated below for convenience). Then $\Sigma$ has **(computational) one-time secrecy if** $\mathcal{L}_{\text{ots-L}}^{\Sigma}\approx \mathcal{L}_{\text{ots-R}}^{\Sigma}$.  That is, if for all polynomial-time distinguishers $\mathcal{A}$, we have $\text{Pr}[\mathcal{A}\diamond \mathcal{L}_{\text{ots-L}}^\Sigma\Rightarrow 1]\approx[\mathcal{A}\diamond \mathcal{L}_{\text{ots-R}}^\Sigma\Rightarrow 1]$.
-**Construction 5.2 (Pseudo-OTP)**
+Let $\Sigma$ be an encryption scheme, and let $\mathcal{L}_{\text{ots-L}}^\Sigma$ and $\mathcal{L}_{\text{ots-R}}^\Sigma$ be defined as in Definition 2.6 (and repeated below for convenience). Then $\Sigma$ has **(computational) one-time secrecy if** $\mathcal{L}_{\text{ots-L}}^\Sigma\approx\mathcal{L}_{\text{ots-R}}^\Sigma$. That is, if for all polynomial-time distinguishers $\mathcal{A}$, we have $\text{Pr}[\mathcal{A}\diamond\mathcal{L}_{\text{ots-L}}^{\Sigma}\Rightarrow 1]\approx\text{Pr}[\mathcal{A}\diamond\mathcal{L}_{\text{ots-R}}^{\Sigma}\Rightarrow 1]$
+
 $$
 \def\arraystretch{1.5}
-\begin{array}{|l|}\hline
-\qquad \qquad \quad \mathcal{L}_{\text{ots-L}}^\Sigma\\\hline
-\underline{\text{EAVESDROP}(m_L,m_R\in\Sigma.\mathcal{M}}\\
-\quad  k\leftarrow \Sigma.\text{KeyGen}\\
-\quad c\leftarrow \Sigma.\text{Enc}(k,m_L)\\
-\quad \text{return}\ c\\\hline
-\end{array}\quad\begin{array}{|l|}\hline
-\qquad \qquad \quad \mathcal{L}_{\text{ots-R}}^\Sigma\\\hline
-\underline{\text{EAVESDROP}(m_L,m_R\in\Sigma.\mathcal{M}}\\
-\quad  k\leftarrow \Sigma.\text{KeyGen}\\
-\quad c\leftarrow \Sigma.\text{Enc}(k,m_R)\\
-\quad \text{return}\ c\\\hline
+\begin{array}{|c|}\hline
+\mathcal{L}_{\text{ots-L}}^{\Sigma}\\
+\underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
+k\leftarrow \Sigma.\text{KeyGen}\\
+c\leftarrow \Sigma.\text{Enc}(k,m_L)\\
+\text{return}\ c\\\hline
+\end{array}
+\quad
+\begin{array}{|c|}\hline
+\mathcal{L}_{\text{ots-R}}^{\Sigma}\\
+\underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
+k\leftarrow \Sigma.\text{KeyGen}\\
+c\leftarrow \Sigma.\text{Enc}(k,m_R)\\
+\text{return}\ c\\\hline
 \end{array}
 $$
-This is essentially the same as Definition 2.6, except we are using $\approx$ (in distinguishability) instead of $\equiv$ (interchangeability).
+
+This is essentially the same as Definition 2.6, except we are using $\approx$ (indistinguishability) instead of $\equiv$ (interchangeability).
 
 **Claim 5.4**
-Let pOTP denote Construction 5.2. If pOTP is instantiated using a secure PRG G then pOTP has computational one-time secrecy.
+*Let pOTP denote Construction 5.2. If pOTP is instantiated using a secure PRG $G$ then pOTP has computational one-time secrecy.*
 
 **Proof**
-We must show that $\mathcal{L}_{\text{ots-L}}^{\text{pOTP}}\approx\mathcal{L}_{\text{ots-R}}^{\text{pOTP}}$. As usual, we will proceed using a sequence of hybrids that begins at $\mathcal{L}_{\text{ots-L}}^{\text{pOTP}}$ and ends at $\mathcal{L}_{\text{ots-R}}^{\text{pOTP}}$. For each hybrid library, we will demonstrate that it is indistinguishable from the previous one. Note that we are allowed to use the fact that G is a secure PRG. In practical terms, this means that if we can express some hybrid library in terms of $\mathcal{L}_{\text{prg-real}}^{G}$ (one of the libraries in the PRG security definition), we can replace it with its counterpart $\mathcal{L}_{\text{prg-rand}}^{G}$(or vice-versa). The PRG security of G says that such a change will be indistinguishable.
+We must show that $\mathcal{L}_{\text{ots-L}}^{\text{pOTP}}\approx\mathcal{L}_{\text{ots-R}}^{\text{pOTP}}$. As usual, we will proceed using a sequence of hybrids that begins at $\mathcal{L}_{\text{ots-L}}^{\text{pOTP}}$ and ends at $\mathcal{L}_{\text{ots-R}}^{\text{pOTP}}$. For each hybrid library, we will demonstrate that it is indistinguishable from the previous one. Note that we are allowed to use the fact that $G$ is a secure PRG. In practical terms, this means that if we can express some hybrid library in terms of  $\mathcal{L}_{\text{prg-real}}^{G}$ (one of the libraries in the PRG security definition), we can replace it with its counterpart $\mathcal{L}_{\text{prg-rand}}^{G}$ (or vice-versa). The PRG security of $G$ says that such a change will be indistinguishable.
+
 
 $$
 \mathcal{L}_{\text{ots-L}}^{\text{pOTP}}:\ \def\arraystretch{1.5}

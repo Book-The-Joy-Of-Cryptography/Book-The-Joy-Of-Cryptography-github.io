@@ -1,3 +1,4 @@
+
 # 2. The Basics of Provable Security
 
 Edgar Allan Poe was not only an author, but also a cryptography enthusiast. He once wrote, in a discussion on the state of the art in cryptography:[^10]
@@ -459,9 +460,10 @@ $$
 \quad \text {return } c \\ \hline
 \end{array} \equiv
 \begin{array}{|l|} \hline
-\qquad\qquad\qquad\mathcal{L}_{\text {ots-L }}^{\Sigma}\\ \hline
+\qquad\qquad\qquad\mathcal{L}_{\text {ots-R }}^{\Sigma}\\ \hline
 \underline{\operatorname{EAVESDROP}\left(m_L, m_R \in \sum . \mathcal{M}\right):}\\
-\quad c \leftarrow \Sigma . \mathcal{C} \\
+\quad k \leftarrow \Sigma . \text { KeyGen } \\
+\quad c \leftarrow \Sigma . \operatorname{Enc}(k, m_R) \\
 \quad \text {return } c \\ \hline
 \end{array}
 $$
