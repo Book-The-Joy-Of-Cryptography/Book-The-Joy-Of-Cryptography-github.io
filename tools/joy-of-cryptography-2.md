@@ -441,7 +441,7 @@ $$
 $$
 
 In other words, if you fill in the specifics of $\Sigma$ (*i.e.*, the behavior of its KeyGen and Enc) into these two library “templates,” and you get two libraries that are interchangeable (*i.e.*, have the same effect on all calling programs), we will say that $\Sigma$ has one-time uniform ciphertexts.
-Throughout this course, we will use the “\$” or $\varPhi$ symbol to denote randomness (as in realvs-random).[^12]
+Throughout this course, we will use the “\$” or $\varPhi$ symbol to denote randomness (as in real-vs-random).[^12]
 
 [^12]: It is quite common in CS literature to use the “\$” symbol when referring to randomness. This stems from thinking of randomized algorithms as algorithms that “toss coins.” Hence, randomized algorithms need to have spare change (i.e., money) sitting around. By convention, randomness comes in US dollars.
 
@@ -541,7 +541,7 @@ $$
 I haven’t shown the Dec algorithm, because in fact there is no way to write one that satisfies the correctness requirement. But let’s pretend we haven’t noticed that yet, and ask whether this encryption scheme satisfies the two security properties defined previously.
 
 **Claim 2.9**
- *Construction 2.8 does **not** have one-time uniform ciphertexts (Denition 2.5).*
+ *Construction 2.8 does **not** have one-time uniform ciphertexts (Definition 2.5).*
 
 **Proof**
 To see whether Construction 2.8 satisfies uniform one-time ciphertexts, we have to plug in its algorithms into the two libraries of Definition 2.5 and see whether the resulting libraries are interchangeable. We’re considering the following two libraries:
@@ -620,7 +620,7 @@ $$
 
 When $\mathcal{A}$ is linked to $\mathcal{L}_{\text {ots}\varPhi\text{-rand }},\ c$ is chosen uniformly from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}$. The probability that $c$ then happens to be all-zeroes is $1/2^{\lambda}$.
 
-In other words, P[$\mathcal{A} \diamond \mathcal{L}_{\text {ots}\varPhi\text{-real }} \Rightarrow$ true] $= 1/2^{\lambda}$.
+In other words, P[$\mathcal{A} \diamond \mathcal{L}_{\text {ots}\varPhi\text{-rand }} \Rightarrow$ true] $= 1/2^{\lambda}$.
 
 Since these two probabilities are different, this shows that $\mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-real }}  \neq \mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-rand }}$. In other words, the scheme does not satisfy this uniform ciphertexts property.
 
@@ -974,13 +974,6 @@ $$
 \quad \operatorname{return } c_2 \\ \hline
 \end{array}
 }_{\mathcal{L}_{\text{hyb-3}}}
-\quad \equiv \quad
-\begin{array}{|l|} \hline
-\qquad\mathcal{L}^{\Sigma}_{\text {otp-rand}}\\ \hline
-\underline{\mathrm{CTXT}\left(m\right):} \\
-\quad c_2 \leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}  \\
-\quad \operatorname{return } c_2 \\ \hline
-\end{array}
 $$
 
 The only difference between these two libraries is that a subroutine call has been inlined. This difference has no effect on the calling program.
@@ -997,7 +990,7 @@ $$
 }_{\mathcal{L}_{\text{hyb-3}}}
 \quad \equiv \quad
 \begin{array}{|l|} \hline
-\qquad\mathcal{L}^{\Sigma}_{\text {otp-rand}}\\ \hline
+\qquad\mathcal{L}^{\Sigma}_{\text {otp}\varPhi\text{-rand}}\\ \hline
 \underline{\mathrm{CTXT}\left(m\right):} \\
 \quad c_2 \leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}  \\
 \quad \operatorname{return } c_2 \\ \hline
@@ -1006,7 +999,7 @@ $$
 
 The only difference between these two libraries is that the two highlighted lines have been removed. But it should be clear that these lines have no effect: $k_1$ is used only to compute $c_1$, which is never used again. Hence, this difference has no effect on the calling program.
 
-The final hybrid is exactly $\mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-rand}}$ (although with a variable name changed). We have shown that $\mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-rand}} \equiv \mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-rreal}}$, meaning that this encryption scheme has one-time uniform ciphertexts.
+The final hybrid is exactly $\mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-rand}}$ (although with a variable name changed). We have shown that $\mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-rand}} \equiv \mathcal{L}^{\Sigma}_{\text {ots}\varPhi\text{-real}}$, meaning that this encryption scheme has one-time uniform ciphertexts.
 
 
 ### Summary of the Hybrid Technique
