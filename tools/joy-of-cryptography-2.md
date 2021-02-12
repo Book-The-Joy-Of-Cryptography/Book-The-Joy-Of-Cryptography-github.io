@@ -1259,7 +1259,7 @@ $$
 
 This scheme is just OTP with the bits $\textcolor{brown}{00}$ added to every ciphertext. The following facts about the scheme should be believable (and the exercises encourage you to prove them formally if you would like more practice at that sort of thing):
 
- - This scheme satisfies one-time one-time secrecy, meaning that encryptions of $m_L$ are distributed identically to encryptions of $m_R$, for any $m_L$ and $m_R$ of the attacker’s choice. We can characterize the ciphertext distribution in both cases as “$\lambda$ uniform bits followed by $\textcolor{brown}{00}$.” Think about how you might use the hybrid proof technique to formally prove that this scheme satisfies one-time secrecy!
+ - This scheme satisfies one-time secrecy, meaning that encryptions of $m_L$ are distributed identically to encryptions of $m_R$, for any $m_L$ and $m_R$ of the attacker’s choice. We can characterize the ciphertext distribution in both cases as “$\lambda$ uniform bits followed by $\textcolor{brown}{00}$.” Think about how you might use the hybrid proof technique to formally prove that this scheme satisfies one-time secrecy!
  - This scheme does not satisfy the one-time uniform ciphertexts property. Its ciphertexts always end with $\textcolor{brown}{00}$, whereas uniform strings end with $\textcolor{brown}{00}$ with probability 1/4. Think about how you might formallize this observation as a calling program /distinguisher for the relevant two libraries!
 
 You might be thinking, surely this can be fixed by redefining the ciphertext space as $\mathcal{C}$ as the set of $\lambda + 2$-bit strings whose last two bits are $\textcolor{brown}{00}$. This is a clever idea, and indeed it would work. If we change the definition of the ciphertext space $\mathcal{C}$ following this suggestion, then the scheme would satisfy the uniform ciphertexts property (this is because the $\mathcal{L}_{\text{ots}\varPhi\text{-rand}}$ library samples uniformly from whatever $\mathcal{C}$ is specified as part of the encryption scheme).
@@ -1531,9 +1531,9 @@ $$
 
 Show that even with this modification the scheme does not have one-time secrecy.
 
-$\star$ 2.11. Prove that if an encryption scheme $\Sigma$ has $|\Sigma.\mathcal{K}| < |\Sigma.\mathcal{M}|$ then it cannot satisfy onetime secrecy. Try to structure your proof as an explicit attack on such a scheme (*i.e.,* a distinguisher against the appropriate libraries).
+$\star$ 2.11. Prove that if an encryption scheme $\Sigma$ has $|\Sigma.\mathcal{K}| < |\Sigma.\mathcal{M}|$ then it cannot satisfy one-time secrecy. Try to structure your proof as an explicit attack on such a scheme (*i.e.,* a distinguisher against the appropriate libraries).
 
-The Enc algorithm of one-time pad is deterministic, but our definitions of encryption allow Enc to be randomized (*i.e.,* it may give different outputs when called twice with the same $k$ and $m$). For full credit, you should prove the statement even for the case of Enc is randomized. However, you may assume that Dec is deterministic.
+The Enc algorithm of one-time pad is deterministic, but our definitions of encryption allow Enc to be randomized (*i.e.,* it may give different outputs when called twice with the same $k$ and $m$). **For full credit**, you should prove the statement even for the case of Enc is randomized. However, you may assume that Dec is deterministic.
 
 **Hint:**
 The definition of interchangeability does not place any restriction on the running time of the distinguisher/calling program. Even an exhaustive brute-force attack would be valid.
