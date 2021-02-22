@@ -578,7 +578,7 @@ The proof is by induction on the value $d +1-k$. The base case is when $d+1-k=0$
 
 For the inductive case, we have $l\leqslant d$ points in $\mathcal{P}$. Let $x^*\in \mathbb{Z}_p$ be a value that does not appear as one of the $x_i$’s. Every polynomial must give some value when evaluated at $x^*$. So,
 
-[# of degree-d polynomials passing through points in P]
+[# of degree-$d$ polynomials passing through points in $\mathcal{P}$]
 $$
 \begin{aligned}
 &=\sum_{y^{*} \in Z_{p}}\left[\# \text { of degree- } d \text { polynomials passing through points in } \mathcal{P} \cup\left\{\left(x^{*}, y^{*}\right)\right\}\right]\\
@@ -586,7 +586,7 @@ $$
 &=p \cdot\left(p^{d+1-k-1}\right)=p^{d+1-k}
 \end{aligned}
 $$
-The equality marked ($\star$) follows from the inductive hypothesis, since each of the terms involves a polynomial passing through a specified set of $k + 1$ points with distinct $x$ coordinates.
+The equality marked ($\star$) follows from the inductive hypothesis, since each of the terms involves a polynomial passing through a specified set of $k + 1$ points with distinct $x$-coordinates. $\blacksquare$
 
 **Example**
 $$
@@ -644,9 +644,9 @@ Correctness follows from the interpolation theorem.
 
 **Example**
 *Here is an example of 3-out-of-5 secret sharing over $\mathbb{Z}_{11}$ (so $p = 11$). Suppose the secret being shared is $m=7 \in \mathbb{Z}_{11}$. The Share algorithm chooses a random degree-2 polynomial with
-constant coecient 7.*
+constant coefficient 7.*
 
-*Let’s say that the remaining two coecients are chosen as $f_2 = 1$ and $f_1 = 4$, resulting in the following polynomial:*
+*Let’s say that the remaining two coefficients are chosen as $f_2 = 1$ and $f_1 = 4$, resulting in the following polynomial:*
 
 $$f(x)=1x^2+4x+7$$
 
@@ -668,7 +668,7 @@ $$
 5 & f(5)=52 & (5,8)
 \end{array}
 $$
-*Remember that this example illustrates just one possible execution of Share. Because Share is a randomized algorithm, there are many valid sharings of the same secret (induced by dierent choices of the highlighted coecients in $f$ ).*
+*Remember that this example illustrates just one possible execution of Share. Because Share is a randomized algorithm, there are many valid sharings of the same secret (induced by different choices of the highlighted coefficients in $f$ ).*
 
 ### Security
 To show the security of Shamir secret sharing, we first show a convenient lemma about the distribution of shares in an unauthorized set:
@@ -679,7 +679,7 @@ Let $p$ be a prime and define the following two libraries:
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline 
-\qquad \qquad\mathcal{L}_{\text{hamir-real}}\\\hline
+\qquad \qquad\mathcal{L}_{\text{shamir-real}}\\\hline
 \underline{\text{POLY}(m,t,U\subseteq \{1,\ldots, p\}):}\\
 \quad\text{if}\ |U|\geqslant t:\text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad f_1,\ldots,f_{t-1}\leftarrow \mathbb{Z}_p\\
@@ -688,7 +688,7 @@ $$
 \quad\quad s_i:=(i,f(i)\% p)\\
 \quad\text{return}\{s_i\ | i\in U\}  \\\hline
 \end{array}\quad\ \begin{array}{|l|} \hline
-\qquad \qquad\mathcal{L}_{\text{hamir-rand}}\\\hline
+\qquad \qquad\mathcal{L}_{\text{shamir-rand}}\\\hline
 \underline{\text{POLY}(m,t,U\subseteq \{1,\ldots, p\}):}\\
 \quad\text{if}\ |U|\geqslant t: \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad\text{for}\ i\in U:\\
@@ -703,23 +703,23 @@ $$
 *The claim is that these libraries are interchangeable: $\mathcal{L}_{\text{shamir-real}}\equiv$$\mathcal{L}_{\text{shamir-rand}}$.*
 
 **Proof**
-Fix a message $m\in \mathbb{Z}_p$, fix set $U$ of users with $|U|<t, and for each $i\in U$ fix a value $y_i\in \mathbb{Z}_p$. We wish to consider the probability that a call to $\text{POLY}(m,t,U)$ outputs $\{(i,y_i)|i\in U\}$ in each of the two libraries.[^3-2]
+Fix a message $m\in \mathbb{Z}_p$, fix set $U$ of users with |U|<t, and for each $i\in U$ fix a value $y_i\in \mathbb{Z}_p$. We wish to consider the probability that a call to $\text{POLY}(m,t,U)$ outputs $\{(i,y_i)|i\in U\}$ in each of the two libraries.[^3-2]
 [^3-2]: This is similar to how, in Claim 2.7, we fixed a particular m and c and computed the probability that EAVESDROP $(m)=c$
 
 In library $\mathcal{L}_{\text{shamir-real}}$, the subroutine chooses a random degree-$(t-1)$ polynomial $f$ such that $f(0)\equiv_p m$. From Corollary 3.10, we know there are $p^{t-1}$ such polynomials.
 In order for POLY to output points consistent with our chosen $y_i$'s the library must have chosen one of the polynomials that passes through $(0,m)$ and all of the $\{(i,y_i)\ | i\in U\}$ points. The library must have chosen one of the polynomials that passes through a specific choice of $|U|+1$ points, and Corollary 3.10 tells us that there are $p^{t-(|U|+1)}$ such polynomials.
 
-The only way for poly to give our desired output is for it to choose one of the $p^{t-(|U|+1)}$ “good” polynomials, out of the $p^{t-1}$ possibilities.  This happens with probability exactly 
+The only way for POLY to give our desired output is for it to choose one of the $p^{t-(|U|+1)}$ “good” polynomials, out of the $p^{t-1}$ possibilities.  This happens with probability exactly 
 
 $$
 \frac{p^{t-|U|-1}}{p^{t-1}}=p^{-|U|}
 $$
 Now, in library $\mathcal{L}_{\text{shamir-rand}}$, POLY chooses its $|U|$ output values uniformly in $\mathbb{Z}_p$. There are $p^{|U|}$ ways to choose them. But only one of those ways causes POLY$(m,t,U)$ to output our specific choice of $\{(i,y_i)|i\in U\}$.  Hence, the probability of receiving this output is $p^{-|U|}$.
 
-For all possible inputs to POLY, both libraries assign the same probability to every possible output. Hence, the libraries are interchangeable.
+For all possible inputs to POLY, both libraries assign the same probability to every possible output. Hence, the libraries are interchangeable. $\blacksquare$
 
 **Theorem 3.13**
-Shamir’s secret-sharing scheme (Construction 3.11) is secure according to Denition 3.3.
+Shamir’s secret-sharing scheme (Construction 3.11) is secure according to Definition 3.3.
 
 **Proof**
 Let $\mathcal{S}$ denote the Shamir secret-sharing scheme. We prove that $\mathcal{L}_{tsss-L}^\mathcal{S}\equiv$$\mathcal{L}_{tsss-R}^\mathcal{S}$ via a hybrid argument.
@@ -732,7 +732,7 @@ $$
 \underline{\text{SHARE}(m_L, m_R ,U):}\\
 \quad\text{if}\ |U| \geqslant t: \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad f_1,\ldots,f_{t-1}\leftarrow \mathbb{Z}_p\\
-\quad f(x):=m_L+\sum_{j=1}^{t-1}f_jx^j\\
+\quad f(\boldsymbol{x}):=m_L+\sum_{j=1}^{t-1}f_j\boldsymbol{x}^j\\
 \quad \text{for}\ i\in U:\\
 \quad\quad s_i:=(i,f(i)\%p)\\
 \quad\text{return}\ \{s_i|i\in U\}\\\hline
@@ -752,13 +752,13 @@ $$
 \underline{\text{POLY}(m, t ,U):}\\
 \quad\text{if}\ |U|\geqslant t: \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad f_1,\ldots,f_{t-1}\leftarrow \mathbb{Z}_p\\
-\quad f(x):=m+\sum_{j=1}^{t-1}f_jx^j\\
+\quad f(\boldsymbol{x}):=m+\sum_{j=1}^{t-1}f_j\boldsymbol{x}^j\\
 \quad\text{for}\ i\in U:\\
 \quad\quad s_i:=(i,f(i)\%p)\\
 \quad\text{return}\ \{s_i|i\in U\}\\\hline
 \end{array} \quad \begin{array}{l}
 \text{Almost the entire body of }\\
-\text{the share subroutine has}\\
+\text{the SHARE subroutine has}\\
 \text{been factored out in terms}\\
 \text{of the $\mathcal{L}_{shamir-real}$ library}\\
 \text{defined above. The only thing}\\
@@ -773,7 +773,7 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline 
 \underline{\text{SHARE}(m_L, m_R ,U):}\\
-\quad\text{return \colorbox{yellow}{POLY}}(m_L,t,U)\\\hline
+\quad\text{return POLY}(m_L,t,U)\\\hline
 \end{array}\diamond\ \begin{array}{|l|} \hline 
 \quad \quad\mathcal{L}_{shamir-rand}\\\hline
 \underline{\text{POLY}(m, t ,U):}\\
@@ -793,7 +793,7 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline 
 \underline{\text{SHARE}(m_L, m_R ,U):}\\
-\quad\text{return \colorbox{yellow}{POLY}}(m_R,t,U)\\\hline
+\quad\text{return POLY}(m_R,t,U)\\\hline
 \end{array}\diamond\ \begin{array}{|l|} \hline 
 \quad\quad\mathcal{L}_{shamir-rand}\\\hline
 \underline{\text{POLY}(m, t ,U):}\\
@@ -806,7 +806,7 @@ $$
 \text{The argument to poly has }\\
 \text{been changed from $m_L$ to $m_R$.}\\
 \text{This has no effect on the library’s}\\
-\text{behavior, since poly is actually}\\
+\text{behavior, since POLY is actually}\\
 \text{ignoring its argument in these}\\
 \text{hybrids.}
 \end{array}$$
@@ -821,7 +821,7 @@ $$
 \underline{\text{POLY}(m, t ,U):}\\
 \quad\text{if}\ |U| \geqslant t: \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad f_1,\ldots,f_{t-1}\leftarrow \mathbb{Z}_p\\
-\quad f(x):=m+\sum_{j=1}^{t-1}f_jx^j\\
+\quad f(\boldsymbol{x}):=m+\sum_{j=1}^{t-1}f_j\boldsymbol{x}^j\\
 \quad \text{for}\ i\in U:\\
 \quad\quad s_i:=(i,f(i)\%p)\\
 \quad\text{return}\ \{s_i|i\in U\}\\\hline
@@ -841,7 +841,7 @@ $$
 \underline{\text{SHARE}(m_L, m_R ,U):}\\
 \quad\text{if}\ |U| \geqslant t: \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad f_1,\ldots,f_{t-1}\leftarrow \mathbb{Z}_p\\
-\quad f(x):=m_R+\sum_{j=1}^{t-1}f_jx^j\\
+\quad f(\boldsymbol{x}):=m_R+\sum_{j=1}^{t-1}f_j\boldsymbol{x}^j\\
 \quad\text{for}\ i\in U:\\
 \quad\quad s_i:=(i,f(i)\%p)\\
 \quad\text{return}\ \{s_i|i\in U\}\\\hline
@@ -852,21 +852,28 @@ $$
 \text{is $\mathcal{L}_{tsss-R}^\mathcal{S}$.}\\
 \end{array}$$
 
-We showed that $\mathcal{L}_{tsss-L}^{\mathcal{S}}\equiv\mathcal{L}_{hyb-1}\equiv\cdots\equiv\mathcal{L}_{hyb-4}\equiv\mathcal{L}_{tsss-R}^{\mathcal{S}}$, so Shamir’s secret sharing scheme is secure.
+We showed that $\mathcal{L}_{tsss-L}^{\mathcal{S}}\equiv\mathcal{L}_{hyb-1}\equiv\cdots\equiv\mathcal{L}_{hyb-4}\equiv\mathcal{L}_{tsss-R}^{\mathcal{S}}$, so Shamir’s secret sharing scheme is secure. $\blacksquare$
 
 ## $\star$ 3.5 Visual Secret Sharing
-Here is a fun variant of 2-out-of-2 secret-sharing called visual secret sharing. In this variant, both the secret and the shares are black-and-white images. We require the same security property as traditional secret-sharing — that is, a single share (image) by itself reveals no information about the secret (image). What makes visual secret sharing different is that we require the *reconstruction* procedure to be done visually.
+Here is a fun variant of 2-out-of-2 secret-sharing called **visual secret sharing**. In this variant, both the secret and the shares are black-and-white images. We require the same security property as traditional secret-sharing — that is, a single share (image) by itself reveals no information about the secret (image). What makes visual secret sharing different is that we require the *reconstruction* procedure to be done visually.
 
 More specifically, each share should be printed on transparent sheets. When the two shares are stacked on top of each other, the secret image is revealed visually. We will discuss a simple visual secret sharing scheme that is inspired by the following observations:
 
-Importantly, when stacking shares on top of each other in the rst two cases, the result is a $2 \times 2$ block that is half-black, half-white (let’s call it “gray”); while in the other cases the result is completely black.
+$$
+\textcolor{red}{\text{Image screenshot here}}
+$$
+
+Importantly, when stacking shares on top of each other in the first two cases, the result is a $2 \times 2$ block that is half-black, half-white (let’s call it “gray”); while in the other cases the result is completely black.
 
 The idea is to process each pixel of the source image independently, and to encode each pixel as a $2\times 2$ block of pixels in each of the shares. A white pixel should be shared in a way that the two shares stack to form a “gray” $2 \times 2$ block, while a black pixel is shared in a way that results in a black $2 \times 2$ block.
 
 More formally:
 
 **Construction 3.14**
-It is not hard to see that share s1 leaks no information about the secret image $m$, because it consists of uniformly chosen $2 \times 2$ blocks. In the exercises you are asked to prove that $s_2$ also individually leaks nothing about the secret image.
+$$
+\textcolor{red}{\text{Image screenshot here}}
+$$
+It is not hard to see that share $s_1$ leaks no information about the secret image $m$, because it consists of uniformly chosen $2 \times 2$ blocks. In the exercises you are asked to prove that $s_2$ also individually leaks nothing about the secret image.
 
 Note that whenever the source pixel is white, the two shares have identical $2\times2$ blocks (so that when stacked, they make a “gray” block). Whenever a source pixel is black, the two shares have opposite blocks, so stack to make a black block.
 
@@ -880,7 +887,7 @@ $$
 
  
 
-3.1. Generalize Construction 3.5 to be an n-out-of-n secret-sharing scheme, 	and prove that your scheme is correct and secure.
+3.1. Generalize Construction 3.5 to be an $n$-out-of-$n$ secret-sharing scheme,  and prove that your scheme is correct and secure.
 
 3.2. Prove Theorem 3.7.
 
@@ -894,39 +901,27 @@ $$
 \begin{array}{|l|} \hline 
 \quad\ \ \ \mathcal{L}_{\text{left}}\\\hline
 \underline{\text{QUERY}():}\\
-\quad r\leftarrow (\mathbb{Z}_p)^n\\
-\quad\text{return}\ r\\\hline
+\quad \boldsymbol{r}\leftarrow (\mathbb{Z}_p)^n\\
+\quad\text{return}\ \boldsymbol{r}\\\hline
 \end{array}\ ;\ \begin{array}{|l|} \hline 
 \quad\ \ \ \mathcal{L}_{\text{right}}\\\hline
 \underline{\text{QUERY}():}\\
-\quad r\leftarrow (\mathbb{Z}_p)^n\\
-\quad \text{return}\ T \times r\\\hline
+\quad \boldsymbol{r}\leftarrow (\mathbb{Z}_p)^n\\
+\quad \text{return}\ T \times \boldsymbol{r}\\\hline
 \end{array}\ .$$
-$$
-\def\arraystretch{1.5}
-\begin{array}{|l|} \hline 
-\quad\ \ \ \ \mathcal{L}_{\text{left}}\\\hline
-\underline{\text{QUERY}():}\\
-\quad r\leftarrow (\mathbb{Z}_p)^n\\
-\quad\text{return}\ r\\\hline
-\end{array}\ ;\ \begin{array}{|l|} \hline 
-\quad\ \ \ \mathcal{L}_{\text{right}}\\\hline
-\underline{\text{QUERY}():}\\
-\quad r\leftarrow (\mathbb{Z}_p)^n\\
-\quad \text{return}\ T \times r\\\hline
-\end{array}\ .$$
+
 (b) Show that the following two libraries are interchangeable:
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline 
 \quad \qquad\mathcal{L}_{\text{left}}\\\hline
 \underline{\text{QUERY}(v \in (\mathbb{Z}_p)^n):}\\
-\quad r\leftarrow (\mathbb{Z}_p)^n\\
-\quad z:=v+Tr\\
+\quad \boldsymbol{r}\leftarrow (\mathbb{Z}_p)^n\\
+\quad z:=\boldsymbol{v}+T\boldsymbol{r}\\
 \quad\text{return}\ z\\\hline
 \end{array}\ ;\ \begin{array}{|l|} \hline 
 \quad \qquad\mathcal{L}_{\text{right}}\\\hline
-\underline{\text{QUERY}(v \in (\mathbb{Z}_p)^n):}\\
+\underline{\text{QUERY}(\boldsymbol{v} \in (\mathbb{Z}_p)^n):}\\
 \quad r\leftarrow (\mathbb{Z}_p)^n\\
 \quad\text{return}\ z\\\hline
 \end{array}\ .$$
@@ -948,17 +943,18 @@ $$
   
  Describe in detail how the sharing algorithm works and how the reconstruction works (for all authorized sets of users).
  
- Note: It is fine if different users have shares which are of different sizes (e.g., different number of bits to represent), and it is also fine if the Reconstruct algorithm depends on the identities of the users who are contributing their shares.
+ *Note:* It is fine if different users have shares which are of different sizes (e.g., different number of bits to represent), and it is also fine if the Reconstruct algorithm depends on the identities of the users who are contributing their shares.
  
 3.8. Suppose there are 9 people on an important committee: Alice, Bob, Carol, David, Eve, Frank, Gina, Harold, & Irene. Alice, Bob & Carol form a subcommittee; David, Eve & Frank form another subcommittee; and Gina, Harold & Irene form another subcommittee.
 
-  Suggest how a dealer can share a secret so that it can only be opened when a majority of each subcommittee is present. Describe why a 6-out-of-9 threshold secret-sharing scheme does not suffice.
+  Suggest how a dealer can share a secret so that it can only be opened when a majority of each subcommittee is present. Describe why a 6-out-of-9 threshold secret-sharing scheme does **not** suffice.
 $$
 \textcolor{red}{\text{Image screenshot here}}
 $$
-3.9. (a) Generalize the previous exercise. A monotone formula is a boolean function $\phi:\{0,1\}^n\rightarrow\{0,1\}$ that when written as a formula uses only and and or operations (no NOTS). For a set $A\subseteq\{1,\ldots,n\}$, let $\mathcal{X}_A$ be the bitstring where whose $i$th bit is 1 if and only if $i\in A$.
+$\star$ 3.9. (a) Generalize the previous exercise. A **monotone formula** is a boolean function $\phi:\{0,1\}^n\rightarrow\{0,1\}$ that when written as a formula uses only AND and OR operations (no NOTS). For a set $A\subseteq\{1,\ldots,n\}$, let $\mathcal{X}_A$ be the bitstring where whose $i$th bit is 1 if and only if $i\in A$.
 
  For every monotone formula $\phi:\{0,1\}^n\rightarrow \{0,1\}$, construct a secret-sharing scheme whose authorized sets are $\{A\subseteq \{1,\ldots,n\}|\phi(\mathcal{X}_A)=1\}$.  Prove that your scheme is secure.
+> **Hint:** express the formula as a tree of AND and OR gates
  
 (b) Give a construction of a *t*-out-of-*n* secret-sharing scheme in which all shares are binary strings, and the only operation required of Share and Reconstruct is xor (so no mod-$p$ operations).
 
@@ -972,4 +968,4 @@ How big are the shares, compared to the Shamir scheme?
 \textcolor{red}{\text{Image screenshot here}}
 $$
 
-3.12. Construct a 3-out-of-3 visual secret sharing scheme. Any two shares should together reveal nothing about the source image, but any three reveal the source image when stacked together.
+$\star$ 3.12. Construct a 3-out-of-3 visual secret sharing scheme. Any two shares should together reveal nothing about the source image, but any three reveal the source image when stacked together.
