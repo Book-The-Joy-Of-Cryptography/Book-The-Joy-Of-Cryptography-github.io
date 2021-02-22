@@ -1,5 +1,6 @@
 
 
+
 # 3. Secret Sharing
 DNS is the system that maps human-memorable Internet domains like $\textcolor{brown}{\texttt{irs.gov}}$ to machine-readable IP addresses like  $\textcolor{brown}{166.123.218.220}$. If an attacker can masquerade as the DNS system and convince your computer that $\textcolor{brown}{\texttt{irs.gov}}$ actually resides at some other IP address, it might result in a bad day for you.
 
@@ -426,7 +427,7 @@ n=2
 $$
 
 ## 3.3 Polynomial Interpolation
-You are probably familiar with the fact that two points determine a line (in Euclidean geometry). It is also true that 3 points determine a parabola, and so on. The next secretsharing scheme we discuss is based on the following principle:
+You are probably familiar with the fact that two points determine a line (in Euclidean geometry). It is also true that 3 points determine a parabola, and so on. The next secret-sharing scheme we discuss is based on the following principle:
 
 $$d+1\ \text{points determine a \textit{unique} degree-d polynomial.}$$
 
@@ -435,14 +436,14 @@ A note on terminology: If f is a polynomial that can be written as $f(x)=\Sigma_
 ### Polynomials Over the Reals
 
 **Theorem 3.8 (Poly Interpolation)**
-Let $\{(x_1,y_1),\ldots,(x_{d+1},y_{d+1})\ \subseteq \mathbb{R}^2\}$ be a set of points whose $x_i$ values are all distinct. Then there is a **unique** degree-$d$ polynomial $f$ with real coefficients that satisfies $y_i=f(x_i)$ for all $i$.
+_Let $\{(x_1,y_1),\ldots,(x_{d+1},y_{d+1})\ \subseteq \mathbb{R}^2\}$ be a set of points whose $x_i$ values are all distinct. Then there is a **unique** degree-$d$ polynomial $f$ with real coefficients that satisfies $y_i=f(x_i)$ for all $i$._
 
 **Proof**
 To start, consider the following polynomial:
 
-$$\ell_1(x)=\dfrac{(x-x_2)(x-x_3)\cdots(x-x_{d+1})}{(x_1-x_2)(x_1-x_3)\cdots(x_1-x_{d+1})}.$$
+$$\ell_1(\boldsymbol{x})=\dfrac{(\boldsymbol{x}-x_2)(\boldsymbol{x}-x_3)\cdots(\boldsymbol{x}-x_{d+1})}{(x_1-x_2)(x_1-x_3)\cdots(x_1-x_{d+1})}.$$
 
-The notation is potentially confusing. $\ell_1$ is a polynomial with formal variable $x$ (written in bold). The non-bold $x_i$ values are just plain numbers (scalars), given in the theorem statement. Therefore the numerator in $\ell_1$ is a degree-$d$ polynomial in $x$. The denominator is just a scalar, and since all of the $x_i$'s are distinct, we are not dividing by zero. Overall, $\ell_1$ is a degree-d polynomial.
+The notation is potentially confusing. $\ell_1$ is a polynomial with formal variable $x$ (written in bold). The non-bold $x_i$ values are just plain numbers (scalars), given in the theorem statement. Therefore the numerator in $\ell_1$ is a degree-$d$ polynomial in $x$. The denominator is just a scalar, and since all of the $x_i$'s are distinct, we are not dividing by zero. Overall, $\ell_1$ is a degree-$d$ polynomial.
 
 What happens when we evaluate $\ell_1$ at one of the special $x_i$ values?
 
@@ -453,7 +454,7 @@ Of course, $\ell_1$ can be evaluated at any point (not just the special points $
 
 We can similarly define other polynomials $\ell_j$:
 
-$$\ell_j(x)=\dfrac{(x-x_1)\cdots (x-x_{j-1})(x-x_{j+1})\cdots (x-x_{d+1})}{(x_j-x_1)\cdots (x_j-x_{j-1})(x_j-x_{j+1})\cdots (x_j-x_{d+1})}.$$
+$$\ell_j(\boldsymbol{x})=\dfrac{(\boldsymbol{x}-x_1)\cdots (\boldsymbol{x}-x_{j-1})(\boldsymbol{x}-x_{j+1})\cdots (\boldsymbol{x}-x_{d+1})}{(x_j-x_1)\cdots (x_j-x_{j-1})(x_j-x_{j+1})\cdots (x_j-x_{d+1})}.$$
 
 The pattern is that the numerator is “missing” the term $(x - x_j)$ and the denominator is missing the term $(x_j -x_j)$, because we don’t want a zero in the denominator. Polynomials of this kind are called **LaGrange polynomials**. They are each degree-$d$ polynomials, and they satisfy the property:
 
@@ -466,7 +467,7 @@ $$
 
 Now consider the following polynomial:
 
-$$f(x)=y_1\ell_1(x)+y_2\ell_2(x)+\cdots+y_{d+1}\ell_{d+1}(x).$$
+$$f(\boldsymbol{x})=y_1\ell_1(\boldsymbol{x})+y_2\ell_2(\boldsymbol{x})+\cdots+y_{d+1}\ell_{d+1}(\boldsymbol{x}).$$
 
 Note that $f$ is a degree-$d$ polynomial since it is the sum of degree-$d$ polynomials (again, the $y_i$ values are just scalars).
 
@@ -480,10 +481,10 @@ f\left(x_{i}\right) &=y_{1} \ell_{1}\left(x_{i}\right)+\cdots+y_{i} \ell_{i}\lef
 \end{aligned}
 $$
 
-so $f(x_i)=y_i$ for every $x_i$, which is what we wanted. This shows that there is some degree-$d$ polynomial with this property.
+so $f(x_i)=y_i$ for every $x_i$, which is what we wanted. This shows that there is *some* degree-$d$ polynomial with this property.
 
 Now let’s argue that this $f$ is unique. Suppose there are two degree-$d$ polynomials $f$ and $f'$ such that $f(x_i)=f'(x_i)=y_i$ for $i\in\{1,\ldots, d+1\}$. Then the polynomial $g(x)=f(x)-f'(x)$ also is degree-$d$, and it satisfies $g(x_i)=0$ for all $i$. In other words, each $x_i$ is a root of $g$, so $g$ has at least $d + 1$ roots. But the only degree-$d$ polynomial with
-$d + 1$ roots is the identically-zero polynomial $g(x)=0$. If $g(x)=0$ then $f=f'$.  In other words, any degree-$d$ polynomial $f'$ that satisfies $f'(x_i)=y_i$ must be equal to $f$. So $f$ is the unique polynomial with this property.
+$d + 1$ roots is the identically-zero polynomial $g(x)=0$. If $g(x)=0$ then $f=f'$.  In other words, any degree-$d$ polynomial $f'$ that satisfies $f'(x_i)=y_i$ must be equal to $f$. So $f$ is the unique polynomial with this property. $\blacksquare$
 
 **Example**
 *Let’s figure out the degree-3 polynomial that passes through the points
@@ -500,10 +501,10 @@ $$
 
 $$
 \begin{array}{l}
-\ell_{1}(x)=\dfrac{\left(x-x_{2}\right)\left(x-x_{3}\right)\left(x-x_{4}\right)}{\left(x_{1}-x_{2}\right)\left(x_{1}-x_{3}\right)\left(x_{1}-x_{4}\right)}=\dfrac{(x-4)(x-5)(x-2)}{(3-4)(3-5)(3-2)}=\dfrac{x^{3}-11 x^{2}+38 x-40}{2} \\\\
-\ell_{2}(x)=\dfrac{\left(x-x_{1}\right)\left(x-x_{3}\right)\left(x-x_{4}\right)}{\left(x_{2}-x_{1}\right)\left(x_{2}-x_{3}\right)\left(x_{2}-x_{4}\right)}=\dfrac{(x-3)(x-5)(x-2)}{(4-3)(4-5)(4-2)}=\dfrac{x^{3}-10 x^{2}+31 x-30}{-2} \\\\
-\ell_{3}(x)=\dfrac{\left(x-x_{1}\right)\left(x-x_{2}\right)\left(x-x_{4}\right)}{\left(x_{3}-x_{1}\right)\left(x_{3}-x_{2}\right)\left(x_{3}-x_{4}\right)}=\dfrac{(x-3)(x-4)(x-2)}{(5-3)(5-4)(5-2)}=\dfrac{x^{3}-9 x^{2}+26 x-24}{6} \\\\
-\ell_{4}(x)=\dfrac{\left(x-x_{1}\right)\left(x-x_{2}\right)\left(x-x_{3}\right)}{\left(x_{4}-x_{1}\right)\left(x_{4}-x_{2}\right)\left(x_{4}-x_{3}\right)}=\dfrac{(x-3)(x-4)(x-5)}{(2-3)(2-4)(2-5)}=\dfrac{x^{3}-12 x^{2}+47 x-60}{-6}
+\ell_{1}(\boldsymbol{x})=\dfrac{\left(\boldsymbol{x}-x_{2}\right)\left(\boldsymbol{x}-x_{3}\right)\left(\boldsymbol{x}-x_{4}\right)}{\left(x_{1}-x_{2}\right)\left(x_{1}-x_{3}\right)\left(x_{1}-x_{4}\right)}=\dfrac{(\boldsymbol{x}-4)(\boldsymbol{x}-5)(\boldsymbol{x}-2)}{(3-4)(3-5)(3-2)}=\dfrac{\boldsymbol{x}^{3}-11 \boldsymbol{x}^{2}+38 \boldsymbol{x}-40}{2} \\\\
+\ell_{2}(\boldsymbol{x})=\dfrac{\left(\boldsymbol{x}-x_{1}\right)\left(\boldsymbol{x}-x_{3}\right)\left(\boldsymbol{x}-x_{4}\right)}{\left(x_{2}-x_{1}\right)\left(x_{2}-x_{3}\right)\left(x_{2}-x_{4}\right)}=\dfrac{(\boldsymbol{x}-3)(\boldsymbol{x}-5)(\boldsymbol{x}-2)}{(4-3)(4-5)(4-2)}=\dfrac{\boldsymbol{x}^{3}-10 \boldsymbol{x}^{2}+31 \boldsymbol{x}-30}{-2} \\\\
+\ell_{3}(\boldsymbol{x})=\dfrac{\left(\boldsymbol{x}-x_{1}\right)\left(\boldsymbol{x}-x_{2}\right)\left(\boldsymbol{x}-x_{4}\right)}{\left(x_{3}-x_{1}\right)\left(x_{3}-x_{2}\right)\left(x_{3}-x_{4}\right)}=\dfrac{(\boldsymbol{x}-3)(\boldsymbol{x}-4)(\boldsymbol{x}-2)}{(5-3)(5-4)(5-2)}=\dfrac{\boldsymbol{x}^{3}-9 \boldsymbol{x}^{2}+26 \boldsymbol{x}-24}{6} \\\\
+\ell_{4}(\boldsymbol{x})=\dfrac{\left(\boldsymbol{x}-x_{1}\right)\left(\boldsymbol{x}-x_{2}\right)\left(\boldsymbol{x}-x_{3}\right)}{\left(x_{4}-x_{1}\right)\left(x_{4}-x_{2}\right)\left(x_{4}-x_{3}\right)}=\dfrac{(\boldsymbol{x}-3)(\boldsymbol{x}-4)(\boldsymbol{x}-5)}{(2-3)(2-4)(2-5)}=\dfrac{\boldsymbol{x}^{3}-12 \boldsymbol{x}^{2}+47 \boldsymbol{x}-60}{-6}
 \end{array}
 $$
 
@@ -518,23 +519,23 @@ $$
 *It will make the next step easier if we rewrite all LaGrange polynomials to have the same denominator 6:*
 $$
 \begin{array}{ll}
-\ell_{1}(x)=\dfrac{3 x^{3}-33 x^{2}+114 x-120}{6} & \ell_{3}(x)=\dfrac{x^{3}-9 x^{2}+26 x-24}{6} \\
-\ell_{2}(x)=\dfrac{-3 x^{3}+30 x^{2}-93 x+90}{6} & \ell_{4}(x)=\dfrac{-x^{3}+12 x^{2}-47 x+60}{6}
+\ell_{1}(\boldsymbol{x})=\dfrac{3 \boldsymbol{x}^{3}-33 \boldsymbol{x}^{2}+114 \boldsymbol{x}-120}{6} & \ell_{3}(x)=\dfrac{\boldsymbol{x}^{3}-9 \boldsymbol{x}^{2}+26 \boldsymbol{x}-24}{6} \\
+\ell_{2}(\boldsymbol{x})=\dfrac{-3 \boldsymbol{x}^{3}+30 \boldsymbol{x}^{2}-93 \boldsymbol{x}+90}{6} & \ell_{4}(x)=\dfrac{-\boldsymbol{x}^{3}+12 \boldsymbol{x}^{2}-47 x+60}{6}
 \end{array}
 $$
 *Our desired polynomial is*
 $$
 \begin{aligned}
-f(x) &=y_{1} \cdot \ell_{1}(x)+y_{2} \cdot \ell_{2}(x)+y_{3} \cdot \ell_{3}(x)+y_{4} \cdot \ell_{4}(x) \\\\
-&=1 \cdot \ell_{1}(x)+1 \cdot \ell_{2}(x)+9 \cdot \ell_{3}(x)+6 \cdot \ell_{4}(x)\\\\
+f(\boldsymbol{x}) &=y_{1} \cdot \ell_{1}(\boldsymbol{x})+y_{2} \cdot \ell_{2}(\boldsymbol{x})+y_{3} \cdot \ell_{3}(\boldsymbol{x})+y_{4} \cdot \ell_{4}(\boldsymbol{x}) \\\\
+&=1 \cdot \ell_{1}(\boldsymbol{x})+1 \cdot \ell_{2}(\boldsymbol{x})+9 \cdot \ell_{3}(\boldsymbol{x})+6 \cdot \ell_{4}(\boldsymbol{x})\\\\
 & =\dfrac{1}{6}\left(\begin{array}{rcr}
- 1 &\cdot & (3x^3-33x^2+114x-120)\\
-+1&\cdot & (\ -3x^3+30x^2-93x+90)\\
-+9&\cdot&(\ \ \ \ \ \ \ \ x^3-9x^2+26x-24)\\
-+6&\cdot&(\ \ \ -x^3+12x^2-47x+60)
+ 1 &\cdot & (3\boldsymbol{x}^3-33\boldsymbol{x}^2+114\boldsymbol{x}-120)\\
++1&\cdot & (\ -3\boldsymbol{x}^3+30\boldsymbol{x}^2-93\boldsymbol{x}+90)\\
++9&\cdot&(\ \ \ \ \ \ \ \ \boldsymbol{x}^3-9\boldsymbol{x}^2+26\boldsymbol{x}-24)\\
++6&\cdot&(\ \ \ -\boldsymbol{x}^3+12\boldsymbol{x}^2-47\boldsymbol{x}+60)
 \end{array}\right)\\\\
-& =\dfrac{1}{6}(3x^3-12x^2-27x+114)\\\\
-&=\dfrac{x^3}{2}-2x^2-\dfrac{9x}{2}+19
+& =\dfrac{1}{6}(3\boldsymbol{x}^3-12\boldsymbol{x}^2-27\boldsymbol{x}+114)\\\\
+&=\dfrac{\boldsymbol{x}^3}{2}-2\boldsymbol{x}^2-\dfrac{9\boldsymbol{x}}{2}+19
 \end{aligned}
 $$
 
@@ -559,13 +560,13 @@ We will see a secret-sharing scheme based on polynomials, whose Share algorithm 
 It is still true that $d +1$ points determine a unique degree-$d$ polynomial when working modulo $p$, if $p$ is a prime!
 
 **Theorem 3.9 (Interp mod $p$)**
-*$\colorbox{yellow}{Let \textit{p} be a prime,}$* *and let*$\{(x_1,y_1),\ldots,(x_{d+1},y_{d+1})\}\subseteq (\mathbb{Z}_p)^2$ be a set of points whose $x_i$ values are all distinct. Then there is a unique degree-$d$ polynomial $f$ with coefficients from $\mathbb{Z}_p$ that satisfies $y_i\equiv_pf(x_i)$ for all $i$.
+_$\colorbox{yellow}{\textit{Let p be a prime},}$and let $\{(x_1,y_1),\ldots,(x_{d+1},y_{d+1})\}\subseteq (\mathbb{Z}_p)^2$ be a set of points whose $x_i$ values are all distinct. Then there is a unique degree-$d$ polynomial $f$ with coefficients from $\mathbb{Z}_p$ that satisfies $y_i\equiv_pf(x_i)$ for all $i$._
 
 The proof is the same as the one for Theorem 3.8, if you interpret all arithmetic modulo $p$. Addition, subtraction, and multiplication mod $p$ are straight forward; the only nontrivial question is how to interpret “division mod $p$,” which is necessary in the definition of the $\ell_j$ polynomials. For now, just accept that you can always “divide” mod $p$ (except by zero) when $p$ is a prime. If you are interested in how division mod $p$ works, look ahead to Chapter 13.
 
 We can also generalize the observation that $d +1$ points uniquely determine a degree-$d$ polynomial. It turns out that:
 
-For any $k$ points, there are exactly $p^{d+1-k}$ polynomials of degree-$d$ that hit those points, mod $p$.
+> For any $k$ points, there are exactly $p^{d+1-k}$ polynomials of degree-$d$ that hit those points, mod $p$.
 
 Note how when $k = d +1$, the statement says that there is just a single polynomial hitting the points.
 
