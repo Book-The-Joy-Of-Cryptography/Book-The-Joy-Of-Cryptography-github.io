@@ -1,4 +1,5 @@
 
+
 # 4. Basing Cryptography on Intractable Computations
 John Nash was a mathematician who earned the 1994 Nobel Prize in Economics for his work in game theory. His life story was made into a successful movie, A *Beautiful Mind*.
 
@@ -377,19 +378,20 @@ Since $\mathcal{L}_{\text{left}}\equiv\mathcal{L}_{\text{hyb-L}}\approx\mathcal{
 In many cryptographic schemes, the users repeatedly choose random strings (e.g., each time they encrypt a message), and security breaks down if the same string is ever chosen twice. Hence, it is important that the probability of a repeated sample is negligible. In this section we compute the probability of such events and express our findings in a modular way, as a statement about the indistinguishability of two libraries.
 
 ### Birthday Probabilities
-If $q$ people are in a room, what is the probability that two of them have the same birthday (if we assume that each person’s birthday is uniformly chosen from among the possible days in a year)? This question is known as the **birthday problem**, and it is famous because the answer is highly unintuitive to most people.
+If $q$ people are in a room, what is the probability that two of them have the same birthday (if we assume that each person’s birthday is uniformly chosen from among the possible days in a year)? This question is known as the **birthday problem**, and it is famous because the answer is highly unintuitive to most people.[^9]
+[^9]: It is sometimes called the “birthday paradox,” even though it is not really a paradox. The actual birthday paradox is that the “birthday paradox” is not a paradox.
 
 
 Let’s make the question more general. Imagine taking $q$ independent, uniform samples from a set of $N$ items. What is the probability that the same value gets chosen more than once? In other words, what is the probability that the following program outputs 1?
 
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{B}(q,N)\\
+\begin{array}{|l|}\hline
+\quad \quad  \quad \mathcal{B}(q,N)\\ \hline
 \text{for}\ i:=1\ \text{to}\ q.\\
-s_i\leftarrow \{1,\ldots,N\}\\
-\text{for}\ j:=1\ \text{to}\ i-1:\\
-\text{if}\ s_i=s_j\ \text{then return 1}\\
+\quad s_i\leftarrow \{1,\ldots,N\}\\
+\quad \text{for}\ j:=1\ \text{to}\ i-1:\\
+\quad \quad \text{if}\ s_i=s_j\ \text{then return 1}\\
 \text{return 0}
 \\\hline
 \end{array}
@@ -431,10 +433,10 @@ $$
 &=1-\prod_{i=1}^{q-1}\left(1-\frac{i}{N}\right)
 \end{aligned}
 $$
-This completes the proof.
+This completes the proof. $\blacksquare$
 
 **Example**
-This formula for BirthdayProb$(q, N)$ is not easy to understand at a glance. We can get a better sense of its behavior as a function of $q$ by plotting it. Below is a plot with $N = 365$, corresponding to the classic birthday problem:
+*This formula for BirthdayProb$(q, N)$ is not easy to understand at a glance. We can get a better sense of its behavior as a function of $q$ by plotting it. Below is a plot with $N = 365$, corresponding to the classic birthday problem:*
 
 $$
 \textcolor{red}{\text{Image screenshot here}}
@@ -492,7 +494,7 @@ $$
 \end{aligned}
 $$
 
-This completes the proof.
+This completes the proof. $\blacksquare$
 
 **Example** *Below is a plot of these bounds compared to the actual value of* $\text{BirthdayProb}(q,N)$ (for $N=365$):
 
@@ -507,35 +509,34 @@ Below are two libraries which will also be useful for future topics.
 
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{samp-L}}\\
+\begin{array}{|l|}\hline
+\mathcal{L}_{\text{samp-L}}\\ \hline
 \underline{\text{SAMP():}}\\
-r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\text{return}\ r\\\hline
+\quad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\quad \text{return}\ r\\\hline
 \end{array}\quad 
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{samp-R}}\\
+\begin{array}{|l|}\hline
+\mathcal{L}_{\text{samp-R}}\\ \hline
 R:=\Theta\\
 \underline{\text{SAMP():}}\\
-r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda \backslash R \\
-R:=R\cup\{r\}\\
-\text{return}\ r\\\hline
+\quad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda \backslash R \\
+\quad R:=R\cup\{r\}\\
+\quad \text{return}\ r\\\hline
 \end{array}
 $$
 
 Both libraries provide a *SAMP* subroutine that samples a random element of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$. The
-implementation in $\mathcal{L}_{\text{samp-L}}$ samples uniformly and independently from  $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ each time.  It samples with replacement, so it is possible (although maybe unlikely) for multiple calls to *SAMP* to return the same value in $\mathcal{L}_{\text{samp-L}}$
+implementation in $\mathcal{L}_{\text{samp-L}}$ samples uniformly and independently from  $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ each time.  It samples **with replacement**, so it is possible (although maybe unlikely) for multiple calls to SAMP to return the same value in $\mathcal{L}_{\text{samp-L}}$
 
-On the other hand, $\mathcal{L}_{\text{samp-R}}$ samples $\lambda$-bit strings without replacement. It keeps track of a set $R$, containing all the values it has previously sampled, and avoids choosing them again ("$\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R$" is the set of $\lambda$-bit strings excluding the ones in $R$). In this library, *SAMP* will never output the same value twice.
+On the other hand, $\mathcal{L}_{\text{samp-R}}$ samples $\lambda$-bit strings **without replacement**. It keeps track of a set $R$, containing all the values it has previously sampled, and avoids choosing them again ("$\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R$" is the set of $\lambda$-bit strings excluding the ones in $R$). In this library, SAMP will never output the same value twice.
 
-**The “obvious” distinguishing strategy.** A natural way (but maybe not the only way) to distinguish these two libraries, therefore, would be to call samp many times. If you ever see a repeated output, then you must certainly be linked to $\mathcal{L}_{\text{samp-L}}$. After some number of calls to samp, if you still don’t see any repeated outputs, you might eventually stop and guess that you are linked to $\mathcal{L}_{\text{samp-R}}$.
+**The “obvious” distinguishing strategy.** A natural way (but maybe not the *only way*) to distinguish these two libraries, therefore, would be to call SAMP many times. If you ever see a repeated output, then you must certainly be linked to $\mathcal{L}_{\text{samp-L}}$. After some number of calls to SAMP, if you still don’t see any repeated outputs, you might eventually stop and guess that you are linked to $\mathcal{L}_{\text{samp-R}}$.
 
-Let $\mathcal{A}_q$ denote this “obvious” calling program that makes $q$ calls to samp and returns 1 if it sees a repeated value. Clearly, the program can never return 1 when it is linked to $\mathcal{L}_{\text{samp-R}}$. On the other hand, when it is linked to $\mathcal{L}_{\text{samp-L}}$, it returns 1 with probability exactly $\text{BirthdayProb}(q,2^\lambda)$. Therefore, the advantage of $\mathcal{A}_q$ is exactly  $\text{BirthdayProb}(q,2^\lambda)$.
+Let $\mathcal{A}_q$ denote this “obvious” calling program that makes $q$ calls to SAMP and returns 1 if it sees a repeated value. Clearly, the program can never return 1 when it is linked to $\mathcal{L}_{\text{samp-R}}$. On the other hand, when it is linked to $\mathcal{L}_{\text{samp-L}}$, it returns 1 with probability exactly $\text{BirthdayProb}(q,2^\lambda)$. Therefore, the advantage of $\mathcal{A}_q$ is exactly  $\text{BirthdayProb}(q,2^\lambda)$.
 
-This program behaves dierently in the presence of these two libraries, therefore they are not *interchangeable*. But are the libraries *indistinguishable*? We have demonstrated a calling program with advantage $\text{BirthdayProb}(q,2^\lambda)$. We have not specified q exactly, but
-if $\mathcal{A}_q$ is meant to run in polynomial time (as a function of $\lambda$), then $q$ must be a polynomial function of $\lambda$. Then the advantage of $\mathcal{A}_q$ is $\text{BirthdayProb}(q,2^\lambda)=\Theta(q^2/2^\lambda)$, which is *negligible!*
+This program behaves dierently in the presence of these two libraries, therefore they are not *interchangeable*. But are the libraries *indistinguishable*? We have demonstrated a calling program with advantage $\text{BirthdayProb}(q,2^\lambda)$. We have not specified $q$ exactly, but if $\mathcal{A}_q$ is meant to run in polynomial time (as a function of $\lambda$), then $q$ must be a polynomial function of $\lambda$. Then the advantage of $\mathcal{A}_q$ is $\text{BirthdayProb}(q,2^\lambda)=\Theta(q^2/2^\lambda)$, which is *negligible!*
 
-To show that the librares are indistinguishable, we have to show that *all* calling programs have negligible advantage. It is not enough just to show that this *particular* calling program has negligible advantage. Perhaps surprisingly, the “obvious” calling program that we considered is the *best* possible distinguisher!
+To show that the librares are indistinguishable, we have to show that *all* calling programs have negligible advantage. It is not enough just to show that this *particular* calling program has negligible advantage. Perhaps surprisingly, the “obvious” calling program that we considered is the *best possible* distinguisher!
 
 **Lemma 4.11 (Repl. Sampling)**
 Let $\mathcal{L}_{\text{samp-L}}$ and $\mathcal{L}_{\text{samp-R}}$ be defined as above. Then for all calling programs $\mathcal{A}$ that make $q$ queries to the samp subroutine, the advantage of $\mathcal{A}$ in distinguishing the libraries is **at most** $\text{BirthdayProb}(q,2^\lambda)$.
