@@ -539,53 +539,52 @@ This program behaves dierently in the presence of these two libraries, therefor
 To show that the librares are indistinguishable, we have to show that *all* calling programs have negligible advantage. It is not enough just to show that this *particular* calling program has negligible advantage. Perhaps surprisingly, the “obvious” calling program that we considered is the *best possible* distinguisher!
 
 **Lemma 4.11 (Repl. Sampling)**
-Let $\mathcal{L}_{\text{samp-L}}$ and $\mathcal{L}_{\text{samp-R}}$ be defined as above. Then for all calling programs $\mathcal{A}$ that make $q$ queries to the samp subroutine, the advantage of $\mathcal{A}$ in distinguishing the libraries is **at most** $\text{BirthdayProb}(q,2^\lambda)$.
+*Let $\mathcal{L}_{\text{samp-L}}$ and $\mathcal{L}_{\text{samp-R}}$ be defined as above. Then for all calling programs $\mathcal{A}$ that make $q$ queries to the SAMP subroutine, the advantage of $\mathcal{A}$ in distinguishing the libraries is **at most** $\text{BirthdayProb}(q,2^\lambda)$.*
 
-In particular, when $\mathcal{A}$ is polynomial-time (in $\lambda$), $q$ grows as a polynomial in the security parameter. Hence, $\mathcal{A}$ has negligible advantage. Since this is true for all polynomial-time $\mathcal{A}$,  we have  $\mathcal{L}_{\text{samp-L}} \approx \mathcal{L}_{\text{samp-R}}$.
+*In particular, when $\mathcal{A}$ is polynomial-time (in $\lambda$), $q$ grows as a polynomial in the security parameter. Hence, $\mathcal{A}$ has negligible advantage. Since this is true for all polynomial-time $\mathcal{A}$,  we have  $\mathcal{L}_{\text{samp-L}} \approx \mathcal{L}_{\text{samp-R}}$.*
 
 **Proof**
 Consider the following hybrid libraries:
 
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{hyb-L}}\\
+\begin{array}{|l|}\hline
+\quad \mathcal{L}_{\text{hyb-L}}\\ \hline
 R:=\emptyset\\
 \text{bad}\ :=0\\
 \underline{\text{SAMP():}}\\
-r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\text{if}\ r \in R\ \text{then:}\\
-\text{bad}\ :=1\\\\
-R:=R\cup\{r\}\\\hline
+\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\quad \text{if}\ r \in R\ \text{then:}\\
+\quad \quad \text{bad}\ :=1\\\\
+\quad R:=R\cup\{r\}\\
+\quad return \ r\\ \hline
 \end{array}
 \quad
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{hyb-R}}\\
+\begin{array}{|l|}\hline
+\mathcal{L}_{\text{hyb-R}}\\ \hline
 R:=\emptyset\\
 \text{bad}\ :=0\\
 \underline{\text{SAMP():}}\\
-r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\text{if}\ r \in R\ \text{then:}\\
-\text{bad}\ :=1\\
-\colorbox{yellow}{r}\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R\\
-R:=R\cup\{r\}\\\hline
+\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\quad \text{if}\ r \in R\ \text{then:}\\
+\quad \quad \text{bad}\ :=1\\
+\quad \quad \colorbox{yellow}{r}\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R\\
+\quad R:=R\cup\{r\}\\
+\quad return \ r \\\hline
 \end{array}
 $$
 
 First, let us prove some simple observations about these libraries:
 
 $\underline{\mathcal{L}_{\text{hyb-L}} \equiv \mathcal{L}_{\text{samp-L}}}$
-Note that $\mathcal{L}_{\text{hyb-L}}$ simply samples uniformly from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$. The extra R
-and bad variables in $\mathcal{L}_{\text{hyb-L}}$ don’t actually have an eect on its external behavior (they are used only for convenience later in the proof).
+Note that $\mathcal{L}_{\text{hyb-L}}$ simply samples uniformly from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$. The extra R and bad variables in $\mathcal{L}_{\text{hyb-L}}$ don’t actually have an effect on its external behavior (they are used only for convenience later in the proof).
 
 $\underline{\mathcal{L}_{\text{hyb-R}} \equiv \mathcal{L}_{\text{samp-R}}}$
-Whereas  $\mathcal{L}_{\text{samp-R}}$ avoids repeats by simply sampling from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R$, this library $\mathcal{L}_{\text{hyb-R}}$ samples $r$ uniformly from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ and retries if the
-result happens to be in $R$. This method is called *rejection* sampling, and
-it has the same effect as sampling $r$ directly from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R$.
+Whereas  $\mathcal{L}_{\text{samp-R}}$ avoids repeats by simply sampling from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R$, this library $\mathcal{L}_{\text{hyb-R}}$ samples $r$ uniformly from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ and retries if the result happens to be in $R$. This method is called *rejection sampling*, and it has the same effect  as sampling $r$ directly from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R$.
+[^10]
+[^10]: The two approaches for sampling from $\{0,1\}^\lambda\backslash R$. may have different running times, but our model considers only the input-output behavior of the library.
 
-
-Conveniently, $\mathcal{L}_{\text{hyb-L}}$ and $\mathcal{L}_{\text{hyb-R}}$ differ only in code that is reachable when bad = 1 (highlighted).
-So, using Lemma 4.8, we can bound the advantage of the calling program:
+Conveniently, $\mathcal{L}_{\text{hyb-L}}$ and $\mathcal{L}_{\text{hyb-R}}$ differ only in code that is reachable when bad = 1 (highlighted). So, using Lemma 4.8, we can bound the advantage of the calling program:
 
 $$
 \begin{aligned}
@@ -594,41 +593,41 @@ $$
 & \leqslant \operatorname{Pr}\left[\mathcal{A} \diamond \mathcal{L}_{\text {hyb-L }} \text { sets bad }:=1\right]
 \end{aligned}
 $$
-Finally, we can observe that $\mathcal{A}\diamond\mathcal{L}_{\text{hyb-L}$ sets bad := 1 only in the event that it sees a repeated sample from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$.  This happens with probability $\text{BirthdayProb}(q,2^\lambda)$.
+Finally, we can observe that $\mathcal{A}\diamond\mathcal{L}_{\text{hyb-L}}$ sets bad := 1 only in the event that it sees a repeated sample from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$.  This happens with probability $\text{BirthdayProb}(q,2^\lambda)$. $\ \blacksquare$
 
 ### Discussion
 
  - Stating the birthday problem in terms of indistinguishable libraries makes it a useful tool in future security proofs. For example, when proving the security of a construction we can replace a uniform sampling step with a sampling-without-replacement step. This change has only a negligible effect, but now the rest of the proof can take advantage of the fact that samples are never repeated.
  Another way to say this is that, when you are thinking about a cryptographic construction, it is “safe to assume” that randomly sampled long strings do not repeat, and behave accordingly.
  
- -However, if a security proof does use the indistinguishability of the birthday libraries, it means that the scheme can likely be broken when a user happens to repeat a uniformly sampled value. Since this becomes inevitable as the number of samples approaches $\sqrt{2^{\lambda+1}\sim 2^{\lambda/2}}$, it means the scheme only offers $\lambda/2$ bits of security. When a scheme has this property, we say that it has **birthday bound security**. It is important to understand when a scheme has this property, since it informs the size of keys that should be chosen in practice.
+ - However, if a security proof does use the indistinguishability of the birthday libraries, it means that the scheme can likely be broken when a user happens to repeat a uniformly sampled value. Since this becomes inevitable as the number of samples approaches $\sqrt{2^{\lambda+1}}\sim 2^{\lambda/2}$, it means the scheme only offers $\lambda/2$ bits of security. When a scheme has this property, we say that it has **birthday bound security**. It is important to understand when a scheme has this property, since it informs the size of keys that should be chosen in practice.
 
 ### A Generalization
-A calling program can distinguish between the previous libraries if samp ever returns the same value twice. In any given call to samp, the variable $\mathcal{R}$ denotes the set of “problematic” values that cause the libraries to be distinguished. At any point, $\mathcal{R}$ has only polynomially many values, so the probability of chosing such a problematic one is negligible.
+A calling program can distinguish between the previous libraries if SAMP ever returns the same value twice. In any given call to SAMP, the variable $\mathcal{R}$ denotes the set of “problematic” values that cause the libraries to be distinguished. At any point, $\mathcal{R}$ has only polynomially many values, so the probability of chosing such a problematic one is negligible.
 
 Suppose we considered a different set of values to be problematic. As long as there are only polynomially many problematic values in each call to SAMP, the reasoning behind the proof wouldn’t change much. This idea leads to the following generalization, in which the calling program explicitly writes down all of the problematic values:
 
 **Lemma 4.12**
-The following two libraries are indistinguishable, provided that the argument $\mathcal{R}$ to SAMP is passed as an explicit list of items.
+*The following two libraries are indistinguishable, provided that the argument $\mathcal{R}$ to SAMP is passed as an explicit list of items.*
 
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{samp-L}}\\
+\begin{array}{|l|}\hline
+\quad \quad \quad \mathcal{L}_{\text{samp-L}}\\ \hline
 \underline{\text{SAMP}(\mathcal{R}\subseteq\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda):}\\
-r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\text{return}\ r \\\hline
+\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\quad \text{return}\ r \\\hline
 \end{array}
 \quad
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{samp-R}}\\
+\begin{array}{|l|}\hline
+\mathcal{L}_{\text{samp-R}}\\ \hline
 \underline{\text{SAMP}(\mathcal{R}\subseteq\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda):}\\
-r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R\\
-\text{return}\ r \\\hline
+\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash R\\
+\quad \text{return}\ r \\\hline
 \end{array}
 $$
 
-Suppose the calling program makes $q$ calls to samp, and in the ith call it uses an argument $\mathcal{R}$ with ni items. Then the advantage of the calling program is at most:
+Suppose the calling program makes $q$ calls to SAMP, and in the $i$th call it uses an argument $\mathcal{R}$ with $n_i$ items. Then the advantage of the calling program is at most:
 
 $$
 1-\prod\limits_{i=1}^q\left(1-\dfrac{n_i}{2^\lambda}\right).
@@ -639,36 +638,47 @@ The birthday scenario corresponds to the special case where $n_i=i-1$ (in the $i
 
 ### Exercises
 
- 1. In Section 4.1 we estimated the monetary cost of large computations, using pricing information from Amazon EC2 cloud computing service. This reflects the cost of doing a huge computation using a *general-purpose* CPU. For long-lived computations, the dominating cost is not the one-time cost of the hardware, but rather the cost of electricity powering the hardware. Because of that, it can be much cheaper to manufacture *special-purpose* hardware. Depending on the nature of the computation, special-purpose hardware can be significantly more energy-efficient.
- This is the situation with the Bitcoin cryptocurrency. Mining Bitcoin requires evaluating the SHA-256 cryptographic hash function as many times as possible, as fast as possible. When mining Bitcoin today, the only economically rational choice is to use specialpurpose hardware that does nothing except evaluate SHA-256, but is millions (maybe billions) of times more energy efficient than a general-purpose CPU evaluating SHA-256.
+4.1. In Section 4.1 we estimated the monetary cost of large computations, using pricing information from Amazon EC2 cloud computing service. This reflects the cost of doing a huge computation using a *general-purpose* CPU. For long-lived computations, the dominating cost is not the one-time cost of the hardware, but rather the cost of electricity powering the hardware. Because of that, it can be much cheaper to manufacture *special-purpose* hardware. Depending on the nature of the computation, special-purpose hardware can be significantly more energy-efficient.
+ This is the situation with the Bitcoin cryptocurrency. Mining Bitcoin requires evaluating the SHA-256 cryptographic hash function as many times as possible, as fast as possible. When mining Bitcoin today, the only economically rational choice is to use special-purpose hardware that does nothing except evaluate SHA-256, but is millions (maybe billions) of times more energy efficient than a general-purpose CPU evaluating SHA-256.
  **(a)** The relevant specs for Bitcoin mining hardware are wattage and giga-hashes (or terahashes) per second, which can be converted into raw energy required per hash. Search online and find the most energy efficient mining hardware you can (e.g., least joules per hash).
  **(b)** Find the cheapest real-world electricity rates you can, anywhere in the world. Use these to estimate the monetary cost of computing $2^{40}, 2^{50},\ldots, 2^{120}$ SHA-256 hashes.
- **(c)** Money is not the only way to measure the energy cost of a huge computation. Search online to find out how much carbon dioxide $(CO_2)$ is placed into the atmosphere per unit of electrical energy produced, under a typical distribution of power production methods. Estimate how many tons of $CO_2$ are produced as a side-effect of computing $2^{40}, 2^{50},\ldots,3^{120}$ SHA-256 hashes.
+ **(c )** Money is not the only way to measure the energy cost of a huge computation. Search online to find out how much carbon dioxide $(CO_2)$ is placed into the atmosphere per unit of electrical energy produced, under a typical distribution of power production methods. Estimate how many tons of $CO_2$ are produced as a side-effect of computing $2^{40}, 2^{50},\ldots,2^{120}$ SHA-256 hashes.
  $\star$ **(d)** Estimate the corresponding $CO_2$ concentration (parts per million) in the atmosphere as a result of computing $2^{40},2^{50},\ldots,2^{120}$ SHA-256 hashes. If it is possible without a PhD in climate science, try to estimate the increase in average global temperature caused by these computations.
- 2. Which of the following are negligible functions in $\lambda$? Justify your answers.
+ 
+4.2. Which of the following are negligible functions in $\lambda$? Justify your answers.
  $$
  \dfrac{1}{2^{\lambda/2}}\quad \dfrac{1}{2^{\log(\lambda^2)}}\quad\dfrac{1}{\lambda^{\log(\lambda)}}\quad\dfrac{1}{\lambda^{2}}\quad \dfrac{1}{2^{(\log\lambda)^2}}\quad \dfrac{1}{{(\log\lambda)^2}}\quad\dfrac{1}{\lambda^{1/\lambda}}\quad\dfrac{1}{\sqrt\lambda}\quad\dfrac{1}{2^{\sqrt\lambda}}
  $$
- 3. Suppose $f$ and $g$ are negligible.
+ 
+4.3. Suppose $f$ and $g$ are negligible.
  **(a)** Show that $f + g$ is negligible.
   **(b)** Show that $f \cdot g$ is negligible.
   **(c )** Give an example $f$ and $g$ which are both negligible, but where $f (\lambda)/g(\lambda)$ is not negligible.
- 4. Show that when $f$ is negligible, then for every polynomial $p$, the function $p(\lambda)f(\lambda)$ not only approaches 0, but it is also negligible itself.
+  
+4.4. Show that when $f$ is negligible, then for every polynomial $p$, the function $p(\lambda)f(\lambda)$ not only approaches 0, but it is also negligible itself.
  >Hint: Use the contrapositive. Suppose that $p(\lambda)f(\lambda)$ is non-negligible, where $p$ is a polynomial. Conclude that $f$ must also be non-negligible.
- 5. Prove that the $\approx$ relation is transitive. Let $f,g,h:\mathbb{N}\rightarrow\mathbb{R}$ be functions. Using the definition of the $\approx$ relation, prove that if $f\approx g$ and $g\approx h$ then $f\approx h$. You may find it useful to invoke the *triangle inequality*: $|a-c|\leqslant|a-b|+|b-c|.$
- 6. Prove Lemma 4.6.
- 7. Prove Lemma 4.7.
- 8. A *deterministic* program is one that uses no random choices. Suppose $\mathcal{L}_1$ and $\mathcal{L}_2$ are two *deterministic* libraries with a common interface. Show that either $\mathcal{L}_1\equiv\mathcal{L}_2$ or else $\mathcal{L}_1\ \&\ \mathcal{L}_2$ can be distinguished with advantage 1.
- 9. Algorithm $\mathcal{B}$ in Section 4.4 has worst-case running time $O(q^2)$. Can you suggest a way to make it run in $O(q\log \q)$ time? What about $O(q)$ time?
- 10. Assume that the last 4 digits of student ID numbers are assigned uniformly at this university. In a class of 46 students, what is the **exact** probability that two students have ID numbers with the same last 4 digits? 
- Compare this exact answer to the upper and lower bounds given by Lemma 4.10.
+
+4.5. Prove that the $\approx$ relation is transitive. Let $f,g,h:\mathbb{N}\rightarrow\mathbb{R}$ be functions. Using the definition of the $\approx$ relation, prove that if $f\approx g$ and $g\approx h$ then $f\approx h$. You may find it useful to invoke the *triangle inequality*: $|a-c|\leqslant|a-b|+|b-c|.$
+
+4.6. Prove Lemma 4.6.
+
+4.7. Prove Lemma 4.7.
+
+$\star$ 4.8. A *deterministic* program is one that uses no random choices. Suppose $\mathcal{L}_1$ and $\mathcal{L}_2$ are two *deterministic* libraries with a common interface. Show that either $\mathcal{L}_1\equiv\mathcal{L}_2$ or else $\mathcal{L}_1\ \&\ \mathcal{L}_2$ can be distinguished with advantage 1.
+
+4.9. Algorithm $\mathcal{B}$ in Section 4.4 has worst-case running time $O(q^2)$. Can you suggest a way to make it run in $O(q\log q)$ time? What about $O(q)$ time?
+
+4.10. Assume that the last 4 digits of student ID numbers are assigned uniformly at this university. In a class of 46 students, what is the **exact** probability that two students have ID numbers with the same last 4 digits? 
+
+Compare this exact answer to the upper and lower bounds given by Lemma 4.10.
  
- 11. Write a program that experimentally estimates the $\text{BirthdayProb}(q, N)$ probabilities. 
- Given $q$ and $N,$ generate $q$ uniformly chosen samples from $\mathbb{Z}N$ , with replacement, and check whether any element was chosen more than once. Repeat this entire process $t$ times to estimate the true probability of $\text{BirthdayProb}(q, N)$.
- Generate a plot that compares your experimental findings to the theoretical upper/lower bounds of $0.632\frac{q(q-1)}{2^{\lambda+1}}$ and $\frac{q(q-1)}{2^{\lambda+1}}$.
+4.11. Write a program that experimentally estimates the $\text{BirthdayProb}(q, N)$ probabilities. 
+ Given $q$ and $N,$ generate $q$ uniformly chosen samples from $\mathbb{Z}_N$ , with replacement, and check whether any element was chosen more than once. Repeat this entire process $t$ times to estimate the true probability of $\text{BirthdayProb}(q, N)$.
+
+Generate a plot that compares your experimental findings to the theoretical upper/lower bounds of $0.632\frac{q(q-1)}{2^{\lambda+1}}$ and $\frac{q(q-1)}{2^{\lambda+1}}$.
  
- 12. Suppose you want to enforce password rules so that at least $2^{128}$ passwords satisfy the rules. How many characters long must the passwords be, in each of these cases?
- **(a)** Passwords consist of lowercase a through $z$ only.
+4.12. Suppose you want to enforce password rules so that at least $2^{128}$ passwords satisfy the rules. How many characters long must the passwords be, in each of these cases?
+ **(a)** Passwords consist of lowercase $\textcolor{brown}{a}$ through $\textcolor{brown}{z}$ only.
  **(b)** Passwords consist of lowercase and uppercase letters $\textcolor{brown}{a}-\textcolor{brown}{z}$ and $\textcolor{brown}{A}-\textcolor{brown}{Z}$.
 **(c )** Passwords consist of lower/uppercase letters and digits $\textcolor{brown}{0}-\textcolor{brown}{9}$.
 **(d)** Passwords consist of lower/uppercase letters, digits, and any symbol characters that appear on a standard US keyboard (including the space character).

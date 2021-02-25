@@ -1,6 +1,5 @@
 # 5 Pseudorandom Generators
-One-time pad requires a key that’s as long as the plaintext. Let’s forget that we know about this limitation. Suppose Alice & Bob share only a short $\lambda$-bit secret $k$, but they want to encrypt a 2$\lambda$-bit plaintext $m$. They don’t know that (perfect) one-time secrecy is impossible in this setting (Exercise 2.11), so they try to get it to work anyway using the
-following reasoning:
+One-time pad requires a key that’s as long as the plaintext. Let’s forget that we know about this limitation. Suppose Alice & Bob share only a short $\lambda$-bit secret $k$, but they want to encrypt a 2$\lambda$-bit plaintext $m$. They don’t know that (perfect) one-time secrecy is impossible in this setting (Exercise 2.11), so they try to get it to work anyway using the following reasoning:
 
  - The only encryption scheme they know about is one-time pad, so they decide that the ciphertext will have the form $c = m\ \oplus \colorbox{grey}{??}$ . This means that the unknown value $\colorbox{grey}{??}$ must be 2$\lambda$ bits long.
  - In order for the security of one-time pad to apply, the unknown value  $\colorbox{grey}{??}$ should be uniformly distributed.
@@ -10,33 +9,32 @@ Let $G$ denote the process that transforms the key $k$ into this mystery value. 
 
 It is not hard to see that if $G$ is a deterministic function, then there are only $2^\lambda$ possible outputs of $G$, so the distribution of $G(k)$ cannot be uniform in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ . We therefore cannot argue that the scheme is secure in the same way as one-time pad.
 
-However, what if the distribution of $G(k)$ values is not perfectly uniform but only “close enough” to uniform? Suppose no polynomial-time algorithm can distinguish the distribution of $G(k)$ values from the uniform distribution. Then surely this ought to be “close enough” to uniform for practical purposes. This is exactly the idea of **pseudorandomness**.
-It turns out that if $G$ has a pseudorandomness property, then the encryption scheme described above is actually secure (against polynomial-time adversaries, in the sense discussed in the previous chapter).
+However, what if the distribution of $G(k)$ values is not perfectly uniform but only “close enough” to uniform? Suppose no polynomial-time algorithm can distinguish the distribution of $G(k)$ values from the uniform distribution. Then surely this ought to be “close enough” to uniform for practical purposes. This is exactly the idea of **pseudorandomness**. It turns out that if $G$ has a pseudorandomness property, then the encryption scheme described above is actually secure (against polynomial-time adversaries, in the sense discussed in the previous chapter).
 
 ## 5.1 Definitions
 A **pseudorandom generator (PRG)** is a deterministic function $G$ whose outputs are longer than its inputs. When the input to $G$ is chosen uniformly at random, it induces a certain distribution over the possible output. As discussed above, this output distribution cannot be uniform. However, the distribution is *pseudorandom* if it is **indistinguishable from the uniform distribution**. More formally:
 
-**Definition 5.1 (PRG security)** Let  $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ be a deterministic function with $\ell>0$. We say that $G$ is a **secure pseudorandom generator (PRG)** if $\mathcal{L}_{\text{prg-real}}^G\approx \mathcal{L}_{prg-rand}^G$, where:
+**Definition 5.1 (PRG security)** *Let  $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ be a deterministic function with $\ell>0$. We say that $G$ is a **secure pseudorandom generator (PRG)** if $\mathcal{L}_{\text{prg-real}}^G\approx \mathcal{L}_{prg-rand}^G$, where:*
 
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{prg-real}}^G\\
+\begin{array}{|l|}\hline
+\mathcal{L}_{\text{prg-real}}^G\\ \hline
 \underline{\text{QUERY():}}\\
-r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\text{return}\ G(s) \\\hline
+\quad s\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\quad \text{return}\ G(s) \\\hline
 \end{array}
 \quad
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{prg-rand}}^G\\
+\begin{array}{|l|}\hline
+\mathcal{L}_{\text{prg-rand}}^G\\ \hline
 \underline{\text{QUERY():}}\\
-r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}\\
-\text{return}\ r \\\hline
+\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}\\
+\quad \text{return}\ r \\\hline
 \end{array}
 $$
-The value $\ell$ is called the **stretch** of the PRG. The input to the PRG is typically called a **seed**.
+*The value $\ell$ is called the **stretch** of the PRG. The input to the PRG is typically called a **seed**.*
 
-Below is an illustration of the distributions sampled by these libraries, for a **lengthdoubling** $(\ell=\lambda)$ PRG (not drawn to scale) :
+Below is an illustration of the distributions sampled by these libraries, for a **length-doubling** $(\ell=\lambda)$ PRG (not drawn to scale) :
  
 $$
 \textcolor{red}{\text{Image screenshot here}}
@@ -45,22 +43,24 @@ $$
 
 To understand PRGs, you must simultaneously appreciate two ways to compare the PRG’s output distribution with the uniform distribution:
 
- - From a relative perspective, the PRG’s output distribution is tiny. Out of the $2^{2\lambda}$ strings in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$, only $2^\lambda$ are possible outputs of $G$. These strings make up a $2^\lambda/2^{2\lambda}=1/2^\lambda$ fraction of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$, only $2^\lambda$-a **negligible fraction!**
+ - From a *relative* perspective, the PRG’s output distribution is tiny. Out of the $2^{2\lambda}$ strings in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$, only $2^\lambda$ are possible outputs of $G$. These strings make up a $2^\lambda/2^{2\lambda}=1/2^\lambda$ fraction of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$, only $2^\lambda$-a **negligible fraction!**
  - From an *absolute* perspective, the PRG’s output distribution is huge. There are $2^\lambda$ possible outputs of $G$, which is an **exponential amount!**
 
 The illustration above only captures the *relative* perspective (comparing the red dots to the entire extent of  $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$,  so it can lead to some misunderstanding. Just looking at this picture, it is hard to imagine how the two distributions could be indistinguishable. How could a calling program *not* notice whether it’s seeing the whole set or just a negligible fraction of the whole set? Well, if you run in polynomial-time in $\lambda$, the $2\lambda$ and $2^{2\lambda}$ are both so enormous that it doesn’t really matter that one is vastly bigger than the other. The relative *sizes* of the distribution don’t really help distinguish, since it is not a viable strategy for the distinguisher to “measure” the size of the distribution it’s sampling.
 
-Consider: there are about $2^{75}$ molecules in a teaspoon of water, and about $2^{2.75}$ molecules of water in Earth’s oceans. Suppose you dump a teaspoon of water into the ocean and let things mix for a few thousand years. Even though the teaspoon accounts for only $1/2^{75}$ of the ocean’s contents, that doesn’t make it easy to keep track of all $2^{75}$ water molecules that originated in the teaspoon! If you are small enough to see individual water molecules, then a teaspoon of water looks as big as the ocean.
+Consider: there are about $2^{75}$ molecules in a teaspoon of water, and about $2^{2.75}$ molecules of water in Earth’s oceans. Suppose you dump a teaspoon of water into the ocean and let things mix for a few thousand years. Even though the teaspoon accounts for only $1/2^{75}$ of the ocean’s contents, that doesn’t make it easy to keep track of all $2^{75}$ water molecules that originated in the teaspoon! If you are small enough to see individual water molecules, then a teaspoon of water looks as big as the ocean.
 
 ### Discussion & Pitfalls
 
- - Do not confuse the interface of a PRG (it takes in a seed as input) with the interface of the security libraries $\mathcal{L}_{\text{prg}-\star}$ (their QUERRY subroutine doesn’t take any input)! A PRG is indeed an algorithm into which you can feed any string you like. However, **security is only guaranteed** when the PRG is being used exactly as described in the security libraries — in particular, when the seed is chosen uniformly/secretly and not used for anything else.
- Nothing prevents a user from putting an adversarially-chosen s into a PRG, or revealing a PRG seed to an adversary, etc. You just get no security guarantee from doing it, since it’s not the situation reflected in the PRG security libraries.
+ - Do not confuse the interface of a PRG (it takes in a seed as input) with the interface of the security libraries $\mathcal{L}_{\text{prg}-\star}$ (their QUERY subroutine doesn’t take any input)! A PRG is indeed an algorithm into which you can feed any string you like. However, **security is only guaranteed** when the PRG is being used exactly as described in the security libraries — in particular, when the seed is chosen uniformly/secretly and not used for anything else.
  
- - It doesn’t really make sense to say that "$\textcolor{brown}{0010110110}$ is a random string” or "$\textcolor{brown}{0000000001}$ is a pseudorandom string.”  Randomness and pseudorandomness are **properties of the process used to generate a string**, not properties of the individual strings themselves. When we have a value $z=G(s)$ where $G$ is a PRG and $s$ is chosen uniformly, you could say that $z$ was “chosen pseudorandomly.” You could say that the output of some process is a “pseudorandom distribution.” But it is slightly sloppy (although common) to say that a string $z$ “is pseudorandom”.
+    Nothing prevents a user from putting an adversarially-chosen s into a PRG, or revealing a PRG seed to an adversary, etc. You just get no security guarantee from doing it, since it’s not the situation reflected in the PRG security libraries.
+ 
+ - It doesn’t really make sense to say that "$\textcolor{brown}{0010110110}$ is a random string” or "$\textcolor{brown}{0000000001}$ is a pseudorandom string.”  Randomness and pseudorandomness are **properties of the *process* used to generate a string**, not properties of the individual strings themselves. When we have a value $z=G(s)$ where $G$ is a PRG and $s$ is chosen uniformly, you could say that $z$ was “chosen pseudorandomly.” You could say that the output of some process is a “pseudorandom distribution.” But it is slightly sloppy (although common) to say that a string $z$ “is pseudorandom”.
  - There are common statistical tests you can run, which check whether some data has various properties that you would expect from a uniform distribution. For example, are there roughly an equal number of $\textcolor{brown}{0}$s and $\textcolor{brown}{1}$s? Does the substring $\textcolor{brown}{01010}$ occur with roughly the frequency I would expect? If I interpret the string as a series of points in the unit square$[0,1)^2$, is it true that roughly $\pi/4$ of them are within
 Euclidean distance 1 of the origin?
-The definition of pseudorandomness is kind of a “master” definition that encompasses all of these statistical tests and more. After all, what is a statistical test, but a polynomial-time procedure that obtains samples from a distribution and outputs a yes/no decision? Pseudorandomness means that every statistical test that “passes” uniform data will also “pass” pseudorandomly generated data.
+
+    The definition of pseudorandomness is kind of a “master” definition that encompasses all of these statistical tests and more. After all, what is a statistical test, but a polynomial-time procedure that obtains samples from a distribution and outputs a yes/no decision? Pseudorandomness means that *every* statistical test that “passes” uniform data will also “pass” pseudorandomly generated data.
 
 
 ## 5.2 Pseudorandom Generators in Practice
