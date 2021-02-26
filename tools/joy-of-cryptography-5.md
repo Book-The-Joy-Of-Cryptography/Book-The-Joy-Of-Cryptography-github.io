@@ -65,15 +65,14 @@ Euclidean distance 1 of the origin?
 
 ## 5.2 Pseudorandom Generators in Practice
 
-You are probably expecting to nowsee at least one example of a secure PRG. Unfortunately, things are not so simple. We have no examples of secure PRGs! If it were possible to prove that some function $G$ is a secure PRG, **it would resolve the famous P vs NP problem** —the most famous unsolved problem in computer science (and arguably, all of mathematics).
+You are probably expecting to now see at least one example of a secure PRG. Unfortunately, things are not so simple. We have no examples of secure PRGs! If it were possible to prove that some function $G$ is a secure PRG, **it would resolve the famous P vs NP problem** —the most famous unsolved problem in computer science (and arguably, all of mathematics).
 
 The next best thing that cryptographic research can offer are **candidate PRGs,** which are *conjectured* to be secure. The best examples of such PRGs are the ones that have been subjected to significant public scrutiny and resisted all attempts at attacks so far.
 
-In fact, the entire rest of this book is based on cryptography that is only conjectured to be secure. How is this possible, given the book’s stated focus on *provable* security? As you progress through the book, pay attention to how all of the provable security claims are *conditional* — if $X$ is secure then $Y$ is secure. You will be able to trace back through this web of implications and discover that there are only a small number of underlying cryptographic primitives whose security is merely *conjectured* (PRGs are one example of such a primitive). Everything else builds on these primitives in a provably secure way.
+In fact, the entire rest of this book is based on cryptography that is only conjectured to be secure. How is this possible, given the book’s stated focus on *provable security*? As you progress through the book, pay attention to how all of the provable security claims are *conditional* — if $X$ is secure then $Y$ is secure. You will be able to trace back through this web of implications and discover that there are only a small number of underlying cryptographic primitives whose security is merely *conjectured* (PRGs are one example of such a primitive). Everything else builds on these primitives in a provably secure way.
 
 With that disclaimer out of the way, surely *now* you can be shown an example of a conjectured secure PRG, right? There are indeed some conjectured PRGs that are simple enough to show you at this point, but you won’t find them in the book. The problem is that none of these PRG candidates are really used in practice. When you really need a PRG in
-practice, you would actually use a PRG that is built from something called a block cipher (which we won’t see until Chapter 6). A block cipher is *conceptually* more complicated than a PRG, and can even be built from a PRG (in principle). That explains why this book starts with PRGs. In practice, a block cipher is just a more useful object, so that is what you would find easily available (even implemented with specialized CPU instructions in
-most CPUs). When we introduce block ciphers (and pseudorandom functions), we will discuss how they can be used to construct PRGs.
+practice, you would actually use a PRG that is built from something called a block cipher (which we won’t see until Chapter 6). A block cipher is *conceptually* more complicated than a PRG, and can even be built from a PRG (in principle). That explains why this book starts with PRGs. In practice, a block cipher is just a more useful object, so that is what you would find easily available (even implemented with specialized CPU instructions in most CPUs). When we introduce block ciphers (and pseudorandom functions), we will discuss how they can be used to construct PRGs.
 
 ## How NOT to Build a PRG
 
@@ -97,9 +96,9 @@ Do you see any patterns? Every string has its first half equal to its second hal
 
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{A}\\
-x||y:=\text{QUERRY()}\\
+\begin{array}{|l|}\hline
+\mathcal{A}\\ \hline
+x||y:=\text{QUERY()}\\
 \text{return}\ x\stackrel{?}{=} y\\\hline
 \end{array}
 $$
@@ -111,40 +110,40 @@ $$
  - *When linked to $\mathcal{L}_{\text{prg-real}}$, the calling program receives outputs of $G$, which always have matching first/second halves. So $\text{Pr}[\mathcal{A}\diamond\mathcal{L}_{\text{prg-real}}^G\Rightarrow 1]=1$. Below we have filled in  $\mathcal{L}_{\text{prg-real}}$ with the details of our $G$ algorithm:*
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{A}\\
+\begin{array}{|l|}\hline
+\mathcal{A}\\ \hline
 x||y:=\text{QUERRY()}\\
 \text{return}\ x\stackrel{?}{=} y\\\hline
 \end{array}
 \diamond
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{prg-real}}^G\\
+\begin{array}{|l|}\hline
+\quad \mathcal{L}_{\text{prg-real}}^G\\ \hline
 \underline{\text{QUERRY():}}\\
-s\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\text{return}\  s||s \\\hline
+\quad s\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
+\quad \text{return}\  s||s \\\hline
 \end{array}
 $$
  
  - *When linked to $\mathcal{L}_{\text{prg-rand}}$, the calling program receives uniform samples from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$*.
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{A}\\
+\begin{array}{|l|}\hline
+\mathcal{A}\\ \hline
 x||y:=\text{QUERRY()}\\
 \text{return}\ x\stackrel{?}{=} y\\\hline
 \end{array}
 \diamond
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{prg-rand}}^G\\
+\begin{array}{|l|}\hline
+\quad \quad \mathcal{L}_{\text{prg-rand}}^G\\ \hline
 \underline{\text{QUERRY():}}\\
-r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
-\text{return}\  r \\\hline
+\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
+\quad \text{return}\  r \\\hline
 \end{array}
 $$
 
 *$\mathcal{A}$ outputs 1 whenever we sample a string from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ with equal first/second halves. What exactly is the probability of this happening? There are several ways to see that the probability is $1/2^\lambda$ (this is like asking the probability of rolling doubles with two dice, but each die has $2^\lambda$ sides instead of 6). Therefore, $\text{Pr}[\mathcal{A}\diamond\mathcal{L}_{\text{prg-rand}}^G \Rightarrow 1]=1/2^\lambda$.*
 
-The advantage of this adversary is $1-1/2^\lambda$ which is certainly non-negligible — it does not even approach $0$ as $\lambda$ grows. This shows that $G$ is not a secure PRG. This example illustrates how randomness/ pseudorandomness is a property of the *entire process*, not of individual strings. If you take a string of $\textcolor{brown}{1}$s and concatenate it with another string of $\textcolor{brown}{1}$s, you get a long string of $\textcolor{brown}{1}$s. “Containing only $\textcolor{brown}{1}$s" is a property of individual strings. If you take a “random string” and concatenate it with another “random string,” you might not get a “random long string.” Being random is not a property of an  individual string, but of the entire process that generates it.
+The advantage of this adversary is $1-1/2^\lambda$ which is certainly non-negligible — it does not even approach $0$ as $\lambda$ grows. This shows that $G$ is not a secure PRG. This example illustrates how randomness/pseudorandomness is a property of the *entire process*, not of individual strings. If you take a string of $\textcolor{brown}{1}$s and concatenate it with another string of $\textcolor{brown}{1}$s, you get a long string of $\textcolor{brown}{1}$s. “Containing only $\textcolor{brown}{1}$s" is a property of individual strings. If you take a “random string” and concatenate it with another “random string,” you might not get a “random long string.” Being random is not a property of an  individual string, but of the entire process that generates it.
 
 Outputs from this $G$ have equal first/second halves, which is an obvious pattern. The challenge of desiging a secure PRG is that its outputs must have *no discernable* pattern! Any pattern will lead to an attack similar to the one shown above.
 
@@ -175,20 +174,20 @@ Let $\Sigma$ be an encryption scheme, and let $\mathcal{L}_{\text{ots-L}}^\Sigma
 
 $$
 \def\arraystretch{1.5}
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{ots-L}}^{\Sigma}\\
+\begin{array}{|l|}\hline
+\quad \quad \quad \quad \quad \quad\mathcal{L}_{\text{ots-L}}^{\Sigma}\\ \hline
 \underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
-k\leftarrow \Sigma.\text{KeyGen}\\
-c\leftarrow \Sigma.\text{Enc}(k,m_L)\\
-\text{return}\ c\\\hline
+\quad k\leftarrow \Sigma.\text{KeyGen}\\
+\quad c\leftarrow \Sigma.\text{Enc}(k,m_L)\\
+\quad \text{return}\ c\\\hline
 \end{array}
 \quad
-\begin{array}{|c|}\hline
-\mathcal{L}_{\text{ots-R}}^{\Sigma}\\
+\begin{array}{|l|}\hline
+ \quad \quad \quad  \quad  \quad \mathcal{L}_{\text{ots-R}}^{\Sigma}\\ \hline
 \underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
-k\leftarrow \Sigma.\text{KeyGen}\\
-c\leftarrow \Sigma.\text{Enc}(k,m_R)\\
-\text{return}\ c\\\hline
+\quad k\leftarrow \Sigma.\text{KeyGen}\\
+\quad c\leftarrow \Sigma.\text{Enc}(k,m_R)\\
+\quad \text{return}\ c\\\hline
 \end{array}
 $$
 
@@ -218,7 +217,7 @@ $$
 \mathcal{L}_{\text{hyb-1}}:\ \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \underline{\text{EAVESDROP}(m_L,m_R):}\\
-\quad  \colorbox{yellow}{z}\leftarrow \text{QUERRY()}\\
+\quad  \colorbox{yellow}{z}\leftarrow \text{QUERY()}\\
 \quad c:=\colorbox{yellow}{z}\oplus m_L\\
 \quad \text{return}\ c\\\hline
 \end{array}\quad
@@ -229,15 +228,15 @@ $$
 \quad \text{return}\ G(s)\\\hline
 \end{array}
 \quad\begin{array}{l}
-\text{The first hybrid step is to factor out the}, \text{shown here with}\\
-\text{computations involving G, in terms of the} \mathcal{L}_{\text{prg-real}}^G \text{library.}
+\text{The first hybrid step is to factor out the} \\
+\text{computations involving G, in terms of the} \\\mathcal{L}_{\text{prg-real}}^G \text{library.}
 \end{array}
 $$
 $$
 \mathcal{L}_{\text{hyb-2}}:\ \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \underline{\text{EAVESDROP}(m_L,m_R):}\\
-\quad  z\leftarrow \text{QUERRY()}\\
+\quad  z\leftarrow \text{QUERY()}\\
 \quad c:=z\oplus m_L\\
 \quad \text{return}\ c\\\hline
 \end{array}\quad
@@ -248,10 +247,10 @@ $$
 \quad \text{return}\ \colorbox{yellow}{r}\\\hline
 \end{array}
 \quad\begin{array}{l}
-\text{From the PRG security of G, we may replace}\\
-\text{the instance of}\ \mathcal{L}_{\text{prg-real}}^G \text{with}\ \mathcal{L}_{\text{prg-rand}}^G,\\
-\text{The resulting hybrid library}\  \mathcal{L}_{\text{hyb-2}}\ \text{is indistinguishable}\\
-\text{from the previous one.}
+\text{From the PRG security of G, we may}\\
+\text{replace the instance of}\ \mathcal{L}_{\text{prg-real}}^G \text{with}\ \mathcal{L}_{\text{prg-rand}}^G,\\
+\text{The resulting hybrid library}\  \mathcal{L}_{\text{hyb-2}}\ \\
+\text{is indistinguishable from the previous one.}
 \end{array}
 $$
 
@@ -266,7 +265,8 @@ $$
 \end{array}\quad
 \begin{array}{l}
 \text{A subroutine has been inlined. Note that the}\\
-\text{resulting library is precisely}\ \mathcal{L}_{\text{ots-L}}^{\text{OTP}} \text{involving standard one-time pad on plaintexts}\\
+\text{resulting library is precisely}\ \mathcal{L}_{\text{ots-L}}^{\text{OTP}} \text{involving} \\
+\bold{standard \ one-time \ pad} \text{\ on plaintexts}\\
 \text{of size}\  \lambda + \ell. \text{We have essentially proven}\\
 \text{that pOTP is indistinguishable from standard}\\
 \text{OTP, and thereforewe can apply the security of OTP.}
@@ -282,8 +282,8 @@ $$
 \quad \text{return}\ c\\\hline
 \end{array}\quad
 \begin{array}{l}
-\text{The (perfect) one-time secrecy of rOTP allows}\\
-\text{us to replace}\ \mathcal{L}_{\text{ots-L}}^{\text{OTP}} \text{with} \ \mathcal{L}_{\text{ots-R}}^{\text{OTP};}\\
+\text{The (perfect) one-time secrecy of rOTP}\\
+\text{allows us to replace}\ \mathcal{L}_{\text{ots-L}}^{\text{OTP}} \text{with} \ \mathcal{L}_{\text{ots-R}}^{\text{OTP};}\\
 \text{they are interchangeable.}
 \end{array}
 $$
@@ -293,13 +293,13 @@ $$
 \mathcal{L}_{\text{hyb-5}}:\ \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \underline{\text{EAVESDROP}(m_L,m_R):}\\
-\quad  z\leftarrow \text{\colorbox{yellow}{QUERRY()}}\\
-\quad c:=z\oplus m_L\\
+\quad  z\leftarrow \text{\colorbox{yellow}{QUERY()}}\\
+\quad c:=z\oplus m_R\\
 \quad \text{return}\ c\\\hline
 \end{array}\quad
 \begin{array}{|l|}\hline
 \qquad \ \mathcal{L}_{\text{prg-rand}}^G\\\hline
-\underline{\text{QUERRY():}}\\
+\underline{\text{QUERY():}}\\
 \quad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}\\
 \quad \text{return}\ r\\\hline
 \end{array}
@@ -332,7 +332,7 @@ $$
 $$
 
 $$
-\mathcal{L}_{\text{hyb-6}}:\ \def\arraystretch{1.5}
+\mathcal{L}_{\text{ots-R}}^{\text{pOTP}}:\ \ \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{ots-R}}^{\text{pOTP}}\\\hline
 \quad  \colorbox{yellow}{k}\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
@@ -349,13 +349,13 @@ Summarizing, we showed a sequence of hybrid libraries satisfying the following:
 $\mathcal{L}_{\text {ots-L }}^{\text {pOTP }} \equiv \mathcal{L}_{\text {hyb }-1} \approx \mathcal{L}_{\text {hyb- } 2} \equiv \mathcal{L}_{\text {hyb- } 3} \equiv \mathcal{L}_{\text {hyb- } 4} \equiv \mathcal{L}_{\text {hyb- } 5} \approx \mathcal{L}_{\text {hyb- } 6} \equiv \mathcal{L}_{\text {ots-R }}^{\text {pOTP }}.$
 
 
-Hence, $\mathcal{L}_{\text {ots-L }}^{\text {pOTP }} \approx \mathcal{L}_{\text {ots-R }}^{\text {pOTP }},$ and pOTP has (computational) one-time secrecy.
+Hence, $\mathcal{L}_{\text {ots-L }}^{\text {pOTP }} \approx \mathcal{L}_{\text {ots-R }}^{\text {pOTP }},$ and pOTP has (computational) one-time secrecy. $\ \blacksquare$
 
 ## 5.4 Extending the Stretch of a PRG
 The *stretch* of a PRG measures how much longer its output is than its input. Can we use a PRG with small stretch to construct a PRG with larger stretch? The answer is yes, but only if you do it the right way!
 
 ### Two Approaches to Increase Stretch
-Suppose $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ is a length-doubling PRG (i.e., a PRG with stretch $\lambda$). Below are two ideas for constructing a PRG with longer stretch:
+Suppose $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ is a length-doubling PRG (*i.e*., a PRG with stretch $\lambda$). Below are two ideas for constructing a PRG with longer stretch:
 
  $$
 \textcolor{red}{\text{Image screenshot here}}
@@ -365,29 +365,28 @@ Although the constructions are similar, only one of them is secure. Before readi
 ### A Security Proof
 I think it’s helpful to illustrate the “strategey” of security proofs by starting from the desired conclusion and working backwards. What better way to do this than as a Socratic dialogue in the style of Galileo?
 
-**SALVIATI:** 	I’m sure that $H_1$ is the secure PRG. 
+**SALVIATI:** 	*I’m sure that $H_1$ is the secure PRG*. 
 
 **SIMPLICIO:** If I understand the security denition for PRGs correctly, you mean that the output of $H_1$ looks indistinguishable from uniform, when the input to $H_1$ is uniform. Why do you say that? 
 
-**SALVIATI:**  Simple! $H_1$’s output consists of segments called $x, u,$ and $v$. Each of these are outputs of $G$, and since $G$ itself is a PRG its outputs look uniform.
+**SALVIATI:**  *Simple! $H_1$’s output consists of segments called $x, u,$ and $v$. Each of these are outputs of $G$, and since $G$ itself is a PRG its outputs look uniform.*
 
 **SIMPLICIO:** I wish I had your boldness, Salviati. I myself am more cautious. If $G$ is a secure PRG, then its outputs are indeed indistinguishable from uniform, but surely *only when its input is uniform!* Are you so sure that’s the case here?
 
-**SALVIATI:** You raise a good point, Simplicio. In these endeavors it is always preferable to err on the side of caution. When we want to claim that $H_1$ is a secure PRG, we consider the nature of its outputs when its seed s is uniform. Since $H_1$ sends that seed s directly into G, your concern is addressed.
+**SALVIATI:** *You raise a good point, Simplicio. In these endeavors it is always preferable to err on the side of caution. When we want to claim that $H_1$ is a secure PRG, we consider the nature of its outputs when its seed s is uniform. Since $H_1$ sends that seed s directly into G, your concern is addressed.*
 
 **SIMPLICIO:** Yes, I can see how in the expression $x || y := G(s)$ the input to $G$ is uniform, and so its outputs $x$ and $y$ are indistinguishable from random. Since $x$ is part of $H_1$’s output, we are making progress towards showing that the entire output of $H_1$ is indistinguishable from random! However, the output of $H_1$ also contains terms $u$ and $v$. When I examine how they are generated, as $u||v := G(y)$, I become concerned again. Surely $y$ is not uniform, so I see no way to apply the security if $G$!
 
 **SALVIATI:**  
-Oh, bless your heart. The answer could not be any more obvious! It is true that $y$ is not uniformly distributed. But did you not just convince yourself that $y$ is indistinguishable from uniform? Should that suffice?
+*Oh, bless your heart. The answer could not be any more obvious! It is true that $y$ is not uniformly distributed. But did you not just convince yourself that $y$ is indistinguishable from uniform? Should that suffice?*
 
 **SIMPLICIO:** 
-Incredible! I believe I understand now. Let me try to summarize: We suppose
-the input s to $H_1$ is chosen uniformly, and examine what happens to $H_1$’s outputs. In the expression $x || y := G(s)$, the input to $G$ is uniform, and thus $x$ and $y$ are indistinguishable from uniform. Now, considering the expression $u||v := G(y)$, the result is indistinguishable from a scenario in which $y$ is truly uniform. But if $y$ were truly uniform, those outputs $u$ and $v$ would be indistinguishable from uniform! Altogether, $x, u,$ and $v$ (the outputs of $H_1$) are each indistinguishable from uniform!
+Incredible! I believe I understand now. Let me try to summarize: We suppose the input s to $H_1$ is chosen uniformly, and examine what happens to $H_1$’s outputs. In the expression $x || y := G(s)$, the input to $G$ is uniform, and thus $x$ and $y$ are indistinguishable from uniform. Now, considering the expression $u||v := G(y)$, the result is indistinguishable from a scenario in which $y$ is truly uniform. But if $y$ were truly uniform, those outputs $u$ and $v$ would be indistinguishable from uniform! Altogether, $x, u,$ and $v$ (the outputs of $H_1$) are each indistinguishable from uniform!
 
 I hope that was as fun for you as it was for me. The formal security proof and its sequence of hybrids will follow the outline given in Simplicio’s summary. We start by applying the PRG security definition to the first call to $G$, and replace its outputs with truly uniform values. After this change, the input to the second call to $G$ becomes uniform, allowing us to apply the PRG security definition again. 
 
 **Claim 5.5**
-If $G$ is a secure length-doubling PRG, then $H_1$ (defined above) is a secure (length-tripling) PRG.
+*If $G$ is a secure length-doubling PRG, then $H_1$ (defined above) is a secure (length-tripling) PRG.*
 
 **Proof**
 One of the trickier aspects of this proof is that we are using a secure PRG $G$ to prove the security of another PRG $H_1$. That means both $\mathcal{L}_{\text{prg}-\star}^{H_1}$ and $\mathcal{L}_{\text{prg}-\star}^{G}$ will appear in this proof. Both libraries/interfaces have a subroutine named “QUERRY”, and we will rename these subroutines QUERRY$_{H1}$ and QUERRY$_G$ to disambiguate.
@@ -1073,3 +1072,5 @@ $$
 (c ) Prove that for any polynomial-time algorithm $\mathcal{A},\text{Pr}[\mathcal{A}(s_n)=t_n]$ is negligible, where $s_n, t_n$ are generated as in the symmetric ratchet construction.
 (d) Prove that for any polynomial-time algorithm $\mathcal{A},\text{Pr}[\mathcal{A}(s_n)=\colorbox{yellow}{s}_{n-1}]$ negligible. In other words, “turning the ratchet backwards” is a hard problem.
 >Hint: the proof should be a few lines, a direct corollary of part (c).
+
+
