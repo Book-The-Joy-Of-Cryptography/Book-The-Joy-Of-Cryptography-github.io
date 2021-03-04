@@ -57,11 +57,11 @@ Consider: there are about $2^{75}$ molecules in a teaspoon of water, and about $
     Nothing prevents a user from putting an adversarially-chosen s into a PRG, or revealing a PRG seed to an adversary, etc. You just get no security guarantee from doing it, since it’s not the situation reflected in the PRG security libraries.
  
  - It doesn’t really make sense to say that "$\textcolor{brown}{0010110110}$ is a random string” or "$\textcolor{brown}{0000000001}$ is a pseudorandom string.”  Randomness and pseudorandomness are **properties of the *process* used to generate a string**, not properties of the individual strings themselves. When we have a value $z=G(s)$ where $G$ is a PRG and $s$ is chosen uniformly, you could say that $z$ was “chosen pseudorandomly.” You could say that the output of some process is a “pseudorandom distribution.” But it is slightly sloppy (although common) to say that a string $z$ “is pseudorandom”.
- - There are common statistical tests you can run, which check whether some data has various properties that you would expect from a uniform distribution. For example, are there roughly an equal number of $\textcolor{brown}{0}$s and $\textcolor{brown}{1}$s? Does the substring $\textcolor{brown}{01010}$ occur with roughly the frequency I would expect? If I interpret the string as a series of points in the unit square$[0,1)^2$, is it true that roughly $\pi/4$ of them are within
+ - There are common statistical tests you can run, which check whether some data has various properties that you would expect from a uniform distribution. [^1] For example, are there roughly an equal number of $\textcolor{brown}{0}$s and $\textcolor{brown}{1}$s? Does the substring $\textcolor{brown}{01010}$ occur with roughly the frequency I would expect? If I interpret the string as a series of points in the unit square$[0,1)^2$, is it true that roughly $\pi/4$ of them are within
 Euclidean distance 1 of the origin?
 
     The definition of pseudorandomness is kind of a “master” definition that encompasses all of these statistical tests and more. After all, what is a statistical test, but a polynomial-time procedure that obtains samples from a distribution and outputs a yes/no decision? Pseudorandomness means that *every* statistical test that “passes” uniform data will also “pass” pseudorandomly generated data.
-
+[^1]: For one list of such tests, see http://csrc.nist.gov/publications/nistpubs/800-22-rev1a/SP800-22rev1a.pdf.
 
 ## 5.2 Pseudorandom Generators in Practice
 
@@ -220,7 +220,8 @@ $$
 \quad  \colorbox{yellow}{z}\leftarrow \text{QUERY()}\\
 \quad c:=\colorbox{yellow}{z}\oplus m_L\\
 \quad \text{return}\ c\\\hline
-\end{array}\quad
+\end{array}
+\diamond
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{prg-real}}^G\\\hline
 \underline{\text{QUERRY():}}\\
@@ -239,7 +240,8 @@ $$
 \quad  z\leftarrow \text{QUERY()}\\
 \quad c:=z\oplus m_L\\
 \quad \text{return}\ c\\\hline
-\end{array}\quad
+\end{array}
+\diamond
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{prg-rand}}^G\\\hline
 \underline{\text{QUERRY():}}\\
@@ -296,7 +298,7 @@ $$
 \quad  z\leftarrow \text{\colorbox{yellow}{QUERY()}}\\
 \quad c:=z\oplus m_R\\
 \quad \text{return}\ c\\\hline
-\end{array}\quad
+\end{array}\diamond
 \begin{array}{|l|}\hline
 \qquad \ \mathcal{L}_{\text{prg-rand}}^G\\\hline
 \underline{\text{QUERY():}}\\
@@ -317,7 +319,7 @@ $$
 \quad  z\leftarrow \text{QUERRY()}\\
 \quad c:=z\oplus m_R\\
 \quad \text{return}\ c\\\hline
-\end{array}\quad
+\end{array}\diamond
 \begin{array}{|l|}\hline
 \qquad \ \mathcal{L}_{\text{prg-real}}^G\\\hline
 \underline{\text{QUERRY():}}\\
@@ -363,11 +365,12 @@ $$
 Although the constructions are similar, only one of them is secure. Before reading any further, can you guess which of $H_1, H_2$ is a secure PRG and which is insecure? By carefully comparing these two approaches, I hope you develop a better understanding of the PRG security definition.
 
 ### A Security Proof
-I think it’s helpful to illustrate the “strategey” of security proofs by starting from the desired conclusion and working backwards. What better way to do this than as a Socratic dialogue in the style of Galileo?
+I think it’s helpful to illustrate the “strategey” of security proofs by starting from the desired conclusion and working backwards. What better way to do this than as a Socratic dialogue in the style of Galileo?[^2]
+[^2]: Don’t answer that.
 
 **SALVIATI:** 	*I’m sure that $H_1$ is the secure PRG*. 
 
-**SIMPLICIO:** If I understand the security denition for PRGs correctly, you mean that the output of $H_1$ looks indistinguishable from uniform, when the input to $H_1$ is uniform. Why do you say that? 
+**SIMPLICIO:** If I understand the security definition for PRGs correctly, you mean that the output of $H_1$ looks indistinguishable from uniform, when the input to $H_1$ is uniform. Why do you say that? 
 
 **SALVIATI:**  *Simple! $H_1$’s output consists of segments called $x, u,$ and $v$. Each of these are outputs of $G$, and since $G$ itself is a PRG its outputs look uniform.*
 
@@ -383,13 +386,14 @@ I think it’s helpful to illustrate the “strategey” of security proofs by s
 **SIMPLICIO:** 
 Incredible! I believe I understand now. Let me try to summarize: We suppose the input s to $H_1$ is chosen uniformly, and examine what happens to $H_1$’s outputs. In the expression $x || y := G(s)$, the input to $G$ is uniform, and thus $x$ and $y$ are indistinguishable from uniform. Now, considering the expression $u||v := G(y)$, the result is indistinguishable from a scenario in which $y$ is truly uniform. But if $y$ were truly uniform, those outputs $u$ and $v$ would be indistinguishable from uniform! Altogether, $x, u,$ and $v$ (the outputs of $H_1$) are each indistinguishable from uniform!
 
-I hope that was as fun for you as it was for me. The formal security proof and its sequence of hybrids will follow the outline given in Simplicio’s summary. We start by applying the PRG security definition to the first call to $G$, and replace its outputs with truly uniform values. After this change, the input to the second call to $G$ becomes uniform, allowing us to apply the PRG security definition again. 
+I hope that was as fun for you as it was for me[^3]. The formal security proof and its sequence of hybrids will follow the outline given in Simplicio’s summary. We start by applying the PRG security definition to the first call to $G$, and replace its outputs with truly uniform values. After this change, the input to the second call to $G$ becomes uniform, allowing us to apply the PRG security definition again. 
+[^3]: If you’re wondering what the hell just happened: In Galileo’s 1632 book *Dialogue Concerning the Two Chief World Systems*, he lays out the arguments for heliocentrism using a dialog between Salviati (who advocated the heliocentric model) and Simplicio (who believed the geocentric model).
 
 **Claim 5.5**
 *If $G$ is a secure length-doubling PRG, then $H_1$ (defined above) is a secure (length-tripling) PRG.*
 
 **Proof**
-One of the trickier aspects of this proof is that we are using a secure PRG $G$ to prove the security of another PRG $H_1$. That means both $\mathcal{L}_{\text{prg}-\star}^{H_1}$ and $\mathcal{L}_{\text{prg}-\star}^{G}$ will appear in this proof. Both libraries/interfaces have a subroutine named “QUERRY”, and we will rename these subroutines QUERRY$_{H1}$ and QUERRY$_G$ to disambiguate.
+One of the trickier aspects of this proof is that we are using a secure PRG $G$ to prove the security of another PRG $H_1$. That means both $\mathcal{L}_{\text{prg}-\star}^{H_1}$ and $\mathcal{L}_{\text{prg}-\star}^{G}$ will appear in this proof. Both libraries/interfaces have a subroutine named “QUERY”, and we will rename these subroutines QUERY$_{H1}$ and QUERY$_G$ to disambiguate.
 
 We want to show that $\mathcal{L}_{\text{prg}-\star}^{H_1}\approx\mathcal{L}_{\text{prg-rand}}^{H_1}$.  As usual, we do so with a hybrid sequence. Since we assume that G is a secure PRG, we are allowed to use the fact that $\mathcal{L}_{\text{prg-real}}^{G}\approx\mathcal{L}_{\text{prg-rand}}^{G}$.
 
@@ -397,6 +401,7 @@ $$
 \mathcal{L}_{\text{prg-real}}^H:\ \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{prg-real}}^{H_1}\\\hline
+\underline{\text{QUERRY}_{H_1}():}\\
 \quad  s\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \def\arraystretch{1.5}
 \left.\begin{array}{c}
@@ -414,14 +419,14 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{QUERRY}_{H_1}():}\\
-\quad \colorbox{yellow}{x||y:=G(s)}\\
+\underline{\text{QUERY}_{H_1}():}\\
+\quad x||y:=\text{QUERY}_G()\\
 \quad u||v:=G(y)\\
 \quad \text{return}\ x||u||v\\\hline
-\end{array}\quad
+\end{array}\diamond
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{prg-real}}^G\\\hline
-\underline{\text{QUERRY():}}\\
+\underline{\text{QUERY():}}\\
 \quad s\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad \text{return}\ G(s)\\\hline
 \end{array}
@@ -435,20 +440,20 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{QUERRY}_{H_1}():}\\
-\quad x||y:=\text{QUERRY}_G()\\
+\underline{\text{QUERY}_{H_1}():}\\
+\quad x||y:=\text{QUERY}_G()\\
 \quad u||v:=G(y)\\
 \quad \text{return}\ x||u||v\\\hline
-\end{array}\quad
+\end{array}\diamond
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{prg-rand}}^G\\\hline
-\underline{\text{QUERRY():}}\\
+\underline{\text{QUERY():}}\\
 \quad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \quad \text{return}\ r\\\hline
 \end{array}
 \quad\begin{array}{l}
 \text{From the PRG security of G, we can replace the}\\
-\text{instance of}\ \mathcal{L}_{\text{prg-real}}\ \text{with}\ \mathcal{L}_{\text{prg-rand}}.\ \text{The resulting}\\
+\text{instance of}\ \mathcal{L}_{\text{prg-real}}^G\ \text{with}\ \mathcal{L}_{\text{prg-rand}}^G.\ \text{The resulting}\\
 \text{hybrid library is indistinguishable.}
 \end{array}
 $$
@@ -456,7 +461,7 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{QUERRY}_{H_1}():}\\
+\underline{\text{QUERY}_{H_1}():}\\
 \quad \colorbox{yellow}{x||y}:=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \quad u||v:=G(y)\\
 \quad \text{return}\ x||u||v\\\hline
@@ -469,7 +474,7 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{QUERRY}_{H_1}():}\\
+\underline{\text{QUERY}_{H_1}():}\\
 \quad \colorbox{yellow}{x}\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad \colorbox{yellow}{y}\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad u||v:=G(y)\\
@@ -486,14 +491,14 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{QUERRY}_{H_1}():}\\
+\underline{\text{QUERY}_{H_1}():}\\
 \quad x\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\quad u||v:=\text{QUERRY}_G()\\
+\quad u||v:=\text{QUERY}_G()\\
 \quad \text{return}\ x||u||v\\\hline
-\end{array}\quad
+\end{array}\diamond
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{prg-real}}^G\\\hline
-\underline{\text{QUERRY():}}\\
+\underline{\text{QUERY}_G():}\\
 \quad s\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad \text{return}\ G(s)\\\hline
 \end{array}
@@ -506,14 +511,14 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{QUERRY}_{H_1}():}\\
+\underline{\text{QUERY}_{H_1}():}\\
 \quad x\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \quad u||v:=\text{QUERRY}_G()\\
 \quad \text{return}\ x||u||v\\\hline
-\end{array}\quad
+\end{array}\diamond
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{prg-rand}}^G\\\hline
-\underline{\text{QUERRY():}}\\
+\underline{\text{QUERY}_G():}\\
 \quad s\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \quad \text{return}\ r\\\hline
 \end{array}
@@ -526,7 +531,7 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{QUERRY}_{H_1}():}\\
+\underline{\text{QUERY}_{H_1}():}\\
 \quad x\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad \colorbox{yellow}{u||v}\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \quad \text{return}\ x||u||v\\\hline
@@ -541,7 +546,7 @@ $$
 \mathcal{L}_{\text{prg-rand}}^{H_1}:\ 
 \begin{array}{|l|}\hline
 \qquad\mathcal{L}_{\text{prg-rand}}^{H_1}\\\hline
-\underline{\text{QUERRY}_{H_1}():}\\
+\underline{\text{QUERY}_{H_1}():}\\
 \quad \colorbox{yellow}{r}\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{3\lambda}\\
 \quad \text{\colorbox{yellow}{return}\ r}\\\hline
 \end{array}
@@ -557,7 +562,7 @@ Through this sequence of hybrid libraries, we showed that:
 $$
 \mathcal{L}_{\text {prg-real }}^{H_{1}} \equiv \mathcal{L}_{\text {hyb }-1} \approx \mathcal{L}_{\text {hyb- } 2} \equiv \mathcal{L}_{\text {hyb- } 3} \equiv \mathcal{L}_{\text {hyb- } 4} \equiv \mathcal{L}_{\text {hyb- } 5} \approx \mathcal{L}_{\text {hyb- } 6} \equiv \mathcal{L}_{\text {hyb- } 7} \equiv \mathcal{L}_{\text {prg-rand }}^{H_{1}}.
 $$
-Hence, $H_1$ is a secure PRG.
+Hence, $H_1$ is a secure PRG.  $\ \blacksquare$
 
 ### Where the Proof Breaks Down for $H_2$
 
@@ -573,9 +578,9 @@ $$
 \end{array}
 $$
 
-We argued that outputs $u$ and $v$ are indistinguishable from uniform since its input $y$ is also indistinguishable from random. But it’s not quite so simple: A PRG’s output is indistinguishable from random if (1) its seed is uniform, and (2) the seed is not used for anything *else!* This construction $H_2$ violates condition (2) because it includes the “seed” $y$ in the output.
+We argued that outputs $u$ and $v$ are indistinguishable from uniform since its input $y$ is also indistinguishable from random. But it’s not quite so simple: A PRG’s output is indistinguishable from random if (1) its seed is uniform, and (2) *the seed is not used for anything else!* This construction $H_2$ violates condition (2) because it includes the “seed” $y$ in the output.
 
-We can see this idea reflected in the formal PRG definition. In $\mathcal{L}_{\text {prg-real }}$,  the seed $s$ is chosen uniformly, given as input to G, and then goes out of scope! If we try to reproduce the security proof for $H_1$ with $H_2$ instead, we’ll get stuck when we are trying to factor out the second call to G in terms of $\mathcal{L}_{\text {prg-real }}$:
+We can see this idea reflected in the formal PRG definition. In $\mathcal{L}_{\text {prg-real }}$,  the seed $s$ is chosen uniformly, given as input to $G$, and then *goes out of scope*! If we try to reproduce the security proof for $H_1$ with $H_2$ instead, we’ll get stuck when we are trying to factor out the second call to $G$ in terms of $\mathcal{L}_{\text {prg-real }}$:
 
 $$
 \def\arraystretch{1.5}
@@ -600,35 +605,25 @@ $$
 \quad \text{return}\ G(s)\\\hline
 \end{array}}_{\text{scope error! y undefined}}$$
 
-We are trying to factor out the two highlighted lines into a separate library, renaming $y$
-into $s$ in the process. But $s$ can only exist inside the private scope of the new library, while
+We are trying to factor out the two highlighted lines into a separate library, renaming $y$ into $s$ in the process. But $s$ can only exist inside the private scope of the new library, while
 there still exists a “dangling reference” $y$ in the original library.
 
-Speaking more generally about PRGs, suppose we have a call to G somewhere and
-want to argue that its outputs are pseudorandom. We can only express this call to G in
-terms of $\mathcal{L}_{\text{prg-real}}^G$ if the input to G is uniform and is used nowhere else. That’s not true here – we can’t express one of the calls to G in terms of $\mathcal{L}_{\text{prg-real}}^G$, so we can’t be sure that the outputs of that call to G look random.
+Speaking more generally about PRGs, suppose we have a call to $G$ somewhere and want to argue that its outputs are pseudorandom. We can only express this call to $G$ in
+terms of $\mathcal{L}_{\text{prg-real}}^G$ if the input to $G$ is uniform and is used nowhere else. That’s not true here – we can’t express one of the calls to $G$ in terms of $\mathcal{L}_{\text{prg-real}}^G$, so we can’t be sure that the outputs of that call to $G$ look random.
 
-These subtle issues are not limited to PRGs. Every hybrid security proof in this course
-includes steps where we factor out some statements in terms of some pre-existing library.
-Don’t take these steps for granted! They will fail (often because of scoping issues) if the
-construction isn’t using the building block correctly. You should always treat such “factoring
-out” steps as “sanity checks” for your proof.
+These subtle issues are not limited to PRGs. Every hybrid security proof in this course includes steps where we factor out some statements in terms of some pre-existing library.
+Don’t take these steps for granted! They will fail (often because of scoping issues) if the construction isn’t using the building block correctly. You should always treat such “factoring out” steps as “sanity checks” for your proof.
 
 ### A Concrete Attack on $H_2$
-So far, we’ve only demonstrated that we get stuck when trying to prove the security of
-$H_2$. But that doesn’t necessarily mean that $H_2$ is insecure – it could mean that we’re just
-not clever enough to see a different security proof. To show that $H_2$ is actually insecure,
-we must demonstrate a successful distinguishing attack.
+So far, we’ve only demonstrated that we get stuck when trying to prove the security of $H_2$. But that doesn’t necessarily mean that $H_2$ is insecure – it could mean that we’re just not clever enough to see a different security proof. To show that $H_2$ is actually insecure, we must demonstrate a successful distinguishing attack.
 
-Attacking a PRG amounts to nding “patterns” in their outputs. Does $H_2$ have a pattern
-in its outputs? Yes, in this case the pattern is that if you write the output in the form $x\|y\|u\|v\|$, then $u\|v$ is always equal to $G(y)$. The calling program can check for this condition, which is unlikely to happen for truly uniform values.
+Attacking a PRG amounts tofinding “patterns” in their outputs. Does $H_2$ have a pattern in its outputs? Yes, in this case the pattern is that if you write the output in the form $x\|y\|u\|v\|$, then $u\|v$ is always equal to $G(y)$. The calling program can check for this condition, which is unlikely to happen for truly uniform values.
 
-You may wonder, is it legal for the calling program to compute $G(y)$? Well, G is a
-publicly known algorithm (Kerckhoffs’ principle!), and y is right there as part of the input.
-Nothing prevents the calling program from running G “in its head.”
+You may wonder, is it legal for the calling program to compute $G(y)$? Well, $G$ is a publicly known algorithm (Kerckhoffs’ principle!), and y is right there as part of the input. Nothing prevents the calling program from running $G$ “in its head.”[^4]
+[^4]: Compare to the case of distinguishing $G(s)$ from uniform, for a secure $G$. The calling program knows the algorithm $G$ but doesn’t have the seed s — it only knows the *output* $G(s)$. In the case of H2, the calling program learns both $y$ and $G(y)$!
 
 **Claim 5.6**
-Construction $H_2$ is not a secure PRG, even if G is.
+*Construction $H_2$ is **not** a secure PRG, even if $G$ is.*
 
 **Proof**
 Consider the following distinguisher $\mathcal{A}$:
@@ -637,27 +632,23 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 x\|y\|u\|v:=\text{QUERY()}\\
-\text{return}\ G(y)\stackrel{!}{=} u\|v\\\hline
+\text{return}\ G(y)\stackrel{?}{=} u\|v\\\hline
 \end{array}
 $$
 When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{prg-real}}^{H_2}$, the outputs indeed satisfy the condition $G(y)=u\|v$, so $\mathcal{A}$ outputs true with probability 1.
 
-When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{prg-rand}}^{H_2}$, the outputs are truly uniform. It is helpful to imagine $x$ and $y$ being chosen before $u$ and $v$. As soon as $y$ is chosen, the value $G(y)$ is uniquely determined, since G is a deterministic algorithm. Then $\mathcal{A}$ will output true if $u\|v$ is chosen exactly to equal this $G(y)$. Since $u$ and $v$ are chosen uniformly, and are a total of $2k$ bits long, this event happens with probability $1/2^{2k}$.
+When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{prg-rand}}^{H_2}$, the outputs are truly uniform. It is helpful to imagine $x$ and $y$ being chosen before $u$ and $v$. As soon as $y$ is chosen, the value $G(y)$ is uniquely determined, since $G$ is a deterministic algorithm. Then $\mathcal{A}$ will output true if $u\|v$ is chosen exactly to equal this $G(y)$. Since $u$ and $v$ are chosen uniformly, and are a total of $2k$ bits long, this event happens with probability $1/2^{2k}$.
 
-$\mathcal{A}$'s advantage is the dierence in these probabilities: $1-1/2^{2k}$, which is nonnegligible.
+$\mathcal{A}$'s advantage is the difference in these probabilities: $1-1/2^{2k}$, which is non-negligible. $\ \blacksquare$
 
 ### Discussion
-In the attack on $H_2$, we never tried to distinguish the output of G from uniform. $H_2$ is
-insecure even if G is the best PRG in the world! It’s insecure because of the incorrect way
-it *uses* G.
+In the attack on $H_2$, we never tried to distinguish the output of $G $from uniform. $H_2$ is insecure even if $G$ is the best PRG in the world! It’s insecure because of the incorrect way
+it *uses* $G$.
 
-From now on in this book, we’ll be studying higher-level constructions that are assembled
-from various building blocks — in this chapter, fancy PRGs constructed from simpler
-PRGs. “Security” means: if the building blocks are secure then the construction is secure.
-“Insecurity” means: *even if the building blocks are secure*, the construction can be insecure.
-So when you’re showing insecurity, you shouldn’t directly attack the building blocks! You
-should assume the building blocks are secure and attack the way that the building blocks
-are being used.
+From now on in this book, we’ll be studying higher-level constructions that are assembled from various building blocks — in this chapter, fancy PRGs constructed from simpler
+PRGs. “Security” means: if the building blocks are secure then the construction is secure. “Insecurity” means: *even if the building blocks are secure*, the construction can be insecure.
+So when you’re showing insecurity, you shouldn’t directly attack the building blocks! You should assume the building blocks are secure and attack *the way that the building blocks
+are being used*.
 
 ## $\star$ 5.5 Applications: Stream Cipher & Symmetric Ratchet
 
