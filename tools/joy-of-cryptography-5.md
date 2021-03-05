@@ -642,7 +642,7 @@ When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{prg-rand}}^{H_2}$, the outpu
 $\mathcal{A}$'s advantage is the difference in these probabilities: $1-1/2^{2k}$, which is non-negligible. $\ \blacksquare$
 
 ### Discussion
-In the attack on $H_2$, we never tried to distinguish the output of $G $from uniform. $H_2$ is insecure even if $G$ is the best PRG in the world! It’s insecure because of the incorrect way
+In the attack on $H_2$, we never tried to distinguish the output of $G$ from uniform. $H_2$ is insecure even if $G$ is the best PRG in the world! It’s insecure because of the incorrect way
 it *uses* $G$.
 
 From now on in this book, we’ll be studying higher-level constructions that are assembled from various building blocks — in this chapter, fancy PRGs constructed from simpler
@@ -652,58 +652,42 @@ are being used*.
 
 ## $\star$ 5.5 Applications: Stream Cipher & Symmetric Ratchet
 
-The PRG-feedback construction can be generalized in a natural way, by continuing to
-feed part of G’s output into G again. The proof works in the same way as for the previous
-construction — the security of G is applied one at a time to each application of G.
+The PRG-feedback construction can be generalized in a natural way, by continuing to feed part of $G’s$ output into $G$ again. The proof works in the same way as for the previous construction — the security of $G$ is applied one at a time to each application of $G$.
 
 **Claim 5.7**
-If G is a secure length-doubling PRG, then for any $n$ (polynomial function of $\lambda$) the following construction $H_n$ is a secure PRG with stretch $n\lambda$:
+*If G is a secure length-doubling PRG, then for any $n$ (polynomial function of $\lambda$) the following construction $H_n$ is a secure PRG with stretch $n\lambda$:*
 
  $$
 \textcolor{red}{\text{Image screenshot here}}
 $$
 
-The fact that this chain of PRGs can be extended indefinitely gives another useful
-functionality:
+The fact that this chain of PRGs can be extended indefinitely gives another useful functionality:
 
 **Definition 5.8 (Stream cipher)**
-A **stream cipher** is an algorithm G that takes a seed s and length ` as input, and outputs a
-string. It should satisfy the following requirements:
+*A **stream cipher** is an algorithm $G$ that takes a seed s and length $\ell$ as input, and outputs a string. It should satisfy the following requirements:*
 
- 1. $G(s,\ell)$ is a string of length $\ell$.
- 2. If $i < j$, then $G(s,i)$ is a prefix of $G(s,j)$.
- 3. For each $n$, the function $G(\cdot,n)$ is a secure PRG.
+ 1. *$G(s,\ell)$ is a string of length $\ell$.*
+ 2. *If $i < j$, then $G(s,i)$ is a prefix of $G(s,j)$.*
+ 3. *For each $n$, the function $G(\cdot,n)$ is a secure PRG.*
 
-Because of the 2nd rule, you might want to think about a single innitely long string that is
-the *limit* of $G(s,n)$ as $n$ goes to infinity. The finite-length strings $G(s,n)$ are all the prefixes
-of this infinitely long string.
+Because of the 2nd rule, you might want to think about a single infinitely long string that is the *limit* of $G(s,n)$ as $n$ goes to infinity. The finite-length strings $G(s,n)$ are all the prefixes of this infinitely long string.
 
-The PRG-feedback construction can be used to construct a secure stream cipher in the
-natural way: given seed $s$ and length $\ell$, keep iterating the PRG-feedback main loop until
-$\ell$ bits have been generated.
+The PRG-feedback construction can be used to construct a secure stream cipher in the natural way: given seed $s$ and length $\ell$, keep iterating the PRG-feedback main loop until $\ell$ bits have been generated.
 
  $$
 \textcolor{red}{\text{Image screenshot here}}
 $$
 
 ### Symmetric Ratchet
-Suppose Alice & Bob share a symmetric key k and are using a secure messaging app to
-exchange messages over a long period of time. Later in the course we will see techniques
-that Alice & Bob could use to securely encrypt many messages using a single key. However,
-suppose Bob’s device is compromised and an attacker learns $k$. Then the attacker
-can decrypt all past, present, and future ciphertexts that it saw!
+Suppose Alice & Bob share a symmetric key $k$ and are using a secure messaging app to exchange messages over a long period of time. Later in the course we will see techniques that Alice & Bob could use to securely encrypt many messages using a single key. However,
+suppose Bob’s device is compromised and an attacker learns $k$. Then the attacker can decrypt all past, present, and future ciphertexts that it saw!
 
-Alice & Bob can protect against such a key compromise by using the PRG-feedback
-stream cipher to constantly “update” their shared key. Suppose they do the following,
+Alice & Bob can protect against such a key compromise by using the PRG-feedback stream cipher to constantly “update” their shared key. Suppose they do the following,
 starting with their shared key $k$:
 
- - They use $k$ to seed a chain of length-doubling PRGs, and both obtain the same stream
-of pseudorandom keys $t1, t2,\ldots$
- - They use $t_i$ as a key to send/receive the ith message. The details of the encryption
-are not relevant to this example.
- - After making a call to the PRG, they erase the PRG input from memory, and only
-remember the PRG’s output. After using $t_i$ to send/receive a message, they also
-erase it from memory.
+ - They use $k$ to seed a chain of length-doubling PRGs, and both obtain the same stream of pseudorandom keys $t1, t2,\ldots$
+ - They use $t_i$ as a key to send/receive the ith message. The details of the encryption are not relevant to this example.
+ - After making a call to the PRG, they erase the PRG input from memory, and only remember the PRG’s output. After using $t_i$ to send/receive a message, they also erase it from memory.
 
 This way of using and forgetting a sequence of keys is called a **symmetric ratchet**.
 
@@ -712,25 +696,14 @@ This way of using and forgetting a sequence of keys is called a **symmetric ratc
 $$
 \textcolor{red}{\text{Image screenshot here}}
 $$
-Suppose that an attacker compromises Bob’s device after $n$ ciphertexts have been sent. The
-only value residing in memory is $s_n$, which the attacker learns. Since G is deterministic, the
-attacker can nowcompute $t_{n+1}, t_{n+2},\ldots$ in the usual way and decrypt all future ciphertexts that are sent.
+Suppose that an attacker compromises Bob’s device after $n$ ciphertexts have been sent. The only value residing in memory is $s_n$, which the attacker learns. Since $G$ is deterministic, the attacker can now compute $t_{n+1}, t_{n+2},\ldots$ in the usual way and decrypt all future ciphertexts that are sent.
 
-However, we can show that the attacker learns no information about $t_1,\ldots, t_n$ from
-$s_n$, which implies that the previous ciphertexts remain safe. By compromising the key $s_n$,
-the adversary only compromises the security of *future* messages, but not past messages.
-Sometimes this property is called **forward secrecy**, meaning that messages in the present
-are protected against a key-compromise that happens in the future.
+However, we can show that the attacker learns no information about $t_1,\ldots, t_n$ from $s_n$, which implies that the previous ciphertexts remain safe. By compromising the key $s_n$, the adversary only compromises the security of *future* messages, but not past messages. Sometimes this property is called **forward secrecy**, meaning that messages in the present are protected against a key-compromise that happens in the future.
 
-This construction is called a **ratchet**, since it is easy to advance the key sequence in the
-forward direction (from $s_n$ to $s_{n+1}$) but hard to reverse it (from $s_{n+1}$ to $s_n$). The exercises explore the problem of explicitly reversing the ratchet, but the more relevant property
-for us is whether the attacker learns anything about the ciphertexts that were generated
-before the compromise.
+This construction is called a **ratchet**, since it is easy to advance the key sequence in the forward direction (from $s_n$ to $s_{n+1}$) but hard to reverse it (from $s_{n+1}$ to $s_n$). The exercises explore the problem of explicitly reversing the ratchet, but the more relevant property for us is whether the attacker learns anything about the ciphertexts that were generated before the compromise.
 
 **Claim 5.10**
-If the symmetric ratchet (Construction 5.9) is used with a secure PRG G and an encryption
-scheme $\Sigma$ that has uniform ciphertexts $(\text{and}\ \Sigma.\mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda)$, then the first $n$ ciphertexts are
-pseudorandom, even to an eavesdropper who compromises the key $s_n$.
+*If the symmetric ratchet (Construction 5.9) is used with a secure PRG $G$ and an encryption scheme $\Sigma$ that has uniform ciphertexts $(\text{and}\ \Sigma.\mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda)$, then the first $n$ ciphertexts are pseudorandom, even to an eavesdropper who compromises the key $s_n$.*
 
 **Proof**
 We are considering an attack scenario in which $n$ plaintexts are encrypted, and the adversary
@@ -785,9 +758,8 @@ $$
 \end{array}
 $$
 
-At this point, the encryption scheme is being used “as intended,” meaning thatwe generate
-its keys $t_i$ uniformly/indepenendtly, and use each key only for one encryption and nothing
-else. Formally speaking, this means we can factor out the body of the for-loop in terms of $\mathcal{L}_{\text{ots-real}}$:
+At this point, the encryption scheme is being used “as intended,” meaning that we generate its keys $t_i$ uniformly/indepenendtly, and use each key only for one encryption and nothing else. Formally speaking, this means we can factor out the body of the for-loop in terms of $\mathcal{L}_{\text{ots}\Phi\text{-real}}$:
+
 
 $$
 \def\arraystretch{1.5}
@@ -799,7 +771,7 @@ $$
 \quad \text{return}\ (c_i,\ldots,c_n,s_n)\\\hline
 \end{array}\diamond
 \begin{array}{|l|}\hline
-\quad \quad\ \ \mathcal{L}_{\text{ots}\$-\text{real}}\\\hline
+\quad \quad\ \ \mathcal{L}_{\text{ots}\$-\text{real}}^\Sigma\\\hline
 \underline{\text{CTXT}(m\in \Sigma.\mathcal{M}):}\\
 \quad k\leftarrow \Sigma.\text{KeyGen}\\
 \quad c\leftarrow \Sigma.\text{Enc}(k,m)\\
@@ -807,7 +779,7 @@ $$
 \end{array}
 $$
 
-We can now replace $\mathcal{L}_{\text{ots}-\text{real}}$ with $\mathcal{L}_{\text{ots}-\text{rand}}$ and inline the subroutine (without showing the intermediate library). The result is:
+We can now replace $\mathcal{L}_{\text{ots}\Phi-\text{real}}$ with $\mathcal{L}_{\text{ots}\Phi-\text{rand}}$ and inline the subroutine (without showing the intermediate library). The result is:
 
 $$
 \def\arraystretch{1.5}
@@ -820,13 +792,9 @@ $$
 \end{array}
 $$
 
-This final library is indistinguishable from the first one. As promised, we showed that the
-attacker cannot distinguish the first $n$ ciphertexts from random values, even when seeing
-$s_n$.
+This final library is indistinguishable from the first one. As promised, we showed that the attacker cannot distinguish the first $n$ ciphertexts from random values, even when seeing $s_n$. $\ \blacksquare$
 
-This proof used the uniform-ciphertexts property, but the same logic applies to basically
-any encryption property you care about — just imagine factoring out the encryption
-steps in terms of a different library than $\mathcal{L}_{\text{ots-real}}$.
+This proof used the uniform-ciphertexts property, but the same logic applies to basically any encryption property you care about — just imagine factoring out the encryption steps in terms of a different library than $\mathcal{L}_{\text{ots}\Phi-\text{real}}$.
 
 ### Exercises
 
