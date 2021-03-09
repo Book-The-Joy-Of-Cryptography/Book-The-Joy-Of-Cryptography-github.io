@@ -2,7 +2,7 @@
 
 Imagine if Alice \& Bob had an *infinite* amount of shared randomness - not just a short key. They could split it up into $\lambda$ -bit chunks and use each one as a one-time pad whenever they want to send an encrypted message of length $\lambda$.
 
-Alice could encrypt by saying, "hey Bob, this message is encrypted with one-time pad using chunk $\# 674696273$ as key. Bob could decrypt by looking up location $\# 674696273$ in his copy of the shared randomness. As long as Alice doesn't repeat a key/chunk, an eavesdropper (who doesn't have the shared randomness) would learn nothing about the encrypted messages. Although Alice announces (publicly) *which* location/chunk was used as each one-time pad key, that information doesn't help the attacker know the value at that location.
+Alice could encrypt by saying, "hey Bob, this message is encrypted with one-time pad using chunk $\# 674696273$ as key. Bob could decrypt by looking up location $\# 674696273$ in his copy of the shared randomness. As long as Alice doesn't repeat a key/chunk, an eavesdropper (who doesn't have the shared randomness) would learn nothing about the encrypted messages. Although Alice announces (publicly) *which* location/chunk was used as each one-time pad key, that information doesn't help the attacker know the *value* at that location.
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
