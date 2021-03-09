@@ -823,11 +823,11 @@ $$
 \qquad  \quad\mathcal{A}\\\hline
 x:=\text{QUERY()}\\
 s'\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda:\\
-\text{return}\ G(s')\stackrel{!}{=}x\\\hline
+\text{return}\ G(s')\stackrel{?}{=}x\\\hline
 \end{array}
 $$
 What is the advantage of $\mathcal{A}$ in distinguishing $\mathcal{L}_{\text{prg-real}}^G$ and $\mathcal{L}_{\text{prg-rand}}^G$?
->Hint: When computing $\text{Pr}[\mathcal{A} \diamond \mathcal{L}_{\text{prg-rand }}^G \text{outputs} ]1$, separate the probabilities based on whether $x$ is a possible output of G or not.
+>Hint: When computing $\text{Pr}[\mathcal{A} \diamond \mathcal{L}_{\text{prg-rand }}^G \text{outputs} \ 1]$, separate the probabilities based on whether $x$ is a possible output of G or not.
 
 5.3. For any PRG $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ there will be many strings in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ that are impossible to get as output of G. Let S be any such set of impossible G-outputs, and consider the following adversary that has S hard-coded:
 
@@ -840,19 +840,17 @@ x:=\text{QUERY()}\\
 \end{array}
 $$
 
-What is the advantage of $\mathcal{A}$ in distinguishing $\mathcal{L}_{\text{prg-real}}^G$ and $\mathcal{L}_{\text{prg-rand}}^G$?  Why does an adversary like this one not automatically break every PRG?
+What is the advantage of $\mathcal{A}$ in distinguishing $\mathcal{L}_{\text{prg-real}}^G$ from $\mathcal{L}_{\text{prg-rand}}^G$?  Why does an adversary like this one not automatically break every PRG?
 
 5.4. Show that the scheme from Section 5.3 does not have perfect one-time secrecy, by showing
 that there must exist two messages $m_1$ and $m_2$ whose ciphertext distributions differ.
->Hint: There must exist strings $s_1, s_2 \in \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ where $s_1$ im(G) and $s_2 \notin$ im(G). Use these two strings to nd two messages $m_1$ and $m_2$ whose ciphertext distributions assign different probabilities to $s_1$ and $s_2$. Note that it is legitimate for an attacker to “know” $s_1$ and $s_2$, as these are properties of G alone, and do not depend on the random choices made “at runtime” — when the library executes the encryption algorithms.
+>Hint: There must exist strings $s_1, s_2 \in \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ where $s_1$  $\in$ im(G) and $s_2 \notin$ im(G). Use these two strings to find two messages $m_1$ and $m_2$ whose ciphertext distributions assign different probabilities to $s_1$ and $s_2$. Note that it is legitimate for an attacker to “know” $s_1$ and $s_2$, as these are properties of G alone, and do not depend on the random choices made “at runtime” — when the library executes the encryption algorithms.
 
-5.5. The proof of Claim 5.5 applies the PRG security rule to both of the calls to G, starting with
-the first one. Describe what happens when you try to apply the PRG security of G to these
-two calls in the opposite order. Does the proof still work, or does it work only in the order
+5.5. The proof of Claim 5.5 applies the PRG security rule to both of the calls to G, starting with the first one. Describe what happens when you try to apply the PRG security of G to these two calls in the opposite order. Does the proof still work, or does it work only in the order
 that was presented?
 
 5.6. Let $\ell'>\ell>0$. Extend the “PRG feedback” construction to transform any PRG of stretch
-$\ell$ into a PRG of stretch $\ell'$ 0. Formally define the new PRG and prove its security using the security of the underlying PRG.
+$\ell$ into a PRG of stretch $\ell'$. Formally define the new PRG and prove its security using the security of the underlying PRG.
 
 5.7.  Prove that if G is a secure PRG, then so is the function $H(s)=G(\bar{s})$.
 
@@ -909,7 +907,7 @@ $$
 $$
 \text{(f)}\quad\def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\backslash\backslash H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{3\lambda}\\
+ // H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{3\lambda}\\
 \underline{H(s_L\|s_R):}\\
 \quad x:=G(s_L)\\
 \quad y:=G(s_R)\\
@@ -920,7 +918,7 @@ $$
 $$
 \text{(g)}\quad\def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\backslash\backslash H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{6\lambda}\\
+// H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{6\lambda}\\
 \underline{H(s_L\|s_R):}\\
 \quad x:=G(s_L)\\
 \quad y:=G(s_R)\\
@@ -928,24 +926,23 @@ $$
 \end{array}
 $$
 
- Let $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ be a secure length-**tripling** PRG. Prove that each of the following functions is also a secure PRG:
+5.9 Let $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda+\ell}$ be a secure length-**tripling** PRG. Prove that each of the following functions is also a secure PRG:
 $$
 \text{(a)}\quad\def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\backslash\backslash H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{4\lambda}\\
+// H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{4\lambda}\\
 \underline{H(s_L\|s_R):}\\
 \quad y:=G(s_R)\\
 \quad \text{return}\ s_L\| y\\\hline
 \end{array}
 $$
 
-Note that $H$ includes half of its input directly in the output. How do you reconcile this
-fact with the conclusion of Exercise 5.14(b)?
+Note that $H$ includes half of its input directly in the output. How do you reconcile this fact with the conclusion of Exercise 5.14(b)?
 
 $$
 \text{(b)}\quad\def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\backslash\backslash H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{3\lambda}\\
+// H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{3\lambda}\\
 \underline{H(s_L\|s_R):}\\
 \quad \text{return}\ G(s_L)\\\hline
 \end{array}
@@ -957,22 +954,21 @@ $$
 $$
 > Hint: Usually when something is insecure, it’s insecure for *any* choice of building block. In this case, the attack only works for certain $G$. Basically, you will need to construct a particular $G$, prove that it’s a secure PRG, and then prove that $H_1/H_2$ is not secure when using this $G$.
 
-5.11. A frequently asked question in cryptography forums is whether it’s possible to determine
-which PRG implementation was used by looking at output samples.
+5.11. A frequently asked question in cryptography forums is whether it’s possible to determine which PRG implementation was used by looking at output samples.
 Let $G_1$ and $G_2$ be two PRGs with matching input/output lengths. Define two libraries $\mathcal{L}_{\text{which-prg}}^{G_1}$ and $\mathcal{L}_{\text{which-prg}}^{G_2}$ as follows:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{which-prg}}^{G_1}\\\hline
-\underline{\text{QUERRY():}}\\
+\underline{\text{QUERY():}}\\
 \quad s\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad \text{return}\ \colorbox{yellow}{G}_1(s)\\\hline
 \end{array}\quad
 \begin{array}{|l|}\hline
 \quad \ \mathcal{L}_{\text{which-prg}}^{G_2}\\\hline
-\underline{\text{QUERRY():}}\\
-\quad s\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
+\underline{\text{QUERY():}}\\
+\quad s\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad \text{return}\ \colorbox{yellow}{G}_2(s)\\\hline
 \end{array}
 $$
@@ -984,10 +980,9 @@ Prove that if $G_1$ and $G_2$ are both secure PRGs, then $\mathcal{L}_{\text{whi
 (b) What can you say about the simpler construction $H(s)=G_1(s_1)\oplus G_2(s_2)$, when one of $G_1,G_2$ is a secure PRG?
 
 $\star$ 5.13. Prove that if PRGs exist, then P$\neq$NP.
->Hint: $\{y| \exists_s:G(s)=y\}\in$ NP. Prove the contrapositive! Use the powerful assumption that P = NP to construct an ecient adversary to attack any candidate PRG.
+>Hint: $\{y| \exists_s:G(s)=y\}\in$ NP. Prove the contrapositive! Use the powerful assumption that P = NP to construct an efficient adversary to attack any candidate PRG.
 
-5.14. (a)  Let $f$ be any function. Show that the following function $G$ is not a secure PRG, no
-matter what $f$ is. Describe a successful distinguisher and explicitly compute its advantage:
+5.14. (a)  Let $f$ be any function. Show that the following function $G$ is **not** a secure PRG, no matter what $f$ is. Describe a successful distinguisher and explicitly compute its advantage:
 
 $$
 \def\arraystretch{1.5}
@@ -1027,9 +1022,9 @@ $$
 \end{array}
 $$
 
-(b) What is Pr[test outputs true] in $\mathcal{L}_{\text{right}}$?
+(b) What is Pr[TEST outputs true] in $\mathcal{L}_{\text{right}}$?
 (c ) Prove that for any polynomial-time algorithm $\mathcal{A},\text{Pr}[\mathcal{A}(s_n)=t_n]$ is negligible, where $s_n, t_n$ are generated as in the symmetric ratchet construction.
 (d) Prove that for any polynomial-time algorithm $\mathcal{A},\text{Pr}[\mathcal{A}(s_n)=\colorbox{yellow}{s}_{n-1}]$ negligible. In other words, “turning the ratchet backwards” is a hard problem.
->Hint: the proof should be a few lines, a direct corollary of part (c).
+>Hint: the proof should be a few lines, a direct corollary of part \(c\).
 
 
