@@ -14,11 +14,11 @@ A **pseudorandom function (PRF)** is a tool that allows Alice \& Bob to achieve 
 
 ## 6.1 Definition
 
-Continuing our example, imagine a huge table of shared data stored as an array $T,$ so the ith item is referenced as $T[i]$. Instead of thinking of $i$ as an integer, we can also think of $i$ as a binary string. If the array has $2^{\text {in }}$ items, then $i$ will be an $i n$ -bit string. If the array contains strings of length "out", then the notation $T[i]$ is like a function that takes an input from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}$ and gives an output from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}$
+Continuing our example, imagine a huge table of shared data stored as an array $T,$ so the ith item is referenced as $T[i]$. Instead of thinking of $i$ as an integer, we can also think of $i$ as a binary string. If the array has $2^{\textit {in }}$ items, then $i$ will be an $i n$ -bit string. If the array contains strings of length "out", then the notation $T[i]$ is like a function that takes an input from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }}$ and gives an output from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {out }}$
 
-A pseudorandom function emulates the functionality of a huge array. It is a function $F$ that takes an input from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}$ and gives an output from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}$. However, $F$ also takes an additional argument called the seed, which acts as a kind of secret key.
+A pseudorandom function emulates the functionality of a huge array. It is a function $F$ that takes an input from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }}$ and gives an output from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {out }}$. However, $F$ also takes an additional argument called the **seed**, which acts as a kind of secret key.
 
-The goal of a pseudorandom function is to "look like" a uniformly chosen array lookup table. Such an array can be accessed through the Lookup subroutine of the following library:
+The goal of a pseudorandom function is to "look like" a uniformly chosen array / lookup table. Such an array can be accessed through the LOOKUP subroutine of the following library:
 
 $$
 \def\arraystretch{1.5}
@@ -38,49 +38,50 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 k \leftarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}\\
-\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}):}\\
+\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }}):}\\
 \quad {\text { return } F(k, x)}\\\hline
 \end{array}
 $$
 
-Note that the first library samples out $\cdot 2^{\text {in }}$ bits uniformly at random (out bits for each of $2^{\text {in }}$ entries in the table), while the second library samples only $\lambda$ bits (the same $k$ is used for all invocations of $F$ ). Still, we are asking for the two libraries to be indistinguishable.
+Note that the first library samples *out* $\cdot 2^{\textit {in }}$ bits uniformly at random (*out* bits for each of $2^{\textit {in }}$ entries in the table), while the second library samples only $\lambda$ bits (the same $k$ is used for all invocations of $F$ ). Still, we are asking for the two libraries to be indistinguishable.
 
- This is basically the definition of a PRF, with one technical caveat. We want to allow situations like in $\geqslant \lambda,$ but in those cases the first library runs in exponential time. It is generally convenient to build our security definitions with libraries that run in polynomial time. We fix this by taking advantage of the fact that, no matter how big the table $T$ is meant to be, a polynomial-time calling program will only access a polynomial amount of it. In some sense it is "overkill" to actually populate the entire table $T$ upfront. Instead, we can populate $T$ in a lazy $/$ on-demand way. $T$ initially starts uninitialized, and its values are only assigned as the calling program requests them. This changes when each $T[x]$ is sampled (if at all), but does not change how it is sampled (i.e, uniformly \& independently). This also changes $T$ from being a typical array to being an *associative* array ("hash table" or "dictionary" data structure), since it only maps a subset of $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}$ to values in $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}$.
+ This is basically the definition of a PRF, with one technical caveat. We want to allow situations like in $\geqslant \lambda,$ but in those cases the first library runs in exponential time. It is generally convenient to build our security definitions with libraries that run in polynomial time. [^1] We fix this by taking advantage of the fact that, no matter how big the table $T$ is meant to be, a polynomial-time calling program will only access a polynomial amount of it. In some sense it is "overkill" to actually populate the entire table $T$ upfront. Instead, we can populate $T$ in a lazy $/$ on-demand way. $T$ initially starts uninitialized, and its values are only assigned as the calling program requests them. This changes when each $T[x]$ is sampled (if at all), but does not change *how* it is sampled (i.e, uniformly \& independently). This also changes $T$ from being a typical array to being an *associative* array ("hash table" or "dictionary" data structure), since it only maps a subset of $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}$ to values in $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}$.
+[^1]: When we use a pseudorandom function as a component in other constructions, the libraries for PRF security will show up as *calling programs* of other libraries. The definition of indistinguishability requires all calling programs to run in polynomial time.
 
-**Definition 6.1 (PRF security)** Let $F:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}\times\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text{in}}\rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text{out}}$ be a deterministic function. We say that $F$ is a secure **pseudorandom function (PRF)** if $\mathcal{L}_{\text{prf-real}}^F\approx\mathcal{L}_{\text{prf-rand}}^F$ where:
+**Definition 6.1 (PRF security)** *Let $F:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}\times\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text{in}}\rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text{out}}$ be a deterministic function. We say that $F$ is a secure **pseudorandom function (PRF)** if $\mathcal{L}_{\text{prf-real}}^F\approx\mathcal{L}_{\text{prf-rand}}^F$, where:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{prf-real}}^F\\\hline
 k \leftarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}\\
-\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}):}\\
+\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }}):}\\
 \quad {\text { return } F(k, x)}\\\hline
 \end{array}
 \quad
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{prf-rand}}^F\\\hline
 T:=\text{empty assoc. array}\\\\
-\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}):}\\
+\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }}):}\\
 \quad\text{if}\ T[x]\ \text{undefined:}\\
-\qquad T[x]\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}\\
+\qquad T[x]\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {out }}\\
 \quad {\text { return } T[x]}\\\hline
 \end{array}
 $$
 
 ### Discussion, Pitfalls
 
-The name "pseudorandom *function*" comes from the perspective of viewing $T$ not as an (associative) array, but as a function $T:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}$. There are $2^{\text {out }-2^{\text {is }}}$ possible functions for $T$ (an incredibly large number), and $\mathcal{L}_{\text {prf-rand }}$ chooses a "random function" by uniformly sampling its truth table as needed.
+The name "pseudorandom *function*" comes from the perspective of viewing $T$ not as an (associative) array, but as a function $T:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {out }}$. There are $2^{\textit {out }-2^{\textit {in }}}$ possible functions for $T$ (an incredibly large number), and $\mathcal{L}_{\text {prf-rand }}$ chooses a "random function" by uniformly sampling its truth table as needed.
 
-For each possible seed $k$, the residual function $F(k, \cdot)$ is also a function from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }} \rightarrow$ $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}$. There are "only" $2^{\lambda}$ possible functions of this kind (one for each choice of $k$ ), and $\mathcal{L}_{\text {prf-real }}$ chooses one of these functions randomly. In both cases, the libraries give the calling program input/output access to the function that was chosen. You can think of this in terms of the picture from Section 5.1 , but instead of strings, the objects are functions. 
+For each possible seed $k$, the residual function $F(k, \cdot)$ is also a function from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }} \rightarrow$ $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {out }}$. There are "only" $2^{\lambda}$ possible functions of this kind (one for each choice of $k$ ), and $\mathcal{L}_{\text {prf-real }}$ chooses one of these functions randomly. In both cases, the libraries give the calling program input/output access to the function that was chosen. You can think of this in terms of the picture from Section 5.1 , but instead of strings, the objects are functions. 
 
-Note that even in the case of a "random function" $\left(\mathcal{L}_{\text {prf-rand }}\right),$ the function $T$ itself is still deterministic! To be precise, this library chooses a deterministic function, uniformly, from the set of all possible **deterministic** functions. But once it makes this choice, the input/output behavior of $T$ is fixed. If the calling program calls Lookur twice with the same $x,$ it receives the same result. The same is true in $\mathcal{L}_{\text {prf-real }}$, since $F$ is a deterministic function and $k$ is fixed throughout the entire execution. To avoid this very natural confusion, it is perhaps better to think in terms of "randomly initialized lookup tables" rather than "random functions.
+Note that even in the case of a "random function" $\left(\mathcal{L}_{\text {prf-rand }}\right),$ the function $T$ itself is still **deterministic**! To be precise, this library chooses a deterministic function, uniformly, from the set of all possible deterministic functions. But once it makes this choice, the input/output behavior of $T$ is fixed. If the calling program calls LOOKUP twice with the same $x,$ it receives the same result. The same is true in $\mathcal{L}_{\text {prf-real }}$, since $F$ is a deterministic function and $k$ is fixed throughout the entire execution. To avoid this very natural confusion, it is perhaps better to think in terms of "randomly initialized lookup tables" rather than "random functions.
 
 ### How NOT to Build a PRF
 We can appreciate the challenges involved in building a PRF by looking at a natural approach that doesn't quite work.
 
 **Example**
-Suppose we have a length-doubling $\operatorname{PRGG}:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{2 \lambda}$ and try to use it to construct a PRFF as follows:
+*Suppose we have a length-doubling $\operatorname{PRGG}:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{2 \lambda}$ and try to use it to construct a PRF F as follows:*
 
 $$
 \def\arraystretch{1.5}
@@ -90,29 +91,30 @@ $$
 \end{array}
 $$
 
+*You might notice that all we have done is rename the encryption algorithm of "pseudo-OTP" (Construction 5.2). We have previously argued that this algorithm is a secure method for onetime encryption, and that the resulting ciphertexts are pseudorandom. Is this enough for a secure PRF? No, we can attack the security of this PRF.*
 
-You might notice that all we have done is rename the encryption algorithm of "pseudo-OTP" (Construction 5.2). We have previously argued that this algorithm is a secure method for onetime encryption, and that the resulting ciphertexts are pseudorandom. Is this enough for a secure PRF? No, we can attack the security of this PRF.
+*Attacking F means designing distinguisher that behaves as differently as possible in the presence of the two $\mathcal{L}_{\text{prf-}\star}^F$ libraries. We want to show that $F$ is insecure even if $G$ is an excellent PRG. We should not try to base our attack on distinguishing outputs of $G$ from random. Instead, we must try to **break the inappropriate way that** $G$ **is used** to construct a PRF*
 
-Atfacking F means designing distinguisher that behaves as differently as possible in the presence of the two $\mathcal{L}_{\text{prf-}\star}^F$ libraries. We want to show that $F$ is insecure even if $G$ is an excellent PRG. We should not try to base aur atack on distingulding oufputs of $G$ frow random. Indend, we must try to **break the inappropriate way that** $G$ **is used** to construct a PRF
+*The distinguisher must use the interface of the $\mathcal{L}_{\text {prf}-\star }$ libraries - i.e., make some calls to the LOOKUP subroutine and output 0 or 1 based on the answers it gets. The LOOKUP subroutine takes an argument, so the distinguisher has to choose which arguments to use.*
 
-The distinguisher must use the interface of the $\mathcal{L}_{\text {prf}-\star }$ libraries - i.e., make some calls to the LOOKUP subroutine and output 0 or 1 based on the answers it gets. The LOOKUP subroutine takes an argument, so the distinguisher has to choose which arguments to use.
+*One observation we can make is that if a calling program sees only one value of the form $G(k) \oplus x,$ it will look pseudorandom. This is essentially what we showed in Section 5.3. So we should be looking for a calling program that makes more than one call to LOOKUP.*
 
-One observation we can make is that if a calling program sees only one value of the form $G(k) \oplus x,$ it will look pseudorandom. This is essentially what we showed in Section 5.3. So we should be looking for a calling program that makes more than one call to LOOKUP.
+*If we make two calls to LOOKUP $-$ say, on inputs $x_{1}$ and $x_{2}-$ the responses from $\mathcal{L}_{\text {prf-real }}$ will be $G(k) \oplus x_{1}$ and $G(k) \oplus x_{2} .$ To be a secure PRF, these responses must look independent and uniform. Do they? They actually have a pattern that the calling program can notice: their XOR is always $x_{1} \oplus x_{2},$ a value that is already known to the calling program.* 
 
-If we make two calls to LOOKUP $-$ say, on inputs $x_{1}$ and $x_{2}-$ the responses from $\mathcal{L}_{\text {prf-real }}$ will be $G(k) \oplus x_{1}$ and $G(k) \oplus x_{2} .$ To be a secure PRF, these responses must look independent and uniform. Do they? They actually have a pattern that the calling program can notice: their XOR is always $x_{1} \oplus x_{2},$ a value that is already known to the calling program. We can condense all of our observations into the following distinguisher:
+*We can condense all of our observations into the following distinguisher:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad \qquad \qquad \qquad \qquad\mathcal{A}\\\hline
-\text{pick}\ x_1,x_2\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\ \text{arbitrarily so that}\ x_1\neq x_2\\
+\text{pick}\ x_1,x_2\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\ \textit{arbitrarily}\ \text{so that} \ x_1\neq x_2\\
 z_1:=\text{LOOKUP}(x_1)\\
 z_2:=\text{LOOKUP}(x_2)\\
 \text { return }z_1 \oplus z_2 \stackrel{?}{=}x_1\oplus x_2\\\hline
 \end{array}
 $$
 
-Let’s compute its advantage in distinguishing $\mathcal{L}_{\text{prf-real}}^F$ from $\mathcal{L}_{\text{prf-rand}}^F$  considering $\mathcal{A}’s$ behavior when linked to these two libraries:
+*Let’s compute its advantage in distinguishing $\mathcal{L}_{\text{prf-real}}^F$ from $\mathcal{L}_{\text{prf-rand}}^F$  by considering $\mathcal{A}’s$ behavior when linked to these two libraries:*
 
 $$
 \def\arraystretch{1.5}
@@ -126,13 +128,13 @@ z_2:=\text{LOOKUP}(x_2)\\
 \diamond
 \begin{array}{|l|}\hline
 \qquad \qquad \ \mathcal{L}_{\text{prf-real}}^F\\\hline
-k\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\\\
+k\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\\\
 \text{LOOKUP}(x):\\
 \quad\text { return }G(k) \oplus x// F(k,x)\\\hline
 \end{array}
 $$
 
-When $\mathcal{A}$ is linked to $\mathcal{L}_{\text {prf-real }}^{F}$, the library will choose a key $k$. Then $z_{1}$ is set to $G(k) \oplus x_{1}$ and $z_{2}$ is set to $G(k) \oplus x_{2} .$ So $z_{1} \oplus z_{2}$ is always equal to $x_{1} \oplus x_{2},$ and $\mathcal{A}$ always outputs $1 .$ That is,
+*When $\mathcal{A}$ is linked to $\mathcal{L}_{\text {prf-real }}^{F}$, the library will choose a key $k$. Then $z_{1}$ is set to $G(k) \oplus x_{1}$ and $z_{2}$ is set to $G(k) \oplus x_{2} .$ So $z_{1} \oplus z_{2}$ is always equal to $x_{1} \oplus x_{2},$ and $\mathcal{A}$ always outputs $1 .$ That is,*
 $$
 \operatorname{Pr}\left[\mathcal{A} \diamond \mathcal{L}_{\text {prf-real }}^{F} \Rightarrow 1\right]=1.
 $$
@@ -158,15 +160,15 @@ T:=\text{empty assoc. array}\\\\
 \end{array}
 $$
 
-When $\mathcal{A}$ is linked to $\mathcal{L}_{\text {prf-rand }}^F$, the responses of the two calls to LOOKUP will be chosen uniformly and independently because LOOKUP is being called on distinct inputs. Consider the moment in time when the second call to LOOKUP is about to happen. At that point, $x_{1}, x_{2},$ and $z_{1}$ have all been determined, while $z_{2}$ is about to be chosen uniformly by the library. Using the properties of XOR, we see that $\mathcal{A}$ will output 1 if and only if $z_{2}$ is chosen to be exactly the value $x_{1} \oplus x_{2} \oplus z_{1} .$ This happens only with probability $1 / 2^{2 \lambda} .$ That is,
+*When $\mathcal{A}$ is linked to $\mathcal{L}_{\text {prf-rand }}^F$, the responses of the two calls to LOOKUP will be chosen uniformly and independently because LOOKUP is being called on distinct inputs. Consider the moment in time when the second call to LOOKUP is about to happen. At that point, $x_{1}, x_{2},$ and $z_{1}$ have all been determined, while $z_{2}$ is about to be chosen uniformly by the library. Using the properties of XOR, we see that $\mathcal{A}$ will output 1 if and only if $z_{2}$ is chosen to be exactly the value $x_{1} \oplus x_{2} \oplus z_{1} .$ This happens only with probability $1 / 2^{2 \lambda} .$ That is,*
 $$
 \operatorname{Pr}\left[\mathcal{A} \circ \mathcal{L}_{\text {prf-rand }}^{F} \Rightarrow 1\right]=1 / 2^{2 \lambda}.
 $$
-The advantage of $\mathcal{A}$ is therefore $1-1 / 2^{2 \lambda}$ which is certainly non-negligible since it doesn't even approach $0 .$ This shows that $F$ is not a secure PRF.
+*The advantage of $\mathcal{A}$ is therefore $1-1 / 2^{2 \lambda}$ which is certainly non-negligible since it doesn't even approach $0 .$ This shows that $F$ is not a secure PRF.*
 
-At a more philosophical level, we wanted to identify exactly how $G$ is being used in an inappropriate way. The PRG security libraries guarantee security when G's seed is chosen freshly for each call to G. This construction of $F$ violates that rule and allows the same seed to be used twice in different calls to $G,$ where the results are supposed to look independent.
+*At a more philosophical level, we wanted to identify exactly how $G$ is being used in an inappropriate way. The PRG security libraries guarantee security when G's seed is chosen freshly for each call to G. This construction of $F$ violates that rule and allows the same seed to be used twice in different calls to $G,$ where the results are supposed to look independent.*
 
-This example shows the challenge of building a PRF. Even though we know how to make any individual output pseudorandom, it is difficult to make all outputs collectively appear independent, when in reality they are derived from a single short seed. 
+This example shows the challenge of building a PRF. Even though we know how to make any *individual* output pseudorandom, it is difficult to make all outputs collectively appear *independent*, when in reality they are derived from a single short seed. 
 
 ## 6.2 PRFs vs PRGs; Variable-Hybrid Proofs
 
