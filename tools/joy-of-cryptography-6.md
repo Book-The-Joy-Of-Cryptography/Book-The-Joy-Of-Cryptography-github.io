@@ -172,7 +172,7 @@ This example shows the challenge of building a PRF. Even though we know how to m
 
 ## 6.2 PRFs vs PRGs; Variable-Hybrid Proofs
 
-In this section we show that a PRG can be used to construct a PRF, and vice-versa. The construction of a PRG from PRF is practical, and is one of the more common ways to obtain a PRG in practice. The construction of a PRF from PRG is more of theoretical interest and does not reflect how PRFs are designed in practice.
+In this section we show that a PRG can be used to construct a PRF, **and vice-versa**. The construction of a PRG from PRF is practical, and is one of the more common ways to obtain a PRG in practice. The construction of a PRF from PRG is more of theoretical interest and does not reflect how PRFs are designed in practice.
 
 ### Constructing a PRG from a PRF
 As promised, a PRF can be used to construct a PRG. The construction is quite natural. For simplicity, suppose we have a PRF $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ (i.e., in $=$ out $=\lambda$ ). We can build a length-doubling PRG in the following way:
@@ -191,20 +191,16 @@ $$
 
 There is nothing particularly special about the inputs $\textcolor{brown}{0\cdots 00}$ and $\textcolor{brown}{0\cdots 01}$ to $F$ . All that matters is that they are distinct. The construction can be extended to easily give more than 2 blocks of output, by treating the input to $F$ as a simple counter (hence the name of this construction).
 
-The guarantee of a PRF is that when its seed is chosen uniformly and it is invoked on
-distinct inputs, its outputs look independently uniform. In particular, its output on inputs
+The guarantee of a PRF is that when its seed is chosen uniformly and it is invoked on distinct inputs, its outputs look independently uniform. In particular, its output on inputs
 $\textcolor{brown}{0\cdots 00}$ and $\textcolor{brown}{0\cdots 01}$ are indistinguishable from uniform. Hence, concatenating them gives a string which is indistinguishable from a uniform 2$\lambda$-bit string.
 
-That really is all there is to the security of this construction, but unfortunately there is
-a slight technical issue which makes the security proof more complicated than you might
-guess. We will have to introduce a new technique of **variable hybrids** to cope with it.
+That really is all there is to the security of this construction, but unfortunately there is a slight technical issue which makes the security proof more complicated than you might guess. We will have to introduce a new technique of **variable hybrids** to cope with it.
 
 **Claim 6.3**
-If $F$ is a secure PRF, then the counter PRG construction $G$ above is a secure PRG.
+*If $F$ is a secure PRF, then the counter PRG construction $G$ above is a secure PRG.*
 
 **Proof**
-In order to prove that $G$ is a secure PRG, we must prove that the following libraries are
-indistinguishable:
+In order to prove that $G$ is a secure PRG, we must prove that the following libraries are indistinguishable:
 
 $$
 \def\arraystretch{1.5}
@@ -227,47 +223,46 @@ $$
 \end{array}
 $$
 
-During the proof, we are allowed to use the fact that $F$ is a secure PRF. That is, we can use
-the fact that the following two libraries are indistinguishable:
+During the proof, we are allowed to use the fact that $F$ is a secure PRF. That is, we can use the fact that the following two libraries are indistinguishable:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{prf-real}}^F\\\hline
 k \leftarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda}\\\\
-\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}):}\\
+\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }}):}\\
 \quad {\text { return } F(k, x)}\\\hline
 \end{array}
 \quad
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{prf-rand}}^F\\\hline
 T:=\text{empty assoc. array}\\\\
-\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }}):}\\
+\underline{\text {LOOKUP}(x \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {in }}):}\\
 \quad\text{if}\ T[x]\ \text{undefined:}\\
-\qquad T[x]\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}\\
+\qquad T[x]\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit {out }}\\
 \quad {\text { return } T[x]}\\\hline
 \end{array}
 $$
 
 The inconvenience in the proof stems from a mismatch of the $s$ variable in $\mathcal{L}_{\text {prg-real }}$ and the $k$ variable in $\mathcal{L}_{\text {prf-real }}$. In $\mathcal{L}_{\text {prg-real }}, s$ is local to the QUERY subroutine. Over the course of an execution, $s$ will take on many values. Since $s$ is used as the PRF seed, we must write the calls to $F$ in terms of the LOOKUP subroutine of $\mathcal{L}_{\text {prf-real }}$. But in $\mathcal{L}_{\text {prf-real }}$ the PRF seed is fixed for the entire execution. In other words, we can only use $\mathcal{L}_{\text {prf-real }}$ to deal with a single PRF seed at a time, but $\mathcal{L}_{\text {prg-real }}$ deals with many PRG seeds at a time.
 
-To address this, we will have to apply the security of $F\left(\right.$ i.e., replace $\mathcal{L}_{\text {prf-real }}$ with $\mathcal{L}_{\text {prf-rand }}$ ) *many times* during the proof $-$ in fact, once for every call to QUERY made by the calling program. Previous security proofs had a fixed number of hybrid steps ( $e . g$., the proof of Claim 5.5 used 7 hybrid libraries to show $\mathcal{L}_{\text {prg-real }} \approx \mathcal{L}_{\text {hyb }-1} \approx \cdots \approx \mathcal{L}_{\text {hyb- } 7} \approx$ $\left.\mathcal{L}_{\text {prg-rand }}\right)$. This proof will have a **variable number of hybrids that depends on the calling program.** Specifically, we will prove
+To address this, we will have to apply the security of $F\left(\right.$ *i.e.*, replace $\mathcal{L}_{\text {prf-real }}$ with $\mathcal{L}_{\text {prf-rand }}$ ) *many times* during the proof $-$ in fact, once for every call to QUERY made by the calling program. Previous security proofs had a fixed number of hybrid steps ( $e . g$., the proof of Claim 5.5 used 7 hybrid libraries to show $\mathcal{L}_{\text {prg-real }} \approx \mathcal{L}_{\text {hyb }-1} \approx \cdots \approx \mathcal{L}_{\text {hyb- } 7} \approx$ $\left.\mathcal{L}_{\text {prg-rand }}\right)$. This proof will have a **variable number of hybrids that depends on the calling program.** Specifically, we will prove
 $$
 \mathcal{L}_{\text {prg-real }}^{G} \approx \mathcal{L}_{\text {hyb-1 }} \approx \cdots \approx \mathcal{L}_{\text {hyb- } \colorbox{yellow}{q}} \approx \mathcal{L}_{\text {prg-rand }}^{G},
 $$
 where $q$ is the number of times the calling program calls QUERY.
 
 Don’t be overwhelmed by all these hybrids. They all follow a simple pattern. In fact,
-the ith hybrid looks like this: 
+the $i$th hybrid looks like this: 
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \qquad\mathcal{L}_{\text{hby}-i}\\\hline
+\qquad \qquad\mathcal{L}_{\text{hyb}-i}:\\\hline
 count:=0\\\\
 \underline{\text{QUERY():}}\\
 \quad count:=count+1\\
-\quad \text{if}\ count \leqslant \colorbox{silver}{i}:\\
+\quad \text{if}\ count \leqslant \colorbox{silver}{\textit{i}}:\\
 \qquad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \qquad\text{return}\ r\\
 \quad \text{else:}\\
@@ -278,15 +273,15 @@ count:=0\\\\
 \end{array}
 $$
 
-In other words, the hybrid libraries all differ in the value $\colorbox{silver}{i}$ that is inserted into the code above. If you're familiar with $C$ compilers, think of this as adding "$\textcolor{brown}{\#\ \texttt{define}\ i\ 427}$ " to the top of the code above, to obtain $\mathcal{L}_{\text {hyb- } 427}$. 
+In other words, the hybrid libraries all differ in the value $\colorbox{silver}{\textit{i}}$ that is inserted into the code above. If you're familiar with $C$ compilers, think of this as adding "$\textcolor{brown}{\#\ \texttt{define}\ i\ 427}$ " to the top of the code above, to obtain $\mathcal{L}_{\text {hyb- } 427}$. 
 
-First note what happens for extreme choices of $\colorbox{silver}{i}$ :
+First note what happens for extreme choices of $\colorbox{silver}{\textit{i}}$ :
 - In $\mathcal{L}_{\text {hyb- } 0}$, the if-branch is never taken (count $\leqslant 0$ is never true). This library behaves exactly like $\mathcal{L}_{\text {prg-real }}^{G}$ by giving PRG outputs on every call to QUERY.
 - If $q$ is the total number of times that the calling program calls QUERY, then in $\mathcal{L}_{\mathrm{hyb}-q},$ the if-branch is always taken ( count $\leqslant q$ is always true). This library behaves exactly like $\mathcal{L}_{\text {prg-rand }}^{G}$ by giving truly uniform output on every call to QUERY.
 
 In general, $\mathcal{L}_{\text {hyb- } i}$ will respond to the first $i$ calls to QUERY by giving truly random output. It will respond to all further calls by giving outputs of our PRG construction.
 
-We have argued that $\mathcal{L}_{\text {prg-real }}^{G} \equiv \mathcal{L}_{\text {hyb- } 0}$ and $\mathcal{L}_{\text {prg-rand }}^{G} \equiv \mathcal{L}_{\text {hyb- } q .}$ To complete the proof, we must show that $\mathcal{L}_{\text {hyb- }(i-1)} \approx \mathcal{L}_{\text {hyb- } i}$ for all $i$. The main reason for going to all this trouble of defining so many hybrid libraries is that $\mathcal{L}_{\mathrm{hyb}-(i-1)}$ and $\mathcal{L}_{\text {hyb- } i}$ are completely identical except in how they respond to the $i$ th call to QUERY. This difference involves a single call to the PRG (and hence a single PRF seed), which allows us to apply the security of the PRF.
+We have argued that $\mathcal{L}_{\text {prg-real }}^{G} \equiv \mathcal{L}_{\text {hyb- } 0}$ and $\mathcal{L}_{\text {prg-rand }}^{G} \equiv \mathcal{L}_{\text {hyb- } q .}$ To complete the proof, we must show that $\mathcal{L}_{\text {hyb- }(i-1)} \approx \mathcal{L}_{\text {hyb- } i}$ for all $i$. The main reason for going to all this trouble of defining so many hybrid libraries is that $\mathcal{L}_{\mathrm{hyb}-(i-1)}$ and $\mathcal{L}_{\text {hyb- } i}$ are completely identical except in how they respond to the $i$th call to QUERY. This difference involves a single call to the PRG (and hence a single PRF seed), which allows us to apply the security of the PRF.
 
 In more detail, let $i$ be arbitrary, and consider the following sequence of steps starting with $\mathcal{L}_{\text {hyb- }(i-1)}$ :
 
@@ -296,10 +291,10 @@ $$
 count:=0\\\\
 \underline{\text{QUERY():}}\\
 \quad count:=count+1\\
-\quad \text{if}\ count \leqslant \colorbox{silver}{i}:\\
+\quad \text{if}\ count < \colorbox{silver}{\textit{i}}:\\
 \qquad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \qquad\text{return}\ r\\
-\quad \text{elseif:}\ count < \colorbox{silver}{i}:\\
+\quad \text{elseif:}\ count = \colorbox{silver}{\textit{i}}:\\
 \qquad s^*\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \qquad x:=F(s^*,\textcolor{brown}{0}\cdots\textcolor{brown}{00})\\
 \qquad y:=F(s^*,\textcolor{brown}{0}\cdots\textcolor{brown}{01})\\
@@ -312,11 +307,16 @@ count:=0\\\\
 \end{array}
 \quad
 \begin{array}{l}
-\text{We have taken $\mathcal{L}_{\text{hyb-(i-1)}}$ and simply expanded the else-branch}\\
-\text{($count \geqslant$ i ) into two subcases ($count = i$ and $count > i$ ).}\\
-\text{However, both cases lead to the same block of code (apart from}\\
-\text{ a change to a localvariable’s name), so the change}\\
-\text{has no effect on the calling program.}
+\text{We have taken $\mathcal{L}_{\text{hyb-(i-1)}}$ }\\
+\text{and simply expanded the }\\
+\text{else-branch ($count \geqslant$ i ) into}\\
+\text{ two subcases ($count = i$ and}\\
+\text{$count > i$ ). However, both}\\
+\text{cases lead to the same block of}\\
+\text{code (apart from a change to a}\\
+\text{local variable’s name), so the }\\
+\text{change has no effect on the}\\
+\text{calling program.}
 \end{array}
 $$
 
@@ -326,10 +326,10 @@ $$
 count:=0\\\\
 \underline{\text{QUERY():}}\\
 \quad count:=count+1\\
-\quad \text{if}\ count < \colorbox{silver}{i}:\\
+\quad \text{if}\ count < \colorbox{silver}{\textit{i}}:\\
 \qquad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \qquad\text{return}\ r\\
-\quad \text{elseif:}\ count < \colorbox{silver}{i}:\\
+\quad \text{elseif:}\ count = \colorbox{silver}{\textit{i}}:\\
 \qquad x:=\text{\colorbox{yellow}{LOOKUP}}(\textcolor{brown}{0}\cdots\textcolor{brown}{00})\\
 \qquad y:=\text{\colorbox{yellow}{LOOKUP}}(\textcolor{brown}{0}\cdots\textcolor{brown}{01})\\
 \qquad \text{return}\ x\|y\\
@@ -348,10 +348,12 @@ k\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\\\
 \end{array}
 \quad
 \begin{array}{l}
-\text{We have factored out the calls to $F$ that}\\
-\text{use seed $s^*$ (corresponding to the $count = \colorbox{silver}{i}$}\\
-\text{case) in terms of $\mathcal{L}_{\text{prf-real}}$}  \text{This change no}\\
-\text{effect on the calling program.}\\
+\text{We have factored out the calls}\\
+\text{to $F$ that use seed $s^*$ (corre}\\
+\text{-sponding to the $count = \colorbox{silver}{\textit{i}}$}\\
+ \text{case) in terms of $\mathcal{L}_{\text{prf-real}}$.  This}\\
+\text{change no effect on the calling}\\
+\text{program.}
 \end{array}
 $$
 
@@ -361,10 +363,10 @@ $$
 count:=0\\\\
 \underline{\text{QUERY():}}\\
 \quad count:=count+1\\
-\quad \text{if}\ count < \colorbox{silver}{i}:\\
+\quad \text{if}\ count < \colorbox{silver}{\textit{i}}:\\
 \qquad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \qquad\text{return}\ r\\
-\quad \text{elseif:}\ count < \colorbox{silver}{i}:\\
+\quad \text{elseif:}\ count = \colorbox{silver}{\textit{i}}:\\
 \qquad x:=\text{LOOKUP}(\textcolor{brown}{0}\cdots\textcolor{brown}{00})\\
 \qquad y:=\text{LOOKUP}(\textcolor{brown}{0}\cdots\textcolor{brown}{01})\\
 \qquad \text{return}\ x\|y\\
@@ -376,7 +378,7 @@ count:=0\\\\
 \end{array}
 \diamond
 \begin{array}{|l|}\hline
-\qquad \qquad\mathcal{L}_{\text{prf-real}}^F\\\hline
+\qquad \qquad\mathcal{L}_{\text{prf-rand}}^F\\\hline
 T:=\text{empty assoc. array}\\\\
 \underline{\text{LOOKUP}(x):}\\
 \quad \text{if}\ T[x]\ \text{undefined:}\\
@@ -397,10 +399,10 @@ $$
 count:=0\\\\
 \underline{\text{QUERY():}}\\
 \quad count:=count+1\\
-\quad \text{if}\ count < \colorbox{silver}{i}:\\
+\quad \text{if}\ count < \colorbox{silver}{\textit{i}}:\\
 \qquad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \qquad\text{return}\ r\\
-\quad \text{elseif:}\ count < \colorbox{silver}{i}:\\
+\quad \text{elseif:}\ count = \colorbox{silver}{\textit{i}}:\\
 \qquad x:=\text{LOOKUP}(\textcolor{brown}{0}\cdots\textcolor{brown}{00})\\
 \qquad y:=\text{LOOKUP}(\textcolor{brown}{0}\cdots\textcolor{brown}{01})\\
 \qquad \text{return}\ x\|y\\
@@ -436,10 +438,10 @@ $$
 count:=0\\\\
 \underline{\text{QUERY():}}\\
 \quad count:=count+1\\
-\quad \text{if}\ count < \colorbox{silver}{i}:\\
+\quad \text{if}\ count < \colorbox{silver}{\textit{i}}:\\
 \qquad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
 \qquad\text{return}\ r\\
-\quad \text{elseif:}\ count < \colorbox{silver}{i}:\\
+\quad \text{elseif:}\ count < \colorbox{silver}{\textit{i}}:\\
 \qquad \colorbox{yellow}{x}\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \qquad \colorbox{yellow}{y}\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \qquad \text{return}\ x\|y\\
@@ -454,7 +456,7 @@ count:=0\\\\
 \text{Inlining the subroutine has no effect on the calling program.}\\
 \text{The resulting library responds with uniformly random output}\\
 \text{to the first $i$ calls to QUERY, and responds with outputs of our}\\
-\text{PRG G to the others. Hence, this library has identical behavior}\\
+\text{PRG } \textit{G} \text{ to the others. Hence, this library has identical behavior}\\
 \text{to $\mathcal{L}_{\text{hyb-}i }$.}
 \end{array}
 $$
@@ -462,23 +464,23 @@ We showed that $\mathcal{L}_{\text {hyb- }(i-1)} \approx \mathcal{L}_{\text {hyb
 $$
 \mathcal{L}_{\text {prg-real }}^{G} \equiv \mathcal{L}_{\text {hyb- } 0} \approx \mathcal{L}_{\text {hyb-1 }} \approx \cdots \approx \mathcal{L}_{\text {hyb- } q} \equiv \mathcal{L}_{\text {prg-rand }}^{G}
 $$
-This shows that $\mathcal{L}_{\text {prg-real }}^{G} \approx \mathcal{L}_{\text {prg-rand }}^{G},$ so $G$ is a secure PRG.
+This shows that $\mathcal{L}_{\text {prg-real }}^{G} \approx \mathcal{L}_{\text {prg-rand }}^{G},$ so $G$ is a secure PRG. $\ \blacksquare$
 
 
 ## $\star\quad$ A Theoretical Construction of a PRF from a PRG
-We have already seen that it is possible to feed the output of a PRG back into the PRG again, to extend its stretch (Claim 5.7). This is done by making a long chain (like a linked list) of PRGs. The trick to constructing a PRF from a PRG is to chain PRGs together in a binary tree (similar to Exercise $5.8(\mathrm{a})$ ). The leaves of the tree correspond to final outputs of the PRF. If we want a PRF with an exponentially large domain (e.g., in $=\lambda$ ), the binary tree itself is exponentially large! However, it is still possible to compute any individual leaf efficiently by simply traversing the tree from root to leaf. This tree traversal itself is the PRF algorithm. This construction of a PRF is due to Goldreich, Goldwasser, and Micali, in the paper that defined the concept of a PRF.
+We have already seen that it is possible to feed the output of a PRG back into the PRG again, to extend its stretch (Claim 5.7). This is done by making a long chain (like a linked list) of PRGs. The trick to constructing a PRF from a PRG is to chain PRGs together in a **binary tree** (similar to Exercise $5.8(\mathrm{a})$ ). The leaves of the tree correspond to final outputs of the PRF. If we want a PRF with an exponentially large domain (*e.g., in $=\lambda$* ), the binary tree itself is exponentially large! However, it is still possible to compute any individual leaf efficiently by simply traversing the tree from root to leaf. This tree traversal itself is the PRF algorithm. This construction of a PRF is due to Goldreich, Goldwasser, and Micali, in the paper that defined the concept of a PRF.
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
 $$
 
-Imagine a complete binary tree of height in (in will be the input length of the PRF). Every node in this tree has a *position* which can be written as a binary string. Think of a node's position as the directions to get there starting at the root, where a $\textcolor{brown}{0}$ means "go left" and $\textcolor{brown}{1}$ means "go right." For example, the root has position $\epsilon$ (the empty string), the right child of the root has position $\textcolor{brown}{1}$ , etc.
+Imagine a complete binary tree of height *in* (*in* will be the input length of the PRF). Every node in this tree has a *position* which can be written as a binary string. Think of a node's position as the directions to get there starting at the root, where a $\textcolor{brown}{0}$ means "go left" and $\textcolor{brown}{1}$ means "go right." For example, the root has position $\epsilon$ (the empty string), the right child of the root has position $\textcolor{brown}{1}$ , etc.
 
-The PRF construction works by assigning a label to every node in the tree, using the a length-doubling $\operatorname{PRG} G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2 \lambda} .$ For convenience, we will write $G_{L}(k)$ and $G_{R}(k)$ to denote the first $\lambda$ bits and last $\lambda$ bits of $G(k)$, respectively. Labels in the tree are $\lambda$ -bit strings, computed according to the following two rules:
+The PRF construction works by assigning a *label* to every node in the tree, using the a length-doubling $\operatorname{PRG} G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2 \lambda} .$ For convenience, we will write $G_{L}(k)$ and $G_{R}(k)$ to denote the first $\lambda$ bits and last $\lambda$ bits of $G(k)$, respectively. Labels in the tree are $\lambda$-bit strings, computed according to the following two rules:
 1. The root node's label is the PRF seed.
 2. If the node at position $p$ has label $v$, then its left child (at position $p \| \textcolor{brown}{0}$ ) gets label $G_{L}(v),$ and its right child (at position $p \| \textcolor{brown}{1}$ ) gets label $G_{R}(v)$
 
-In the picture above, a node's label is the string being sent on its incoming edge. The tree has $2^{\text {in }}$ leaves, whose positions are the strings $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {in }}$. We define $F(k, x)$ to be the label of node/leaf $x$. To compute this label, we can traverse the tree from root to leaf, taking left and right turns at each node according to the bits of $x$ and computing the labels along that path according to the labeling rule. In the picture above, the highlighted path corresponds to the computation of $F(k, \textcolor{brown}{1001}\cdots)$.
+In the picture above, a node's label is the string being sent on its incoming edge. The tree has $2^{\textit {in }}$ leaves, whose positions are the strings $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {in }}$. We define $F(k, x)$ to be the label of node/leaf $x$. To compute this label, we can traverse the tree from root to leaf, taking left and right turns at each node according to the bits of $x$ and computing the labels along that path according to the labeling rule. In the picture above, the highlighted path corresponds to the computation of $F(k, \textcolor{brown}{1001}\cdots)$.
 
 It is important to remember that the binary tree is a useful conceptual tool, but it is exponentially large in general. Running the PRF on some input does not involve computing labels for the entire tree, only along a single path from root to leaf.
 
@@ -489,7 +491,7 @@ $$
 \begin{array}{|ll|}\hline
 & \underline{F(k,x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit{in}}}\\
 & \quad v:=k\\
-\text{\textit{in}=arbitrary} &\quad \text{for}\ i=1\ \text{to \textit{in}}:\\
+\text{\textit{in} = arbitrary} &\quad \text{for}\ i=1\ \text{to \textit{in}}:\\
 out=\lambda & \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)\\
 & \qquad \text{if}\ x_i=\textcolor{brown}{1}\ \text{then}\ v:=G_R(v)\\
 & \quad \text{return}\ v\\\hline
@@ -497,11 +499,10 @@ out=\lambda & \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)
 $$
 
 **Claim 6.5**
-If $G$ is a secure PRG, then Construction 6.4 is a secure PRF.
+*If $G$ is a secure PRG, then Construction 6.4 is a secure PR*F.
 
 **Proof**
-We prove the claim using a sequence of hybrids. The number of hybrids in this case
-depends on the input-length parameter in. The hybrids are defined as follows:
+We prove the claim using a sequence of hybrids. The number of hybrids in this case depends on the input-length parameter *in*. The hybrids are defined as follows:
 
 
 
@@ -511,7 +512,7 @@ $$
 \qquad \qquad \ \ \mathcal{L}_{\text{hyb-d}}\\\hline
 T:=\text{empty assoc. array}\\\\
 \underline{\text{QUERY}(x):}\\
-\quad p:=\text{first} \colorbox{silver}{d}\  \text{bits of}\ x\\
+\quad p:=\text{first} \colorbox{silver}{\textit{d}}\  \text{bits of}\ x\\
 \quad \text{if}\  T[p]\ \text{undefined:}\\
 \qquad T[p]\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \quad v:=T[p]\\
@@ -522,29 +523,29 @@ T:=\text{empty assoc. array}\\\\
 \end{array}
 $$
 
-The hybrids differ only in their hard-coded value of $\colorbox{silver}{d}$. We will show that
+The hybrids differ only in their hard-coded value of $\colorbox{silver}{\textit{d}}$. We will show that
 $$
 \mathcal{L}_{\text {prf-real }}^{F} \equiv \mathcal{L}_{\text {hyb- } 0} \approx \mathcal{L}_{\text {hyb- } 1} \approx \cdots \approx \mathcal{L}_{\text {hyb-in }} \equiv \mathcal{L}_{\text {prf-rand }}^{F}
 $$
-We first start by understanding the behavior of $\mathcal{L}_{\text {hyb- } d}$ for extreme choices of $\colorbox{silver}{d}$. Simplifications to the code are shown on the right.
+We first start by understanding the behavior of $\mathcal{L}_{\text {hyb- } d}$ for extreme choices of $\colorbox{silver}{\textit{d}}$. Simplifications to the code are shown on the right.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \qquad \qquad \qquad \qquad \mathcal{L}_{\text{hyb-d}}\\\hline
+\qquad \qquad \qquad \qquad \qquad \mathcal{L}_{\text{hyb-0}}\\\hline
 \begin{array}{ll}
 T:=\text{empty assoc. array} &\qquad k:=\text{undefined}\\
-& \qquad//k\text{is alias for}\ T[\epsilon]\\
+& \qquad//k\text{ is alias for}\ T[\epsilon]\\
 \end{array}\\
 \begin{array}{ll}
-\underline{\text{QUERY}(x):}\\
-\quad p:=\text{first} \colorbox{silver}{d}\  \text{bits of}\ x &\qquad\ \ p=\epsilon\\
+\underline{\text{LOOKUP}(x):}\\
+\quad p:=\text{first} \colorbox{silver}{0}\  \text{bits of}\ x &\qquad\ \ p=\epsilon\\
 \quad \text{if}\  T[p]\ \text{undefined:} &\qquad\ \  \text{if}\ k\ \text{undefined:}\\
 \qquad T[p]\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda & \qquad \qquad k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \end{array}\\
 \left.\begin{array}{l}
 \quad v:=T[p]\\
-\quad \text{for}\ i=\colorbox{silver}{d+1}\ \text{to}\ in: \\
+\quad \text{for}\ i=\colorbox{silver}{1}\ \text{to}\ in: \\
 \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)\\
 \qquad \text{if}\ x_i=\textcolor{brown}{1}\ \text{then}\ v:=G_R(v)\\
 \end{array}\right\}v:=F(k,x)\\
@@ -552,7 +553,7 @@ T:=\text{empty assoc. array} &\qquad k:=\text{undefined}\\
 \end{array}
 \quad
 \begin{array}{l}
-\text{In $\mathcal{L}_{\text{hyb-d}}$, we always have $p=\epsilon$,}\\
+\text{In $\mathcal{L}_{\text{hyb-0}}$, we always have $p=\epsilon$,}\\
 \text{so the only entry of T that is accessed}\\
 \text{is $T[\epsilon]$. Then renaming
 $T[\epsilon]$ to $k$, we see}\\
@@ -582,7 +583,7 @@ T:=\text{empty assoc. array} &\\
 \quad \text{for}\ i=\colorbox{silver}{\textit{in}+1}\ \text{to}\ in: \\
 \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)\\
 \qquad \text{if}\ x_i=\textcolor{brown}{1}\ \text{then}\ v:=G_R(v)\\
-\end{array}\right\}// \text{unreachable}\\
+\end{array}\right\}// \textit{unreachable}\\
 \quad \text{return}\ v \qquad \qquad \qquad \qquad \qquad \text{return}\ \ T[x]\\\hline
 \end{array}
 \quad
@@ -595,7 +596,7 @@ T:=\text{empty assoc. array} &\\
 \end{array}
 $$
 
-The general pattern is that $\mathcal{L}_{\text {hyb- } d}$ "chops off" the top $d$ levels of the conceptual binary tree. When computing the output for some string $x$, we don't start traversing the tree from the root but rather $d$ levels down the tree, at the node whose position is the $d$ -bit prefix of $x$ (called $p$ in the library). We initialize the label of this node as a uniform value (unless it has already been defined), and then continue the traversal to the leaf $x$. 
+The general pattern is that $\mathcal{L}_{\text {hyb- } d}$ "chops off" the top $d$ levels of the conceptual binary tree. When computing the output for some string $x$, we don't start traversing the tree from the root but rather $d$ levels down the tree, at the node whose position is the $d$-bit prefix of $x$ (called $p$ in the library). We initialize the label of this node as a uniform value (unless it has already been defined), and then continue the traversal to the leaf $x$. 
 
 To finish the proof, we show that $\mathcal{L}_{\mathrm{hyb}-(d-1)}$ and $\mathcal{L}_{\mathrm{hyb}-d}$ are indistinguishable:
 
@@ -609,9 +610,9 @@ T:=\text{empty assoc. array}\\\\
 \qquad T[p]\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \qquad \colorbox{yellow}{T}[p\|\textcolor{brown}{0}]:=G_L(T[p])\\
 \qquad \colorbox{yellow}{T}[p\|\textcolor{brown}{1}]:=G_R(T[p])\\
-\quad \colorbox{yellow}{p':=\text{first}} \colorbox{silver}{d}\ \text{bits of}\ x\\
-\quad \colorbox{yellow}{v:=T[p']}\\
-\quad \text{for}\ i=\colorbox{silver}{d+1}\ \text{to}\ in: \\
+\quad p' \colorbox{yellow}{:= \text{first}} \colorbox{silver}{d}\ \text{bits of}\ x\\
+\quad \colorbox{yellow}{\textit{v} :=}T[p']\\
+\quad \text{for}\ i=\colorbox{silver}{\textit{d} +1}\ \text{to}\ in: \\
 \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)\\
 \qquad \text{if}\ x_i=\textcolor{brown}{1}\ \text{then}\ v:=G_R(v)\\
 \quad \text{return}\ v\\\hline
@@ -623,9 +624,9 @@ T:=\text{empty assoc. array}\\\\
 \text{have no effect on the calling program. The library here}\\
 \text{advances $d- 1$ levels down the tree (to the node at location $p$),}\\
 \text{initializes that node’s label as a uniform value, then}\\
-\text{computes the labels for both its children, and finally continues computing}\\
+\text{computes the labels for $both$ its children, and finally continues computing}\\
 \text{labels toward the leaf. The only significant difference from}\\
-\mathcal{L}_{\text{hyb-}(d-1)}\text{is that it computes the labels of both of $p$’s children, even}\\
+\mathcal{L}_{\text{hyb-}(d-1)}\text{is that it computes the labels of $both$ of $p$’s children, even}\\
 \text{though only one is on the path to $x$. Since it computes the label}\\
 \text{correctly, though, it makes no difference when (or if) this}\\
 \text{extra label is computed.}
@@ -637,12 +638,12 @@ $$
 \begin{array}{|l|}\hline
 T:=\text{empty assoc. array}\\\\
 \underline{\text{LOOKUP}(x):}\\
-\quad p:=\text{first} \colorbox{silver}{d-1}\  \text{bits of}\ x\\
+\quad p:=\text{first} \colorbox{silver}{\textit{d}-1}\  \text{bits of}\ x\\
 \quad \text{if}\  T[p]\ \text{undefined:}\\
 \qquad \colorbox{yellow}{T}[p\|\textcolor{brown}{0}]\Big|\Big|T[p\|\textcolor{brown}{1}]:=\text{QUERY()}\\
-\quad p':=\text{first} \colorbox{silver}{d}+1\ \text{bits of}\ x\\
+\quad p':=\text{first} \colorbox{silver}{\textit{d}}+1\ \text{bits of}\ x\\
 \quad v:=T[p']\\
-\quad \text{for}\ i=\colorbox{silver}{d+1}\ \text{to}\ in: \\
+\quad \text{for}\ i=\colorbox{silver}{\textit{d} }+1\ \text{to}\ in: \\
 \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)\\
 \qquad \text{if}\ x_i=\textcolor{brown}{1}\ \text{then}\ v:=G_R(v)\\
 \quad \text{return}\ v\\\hline
@@ -674,12 +675,12 @@ $$
 \begin{array}{|l|}\hline
 T:=\text{empty assoc. array}\\\\
 \underline{\text{LOOKUP}(x):}\\
-\quad p:=\text{first} \colorbox{silver}{d-1}\  \text{bits of}\ x\\
+\quad p:=\text{first} \colorbox{silver}{\textit{d }-1}\  \text{bits of}\ x\\
 \quad \text{if}\  T[p]\ \text{undefined:}\\
 \qquad T[p\|\textcolor{brown}{0}]\Big|\Big|T[p\|\textcolor{brown}{1}]:=\text{QUERY()}\\
-\quad p':=\text{first} \colorbox{silver}{d}+1\ \text{bits of}\ x\\
+\quad p':=\text{first} \colorbox{silver}{\textit{d}}+1\ \text{bits of}\ x\\
 \quad v:=T[p']\\
-\quad \text{for}\ i=\colorbox{silver}{d+1}\ \text{to}\ in: \\
+\quad \text{for}\ i=\colorbox{silver}{\textit{d}}+1\ \text{to}\ in: \\
 \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)\\
 \qquad \text{if}\ x_i=\textcolor{brown}{1}\ \text{then}\ v:=G_R(v)\\
 \quad \text{return}\ v\\\hline
@@ -689,7 +690,7 @@ T:=\text{empty assoc. array}\\\\
 \quad\ \ \mathcal{L}_{\text{prg-rand}}^G\\\hline
 \underline{\text{QUERY():}}\\
 \quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\\
-\quad \text{return}\ G(s)\\\hline
+\quad \text{return}\ r\\\hline
 \end{array}
 \quad
 \begin{array}{l}
@@ -704,13 +705,13 @@ $$
 \begin{array}{|l|}\hline
 T:=\text{empty assoc. array}\\\\
 \underline{\text{LOOKUP}(x):}\\
-\quad p:=\text{first} \colorbox{silver}{d-1}\  \text{bits of}\ x\\
+\quad p:=\text{first} \colorbox{silver}{\textit{d} -1}\  \text{bits of}\ x\\
 \quad \text{if}\  T[p]\ \text{undefined:}\\
 \qquad \colorbox{yellow}{T}[p\|\textcolor{brown}{0}]\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \qquad \colorbox{yellow}{T}[p\|\textcolor{brown}{1}]\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\quad p':=\text{first} \colorbox{silver}{d}+1\ \text{bits of}\ x\\
+\quad p':=\text{first} \colorbox{silver}{\textit{d}}+1\ \text{bits of}\ x\\
 \quad v:=T[p']\\
-\quad \text{for}\ i=\colorbox{silver}{d+1}\ \text{to}\ in: \\
+\quad \text{for}\ i=\colorbox{silver}{\textit{d}}+1\ \text{to}\ in: \\
 \qquad \text{if}\ x_i=\textcolor{brown}{0}\ \text{then}\ v:=G_L(v)\\
 \qquad \text{if}\ x_i=\textcolor{brown}{1}\ \text{then}\ v:=G_R(v)\\
 \quad \text{return}\ v\\\hline
@@ -734,7 +735,7 @@ We showed that $\mathcal{L}_{\text{hby}-(d-1)}\approx \mathcal{L}_{\text{hby-d}}
 
 $$\mathcal{L}_{\text{prf-real}}^F\equiv\mathcal{L}_{\text{hby-0}}\approx\mathcal{L}_{\text{hby-1}}\approx\cdots\approx \mathcal{L}_{\text{hby-in}}\equiv\mathcal{L}_{\text{prf-rand}}^F.$$
 
-Hence, $F$ is a secure PRF.
+Hence, $F$ is a secure PRF. $\ \blacksquare$
 
 ## 6.3 Block Ciphers (Pseudorandom Permutations)
 
