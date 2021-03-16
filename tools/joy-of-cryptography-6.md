@@ -741,32 +741,32 @@ Hence, $F$ is a secure PRF. $\ \blacksquare$
 
 After fixing the seed of a PRF, it computes a function from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {in }}$ to $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {out }}$. Let's consider the case where *in* $=$ *out*. Some functions from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {in }}$ to $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {out }}$ are invertible, which leads to the question of whether a PRF might realize such a function and be invertible (with knowledge of the seed). In other words, what if it were possible to determine $x$ when given $k$ and $F(k, x) ?$ While this would be a convenient property, it is not guaranteed by the PRF security definition, even in the case of *in* $=$ *out*. A function from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {in }}$ to $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {out }}$ chosen at random is unlikely to have an inverse, therefore a PRF instantiated with a random key is unlikely to have an inverse.
 
-A **pseudorandom permutation** **(PRP)** $-$ also called a **block cipher** $-$ is essentially a PRF that is guaranteed to be invertible for every choice of seed. We use both terms (PRP and block cipher) interchangeably. The term "permutation" refers to the fact that, for every $k,$ the function $F(k, \cdot)$ should be a permutation of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{i n} .$ Instead of requiring a PRP to be indistinguishable from a randomly chosen function, we require it to be indistinguishable from a randomly chosen *invertible* function.  This means we must modify one of the libraries from the PRF definition. Instead of populating the associative array $T$ with uniformly random values, it chooses uniformly random *but distinct* values. As long as $T$ gives distinct outputs on distinct inputs, it is consistent with some invertible function. The library guarantees distinctness by only sampling values that it has not previously assigned. Thinking of an associative array $T$ as a key-value store, we use the notation $T .$ values to denote the set of values stored in $T$.
-
+A **pseudorandom permutation** **(PRP)** $-$ also called a **block cipher** $-$ is essentially a PRF that is guaranteed to be invertible for every choice of seed. We use both terms (PRP and block cipher) interchangeably. The term "permutation" refers to the fact that, for every $k,$ the function $F(k, \cdot)$ should be a permutation of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{i n} .$ Instead of requiring a PRP to be indistinguishable from a randomly chosen function, we require it to be indistinguishable from a randomly chosen *invertible* function.[^2]  This means we must modify one of the libraries from the PRF definition. Instead of populating the associative array $T$ with uniformly random values, it chooses uniformly random *but distinct* values. As long as $T$ gives distinct outputs on distinct inputs, it is consistent with some invertible function. The library guarantees distinctness by only sampling values that it has not previously assigned. Thinking of an associative array $T$ as a key-value store, we use the notation $T .$ values to denote the set of values stored in $T$.
+[^2]: As we will see later, the distinction between randomly chosen function and randomly chosen *invertible* function is not as significant as it might seem.
 
 **Definition 6.6 (PRP syntax)**
 
-Let $F:\{0,1\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }}$ be a deterministic function. We refer to blen as the **blocklength** of $F$ and any element of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }}$ as a **block**.
+*Let $F:\{0,1\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }}$ be a deterministic function. We refer to blen as the **blocklength** of $F$ and any element of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }}$ as a **block**.*
 
-We call $F$ a **secure pseudorandom permutation (PRP) (block cipher)** if the following two conditions hold:
-1. (Invertible given $k$ ) There is a function $F^{-1}:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }}$ satisfying
+*We call $F$ a **secure pseudorandom permutation (PRP) (block cipher)** if the following two conditions hold:*
+1. *(Invertible given $k$ ) There is a function $F^{-1}:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }}$ satisfying*
 $$
 F^{-1}(k, F(k, x))=x
 $$
-for all $k \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ and all $x \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }}$
+for all $k \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ and all $x \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }}$
 2. (Security) $\mathcal{L}_{\text {prp-real }}^{F} \approx \mathcal{L}_{\text {prp-rand }}^{F},$ where
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \qquad\mathcal{L}_{\text{prf-real}}^F\\\hline
+\qquad \qquad\mathcal{L}_{\text{prp-real}}^F\\\hline
 k\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\\\
 \underline{\text{LOOKUP}(x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{return}\ F(k,x)\\\hline
 \end{array}
 \quad
 \begin{array}{|l|}\hline
-\qquad \qquad \quad\mathcal{L}_{\text{prf-rand}}^F\\\hline
+\qquad \qquad \quad\mathcal{L}_{\text{prp-rand}}^F\\\hline
 T:=\text{empty assoc. array}\\\\
 \underline{\text{LOOKUP}(x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{if}\ T[x]\ \text{undefined:}\\
@@ -780,7 +780,7 @@ $$
 The changes from the PRF definition are highlighted in yellow. In particular, the $\mathcal{L}_{\text {prp-real }}$ and $\mathcal{L}_{\text {prf-real }}$ libraries are identical.
 
 ### Discussion, Pitfalls
-In the definition, both the functions $F$ and $F^{-1}$ take the seed $k$ as input. Therefore, only someone with $k$ can invert the block cipher. Think back to the definition of a PRF without the seed $k$, it is hard to compute $F(k, x)$. A block cipher has a forward and reverse direction, and computing either of them is hard without $k !$
+In the definition, both the functions $F$ and $F^{-1}$ take the seed $k$ as input. Therefore, only someone with $k$ can invert the block cipher. Think back to the definition of a PRF without the seed $k$, it is hard to compute $F(k, x)$. A block cipher has a forward and reverse direction, and computing *either* of them is hard without $k !$
 
 ## 6.4 Relating PRFs and Block Ciphers
 In this section we discuss how to obtain PRFs from PRPs/block ciphers, and vice-versa.
@@ -788,12 +788,12 @@ In this section we discuss how to obtain PRFs from PRPs/block ciphers, and vice-
 
 ### Switching Lemma (PRPs are PRFs, Too!)
 
-Imagine you can query a PRP on chosen inputs (as in the $\mathcal{L}_{\text {prp-real }}$ library), and suppose the blocklength of the PRP is blen $=\lambda$. You would only be able to query that PRP on a *negligible* *fraction* of its exponentially large input domain. It seems unlikely that you would even be able to tell that it was a PRP (i.e., an invertible function) rather than a PRF (an unrestricted function). 
+Imagine you can query a PRP on chosen inputs (as in the $\mathcal{L}_{\text {prp-real }}$ library), and suppose the blocklength of the PRP is *blen* $=\lambda$. You would only be able to query that PRP on a *negligible* *fraction* of its exponentially large input domain. It seems unlikely that you would even be able to tell that it was a PRP (i.e., an invertible function) rather than a PRF (an unrestricted function). 
 
 This idea can be formalized as follows.
 
 **Lemma 6.7 (PRP switching)**
-Let $\mathcal{L}_{\text {prf-rand }}$ and $\mathcal{L}_{\text {prp-rand }}$ be defined as in Definitions $6.1 \& 6.6,$ with parameters *in* $=$ *out* $=$ blen $=\lambda$ (so that the interfaces match up). Then $\mathcal{L}_{\text {prf-rand }} \approx \mathcal{L}_{\text {prp-rand }}.$
+*Let $\mathcal{L}_{\text {prf-rand }}$ and $\mathcal{L}_{\text {prp-rand }}$ be defined as in Definitions $6.1 \ \& \ 6.6,$ with parameters *in* $=$ *out* $=$ blen $=\lambda$ (so that the interfaces match up). Then $\mathcal{L}_{\text {prf-rand }} \approx \mathcal{L}_{\text {prp-rand }}.$*
 
 **Proof**
 Recall the replacement-sampling lemma, Lemma 4.11 , which showed that the following libraries are indistinguishable:
@@ -833,36 +833,33 @@ When we link $\mathcal{L}^{*} \diamond \mathcal{L}_{\text{samp-L}}$ we obtain $\
 $$
 \mathcal{L}_{\text {prf-rand }} \equiv \mathcal{L}^{*} \diamond \mathcal{L}_{\text {samp-L }} \approx \mathcal{L}^{*} \diamond \mathcal{L}_{\text {samp-R }} \equiv \mathcal{L}_{\text {prp-rand }},
 $$
-which completes the proof.
+which completes the proof. $\ \blacksquare$
 
-Using the switching lemma, we can conclude that every PRP (with blen $=\lambda$ ) is also a PRF:
+Using the switching lemma, we can conclude that every PRP (with *blen* $=\lambda$ ) is also a PRF:
 
 **Corollary 6.8**
-Let $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ be a secure PRP (with blen $=\lambda$ ). Then $F$ is also a secure PRF.
+*Let $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ be a secure PRP (with blen $=\lambda$ ). Then $F$ is also a secure PRF.*
 
 **Proof**
 As we have observed above, $\mathcal{L}_{\text {prf-real }}^{F}$ and $\mathcal{L}_{\text {prp-real }}^{F}$ are literally the same library. Since $F$ is a secure PRP, $\mathcal{L}_{\text {prp-real }}^{F} \approx \mathcal{L}_{\text {prp-rand }}^{F} .$ Finally, by the switching lemma, $\mathcal{L}_{\text {prp-rand }}^{F} \approx \mathcal{L}_{\text {prf-rand }}^{F}$ Putting everything together:
 $$
-\mathcal{L}_{\text {prf-real }}^{F} \equiv \mathcal{L}_{\text {prp-real }}^{F} \approx \mathcal{L}_{\text {prp-rand }}^{F} \approx \mathcal{L}_{\text {prf-rand }}^{F}.
+\mathcal{L}_{\text {prf-real }}^{F} \equiv \mathcal{L}_{\text {prp-real }}^{F} \approx \mathcal{L}_{\text {prp-rand }}^{F} \approx \mathcal{L}_{\text {prf-rand }}^{F},
 $$
 hence $F$ is a secure PRF.
 
-Keep in mind that the switching lemma applies only when the blocklength is sufficiently large (at least $\lambda$ bits long). This comes from the fact that $\mathcal{L}_{\text {samp-L }}$ and $\mathcal{L}_{\text {samp-R }}$ in the proof are indistinguishable only when sampling with long (length-\lambda) strings (look at the proof of Lemma 4.11 to recall why). Exercise 6.14 asks you to show that a random permutation over a small domain can be distinguished from a random (unconstrained) function; so, a PRP with a small blocklength is not a PRF.
+Keep in mind that the switching lemma applies only when the blocklength is sufficiently large (at least $\lambda$ bits long). This comes from the fact that $\mathcal{L}_{\text {samp-L }}$ and $\mathcal{L}_{\text {samp-R }}$ in the proof are indistinguishable only when sampling with long (length-$\lambda$) strings (look at the proof of Lemma 4.11 to recall why). Exercise 6.14 asks you to show that a random permutation over a *small domain* can be distinguished from a random (unconstrained) function; so, a PRP with a small blocklength is **not** a PRF.
 
 ### Constructing a PRP from a PRF: The Feistel Construction
-How can you build an *invertible* block cipher out of a PRF that is not necessarily invertible?
-In this section, we show a simple technique called the **Feistel construction** (named after
+How can you build an *invertible* block cipher out of a PRF that is not necessarily invertible? In this section, we show a simple technique called the **Feistel construction** (named after
 IBM cryptographer Horst Feistel).
 
-The main idea in the Feistel construction is to convert a not-necessarily-invertible
-function $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n$ into an invertible function $F^*:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2n}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2n}$. The function $F^*$ is called the **Feistel round with round function** $F$ and is defined as follows:
+The main idea in the Feistel construction is to convert a not-necessarily-invertible function $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n$ into an invertible function $F^*:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2n}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2n}$. The function $F^*$ is called the **Feistel round with round function** $F$ and is defined as follows:
 
 **Construction 6.9 (Feistel round)**
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
 $$
-No matter what $F$ is, its Feistel round $F^*$ is invertible. Not only that, but its inverse is
-a kind of “mirror image” of $F^*$:
+No matter what $F$ is, its Feistel round $F^*$ is invertible. Not only that, but its inverse is a kind of “mirror image” of $F^*$:
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
@@ -870,7 +867,7 @@ $$
 Note how both the forward and inverse Feistel rounds use $F$ in the forward direction!
 
 **Example**
-Let's see what happens in the Feistel construction with a trivial round function. Consider the constant function $F(y)=\textcolor{brown}{0}^{n},$ which is the "*least invertible" function imaginable.* The Feistel construction gives:
+*Let's see what happens in the Feistel construction with a trivial round function. Consider the constant function $F(y)=\textcolor{brown}{0}^{n},$ which is the "*least invertible" function imaginable.* The Feistel construction gives:*
 $$
 \begin{aligned}
 F^{*}(x \| y) &=y \|(F(y) \oplus x) \\
@@ -878,17 +875,17 @@ F^{*}(x \| y) &=y \|(F(y) \oplus x) \\
 &=y \| x
 \end{aligned}
 $$
-The result is a function that simply switches the order of its halves - clearly invertible.
+*The result is a function that simply switches the order of its halves - clearly invertible.*
 
 **Example**
-Let's try another simple round function, this time the identity function $F(y)=y .$ The Feistel construction gives:
+*Let's try another simple round function, this time the identity function $F(y)=y .$ The Feistel construction gives:*
 $$
 \begin{aligned}
 F^{*}(x \| y) &=y \|(F(y) \oplus x) \\
 &=y \|(y \oplus x)
 \end{aligned}
 $$
-This function is invertible because given $y$ and $y \oplus x$ we can solve for $x$ as $y \oplus(y \oplus x) .$ You can verify that this is what happens when you plug $F$ into the inverse Feistel construction.
+*This function is invertible because given $y$ and $y \oplus x$ we can solve for $x$ as $y \oplus(y \oplus x) .$ You can verify that this is what happens when you plug $F$ into the inverse Feistel construction.*
 
 We can also consider using a round function $F$ that has a key/seed. The result will be an $F^{*}$ that also takes a seed. For every seed $k, F^{*}(k, \cdot)$ will have an inverse (which looks like its mirror image).
 
@@ -897,60 +894,57 @@ $$
 \textcolor{red}{{\text{Image screenshot here}}}
 $$
 Now suppose $F$ is a secure PRF and we use it as a Feistel round function, to obtain a
-keyed function $F^*$. Since $F(k,\cdot)$ is invertible for every $k$, and since $F^*$ uses a secure PRF in some way, you might be tempted to claim that $F^*$ is a secure PRP. Unfortunately, it is not! The output of $F^*$ contains half of its input, making it quite trivial to break the PRP-security of $F^*$.
+keyed function $F^*$. Since $F^*(k,\cdot)$ is invertible for every $k$, and since $F^*$ uses a secure PRF in some way, you might be tempted to claim that $F^*$ is a secure PRP. Unfortunately, it is not! The output of $F^*$ contains half of its input, making it quite trivial to break the PRP-security of $F^*$.
 
-We can avoid this trivial attack by performing several Feistel rounds in succession,
-resulting in a construction called a **Feistel cipher**. At each round, we can even use a
-different key to the round function. If we use $k_1$ in the first round, $k_2$ in the second round,
-and so on, then $k_1, k_2,\ldots$ is called the **key schedule** of the Feistel cipher. The formal
-denition of an r -round Feistel cipher is given below:
+We can avoid this trivial attack by performing several Feistel rounds in succession, resulting in a construction called a **Feistel cipher**. At each round, we can even use a
+different key to the round function. If we use $k_1$ in the first round, $k_2$ in the second round, and so on, then $k_1, k_2,\ldots$ is called the **key schedule** of the Feistel cipher. The formal definition of an r-round Feistel cipher is given below:
 
 **Construction 6.11 (Feistel cipher)**
+
+$$
+\textcolor{red}{{\text{Image screenshot here}}}
+$$
+
 Because each round is invertible (given the appropriate round key), the overall Feistel cipher is also invertible. Note that the inverse of the Feistel cipher uses inverse Feistel rounds and reverses the order of the key schedule.
 
-Surprisingly, a 3-round Feistel cipher can actually be secure, although a 2-round Feistel cipher is never secure (see the exercises). More precisely: when F is a secure PRF with *in = out* = $\lambda$, then using $F$ as the round function of a 3-round Feistel cipher results in a secure PRP. The Feistel cipher has blocklength $2\lambda$, and it has a key of length $3\lambda$(3 times longer than the key for $F$ ). Implicitly, this means that the three round keys are chosen independently.
+Surprisingly, a 3-round Feistel cipher can actually be secure, although a 2-round Feistel cipher is never secure (see the exercises). More precisely: when *F* is a secure PRF with *in = out* = $\lambda$, then using $F$ as the round function of a 3-round Feistel cipher results in a secure PRP. The Feistel cipher has blocklength $2\lambda$, and it has a key of length $3\lambda$(3 times longer than the key for $F$ ). Implicitly, this means that the three round keys are chosen independently.
 
 **Theorem 6.12 (Luby-Rackoff)**
-If $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ a secure PRF, then the 3-round Feistel cipher $\mathbb{F}_3$ (Construction 6.11) is a secure PRP.
+*If $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ is a secure PRF, then the 3-round Feistel cipher $\mathbb{F}_3$ (Construction 6.11) is a secure PRP.*
 
 Unfortunately, the proof of this theorem is beyond the scope of this book.
 
 ## 6.5 PRFs and Block Ciphers in Practice
 
-Block ciphers are one of the cornerstones of cryptography in practice today. We have
-shown how (at least in principle) block ciphers can be constructed out of simpler primitives:
-PRGs and PRFs. However, in practice we use block ciphers that are designed “from
-scratch,” and then use these block ciphers to construct simpler PRGs and PRFs when we
-need them.
+Block ciphers are one of the cornerstones of cryptography in practice today. We have shown how (at least in principle) block ciphers can be constructed out of simpler primitives: PRGs and PRFs. However, in practice we use block ciphers that are designed “from scratch,” and then use these block ciphers to construct simpler PRGs and PRFs when we need them.
 
-We currently have **no proof** that any secure PRP exists. Aswe discussed in Section 5.2,
-such a proof would resolve the famous P vs NP problem. Without such proofs, what is our
-basis for confidence in the security of block ciphers being used today? The process that led
-to the Advanced Encryption Standard (AES) block cipher demonstrates the cryptographic
-community’s best efforts at instilling such confidence.
+We currently have **no proof** that any secure PRP exists. As we discussed in Section 5.2, such a proof would resolve the famous P vs NP problem. Without such proofs, what is our
+basis for confidence in the security of block ciphers being used today? The process that led to the Advanced Encryption Standard (AES) block cipher demonstrates the cryptographic community’s best efforts at instilling such confidence.
 
 The National Institute of Standards & Technology (NIST) sponsored a competition to design a block cipher to replace the DES standard from the 1970s. Many teams of cryptographers
 submitted their block cipher designs, all of which were then subject to years of intense public scrutiny by the cryptographic research community. The designs were evaluated on the basis of their performance and resistance to attacks against the PRP security definition (and other attacks). Some designs did offer proofs that they resist certain *classes of attacks*, and proofs that justify certain choices in building the block cipher from simpler components.
 
-The Rijndael cipher, designed by Vincent Rijmen and Joan Daemen, was selected as the winner and became the AES standard in 2001. There may not be another cryptographic algorithm that has been the focus of more scrutiny and attempts at attack. So far no significant weaknesses in AES are known.
+The Rijndael cipher, designed by Vincent Rijmen and Joan Daemen, was selected as the winner and became the AES standard in 2001. There may not be another cryptographic algorithm that has been the focus of more scrutiny and attempts at attack. So far no significant weaknesses in AES are known.[^3]
 
-The AES block cipher has a blocklength of 128 bits, and oers 3 different variants with 128-bit, 192-bit, and 256-bit keys. As a result of its standardization, AES is available in cryptographic libraries for any programming language. It is even implemented as hardware instructions in most modern processors, allowing millions of AES evaluations per second. As we have seen, once you have access to a good block cipher, it can be used directly also as a secure PRF (Corollary 6.8), and it can be used to construct a simple PRG (Construction 6.2). Even though AES itself is not a *provably secure* PRP, these constructions of PRFs and PRGs based on AES are secure. Or, more precisely, the PRF-security and PRG-security of these constructions is guaranteed to be as good as the PRP-security of AES.
+[^3]: In all fairness, there is a possibility that government agencies like NSA know of weaknesses in many cryptographic algorithms, but keep them secret. I know of a rather famous cryptographer (whom I will not name here) who believes this is likely, based on the fact that NSA has hired more math & cryptography PhDs than have gone on to do public research.
 
-## $\star\quad$ 6.6  Strong Pseudorandom Permutations
+The AES block cipher has a blocklength of 128 bits, and offers 3 different variants with 128-bit, 192-bit, and 256-bit keys. As a result of its standardization, AES is available in cryptographic libraries for any programming language. It is even implemented as hardware instructions in most modern processors, allowing millions of AES evaluations per second. As we have seen, once you have access to a good block cipher, it can be used directly also as a secure PRF (Corollary 6.8), and it can be used to construct a simple PRG (Construction 6.2). Even though AES itself is not a *provably secure* PRP, these constructions of PRFs and PRGs based on AES are secure. Or, more precisely, the PRF-security and PRG-security of these constructions is guaranteed to be as good as the PRP-security of AES.
+
+## $\star$ 6.6  Strong Pseudorandom Permutations
 Since a block cipher $F$ has a corresponding inverse $F ^{-1}$, it is natural to think of $F$ and $F ^{-1}$ as interchangeable in some sense. However, the PRP security definition only guarantees a security property for $F$ and not its inverse. In the exercises, you will see that it is possible to construct $F$ which is a secure PRP, whose inverse $F^{-1}$ is not a secure PRP!
 
-It would be very natural to ask for a PRP whose $F$ and $F ^{-1}$ are both secure. We will later  see applications where this property would be convenient. An even stronger requirement would allow the distinguisher to query both $F$ and $F ^{-1}$ in a single interaction (rather than one security definition where the distinguisher queries only F , and another definition where the distinguisher queries only $F ^{-1}$). If a PRP is indistinguishable from a random permutation under that setting, then we say it is a **strong PRP** (SPRP).
+It would be very natural to ask for a PRP whose $F$ and $F ^{-1}$ are both secure. We will later  see applications where this property would be convenient. An even stronger requirement would allow the distinguisher to query both $F$ and $F ^{-1}$ in a *single* interaction (rather than one security definition where the distinguisher queries only F , and another definition where the distinguisher queries only $F ^{-1}$). If a PRP is indistinguishable from a random permutation under that setting, then we say it is a **strong PRP** (SPRP).
 
-In the formal security definition, we provide the calling program two subroutines: one for forward queries and one for reverse queries. In $\mathcal{L}_{\text{sprp-real}}$, these subroutines are implemented by calling the PRP or its inverse accordingly. In $\mathcal{L}_{\text{sprp-real}}$ we emulate the behavior of a randomly chosen permutation that can be queried in both directions. We maintain two associative arrays $T$ and $T_{inv}$ to hold the truth tables of these permutations, and sample their values on-demand. The only restriction is that  $T$ and $T_{inv}$ maintain consistency $(T[x]=y$ if and only if $T_{inv}[y]=x)$. This also ensures that they always represent an invertible function. We use the same technique as before to ensure invertibility.
+In the formal security definition, we provide the calling program *two* subroutines: one for forward queries and one for reverse queries. In $\mathcal{L}_{\text{sprp-real}}$, these subroutines are implemented by calling the PRP or its inverse accordingly. In $\mathcal{L}_{\text{sprp-rand}}$, we emulate the behavior of a randomly chosen permutation that can be queried in both directions. We maintain two associative arrays $T$ and $T_{inv}$ to hold the truth tables of these permutations, and sample their values on-demand. The only restriction is that  $T$ and $T_{inv}$ maintain consistency $(T[x]=y$ if and only if $T_{inv}[y]=x)$. This also ensures that they always represent an invertible function. We use the same technique as before to ensure invertibility.
 
 **Definition 6.13 (SPRP security)**
-Let $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}$ be a deterministic function. We say that F is a **secure strong pseudorandom permutation (SPRP)** if $\mathcal{L}_{\text{sprp-real}}^F\approx \mathcal{L}_{\text{sprp-rand}}^F$
+*Let $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}$ be a deterministic function. We say that F is a **secure strong pseudorandom permutation (SPRP)** if $\mathcal{L}_{\text{sprp-real}}^F\approx \mathcal{L}_{\text{sprp-rand}}^F$, where*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad\qquad \ \ \mathcal{L}_{\text{sprp-real}}^F\\\hline
-\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\\\
+\quad k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\\\
 \underline{\text{LOOKUP}(x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{return}\ F(k,x)\\\\
 \underline{\text{INVLOOKUP}(y\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
@@ -962,12 +956,12 @@ T,T_{inv}:=\text{empty assoc. arrays}\\\\
 \underline{\text{LOOKUP}(x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{if}\ T[x]\ \text{undefined}:\\
 \qquad y\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash T.\text{values}\\
-\qquad T[x]:=y:\quad T_{inv}[y]:=x\\
+\qquad T[x]:=y;\quad T_{inv}[y]:=x\\
 \quad \text{return}\ T[x]\\
 \underline{\text{INVLOOKUP}(y\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{if}\ T_{inv}[y]\ \text{undefined}:\\
 \qquad x\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash T_{inv}.\text{values}\\
-\qquad T_{inv}[y]:=x:\quad T[x]:=y\\
+\qquad T_{inv}[y]:=x;\quad T[x]:=y\\
 \quad \text{return}\ T_{inv}[y]\\\hline
 \end{array}
 $$
@@ -976,7 +970,7 @@ Earlier we showed that using a PRF as the round function in a 3-round Feistel ci
 
 **Theorem 6.14 (Luby-Rackoff)**
 
-Let $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ is a secure PRF, then the 4-round Feistel cipher $\mathbb{F}_4$ (Construction 6.11) is a secure SPRP.
+*If $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$ is a secure PRF, then the 4-round Feistel cipher $\mathbb{F}_4$ (Construction 6.11) is a secure SPRP.*
 
 ### Exercises
 
@@ -1004,7 +998,7 @@ F^{\prime}(k, x)=F(k, x) \oplus x
 $$
 Prove that $F^{\prime}$ is a secure PRF.
 
-6.3. Let $F$ be a secure PRF with $\lambda$ -bit outputs, and let $G$ be a PRG with stretch $\ell$. Define
+6.3. Let $F$ be a secure PRF with $\lambda$-bit outputs, and let $G$ be a PRG with stretch $\ell$. Define
 $$
 F^{\prime}(k, r)=G(F(k, r))
 $$
@@ -1020,9 +1014,9 @@ We will see that $F^{\prime}$ is not necessarily a PRF.
 > Hint: You should not even need to use the fact that G is a PRG.
 > 
 $\star$ (b) Exercise 5.9 (b) constructs a secure length-doubling PRG that ignores half of its input Show that $F^{\prime}$ is insecure when instantiated with such a PRG. Give a distinguisher and compute its advantage.
- Note: You are not attacking the PRF security of $F,$ nor the PRG security of $G$. You are attacking the invalid way in which they have been combined.
+ *Note*: You are not attacking the PRF security of $F,$ nor the PRG security of $G$. You are attacking the invalid way in which they have been combined.
  
-6.5. Let $F$ be a secure PRF, and let $m \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {in }}$ be a fixed (therefore known to the adversary) string. Define the new function
+6.5. Let $F$ be a secure PRF, and let $m \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {in }}$ be a fixed (therefore known to the adversary) string. Define the new function
 $$
 F_{m}(k, x)=F(k, x) \oplus F(k, m).
 $$
@@ -1045,10 +1039,10 @@ Show that $F'$ is **not** a secure PRF. Describe a distinguisher and compute its
 
 (a) $F^{\prime}\left(k, x \| x^{\prime}\right)=F(k, x) \| F\left(k, x^{\prime}\right),$ where $x$ and $x^{\prime}$ are each *in* bits long.
 (b) $F^{\prime}\left(k, x \| x^{\prime}\right)=F(k, x) \oplus F\left(k, x^{\prime}\right),$ where $x$ and $x^{\prime}$ are each *in* bits long.
-(c) $F^{\prime}\left(k, x \| x^{\prime}\right)=F(k, x) \oplus F\left(k, x \oplus x^{\prime}\right),$ where $x$ and $x^{\prime}$ are each *in* bits long.
-(d) $F^{\prime}\left(k, x \| x^{\prime}\right)=F(k, \textcolor{brown}{0} \| x) \oplus F\left(k, \textcolor{brown}{1} \| x^{\prime}\right),$ where $x$ and $x^{\prime}$ are each *in*-$1$ bits long.
+(c ) $F^{\prime}\left(k, x \| x^{\prime}\right)=F(k, x) \oplus F\left(k, x \oplus x^{\prime}\right),$ where $x$ and $x^{\prime}$ are each *in* bits long.
+(d) $F^{\prime}\left(k, x \| x^{\prime}\right)=F(k, \textcolor{brown}{0} \| x) \oplus F\left(k, \textcolor{brown}{1} \| x^{\prime}\right),$ where $x$ and $x^{\prime}$ are each *in* - $1$ bits long.
 
-6.9. Define a PRF $F$ whose key $k$ we write as $\left(k_{1}, \ldots, k_{i n}\right),$ where each $k_{i}$ is a string of length out. Then $F$ is defined as:
+6.9. Define a PRF $F$ whose key $k$ we write as $\left(k_{1}, \ldots, k_{i n}\right),$ where each $k_{i}$ is a string of length *out*. Then $F$ is defined as:
 $$
 F(k, x)=\bigoplus_{i \times x_{i}=1} k_{i}.
 $$
@@ -1067,33 +1061,30 @@ Show that $F$ is **not** a secure PRF. Describe a distinguisher and compute its 
 6.13. Suppose $R:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$ is chosen uniformly among all such functions. What is the probability that there exists an $x \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$ such that $R(x)=x ?$
 >Hint: First find the probability that $R(x)\neq x$ for all $x$. Simplify your answer using the approximation $(1-y)\approx e^{-y}$.
 >
-6.14. In this problem, you will show that the PRP switching lemma holds only for large domains. Let $\mathcal{L}_{\text {prf-rand }}$ and $\mathcal{L}_{\text {prp-rand }}$ be as in Lemma $6.7 .$ Choose any small value of blen $=$ in $=$ out that you like, and show that $\mathcal{L}_{\text {prf-rand }} \not\approx \mathcal{L}_{\text {prp-rand }}$ with those parameters. Describe $\mathbf{a}$ distinguisher and compute its advantage.
+6.14. In this problem, you will show that the PRP switching lemma holds only for large domains. Let $\mathcal{L}_{\text {prf-rand }}$ and $\mathcal{L}_{\text {prp-rand }}$ be as in Lemma $6.7 .$ Choose any small value of blen $=$ in $=$ out that you like, and show that $\mathcal{L}_{\text {prf-rand }} \not\approx \mathcal{L}_{\text {prp-rand }}$ with those parameters. Describe a distinguisher and compute its advantage.
 
->Hint: Remember that the distinguisher needs to run in polynomial time in$\lambda$, but not necessarily polynomial in blen.
+>Hint: Remember that the distinguisher needs to run in polynomial time in$\lambda$, but not necessarily polynomial in *blen*.
 
-6.15. Let $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{in} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}$ be a (not necessarily invertible) function. We showed how to
-use F as a round function in the Feistel construction ony when *in = out*.
+6.15. Let $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{in} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}$ be a (not necessarily invertible) function. We showed how to use F as a round function in the Feistel construction ony when *in = out*.
 
-Describe a modification of the Feistel construction that works even when the round function satisfies *in* $\neq$ *out*. The result should be an invertible with input/output length *in+out*. Be sure to show that your proposed transform is invertible! You are not being asked to show any security properties of the Feistel construction.
+Describe a modification of the Feistel construction that works even when the round function satisfies *in* $\neq$ *out*. The result should be an invertible with input/output length *in + out*. Be sure to show that your proposed transform is invertible! You are not being asked to show any security properties of the Feistel construction.
 
-6.16. Showthat a 1-round keyed Feistel cipher **cannot** be a secure PRP, no matter what its round functions are. That is, construct a distinguisher that successfully distinguishes $\mathcal{L}_{\text{prp-real}}^F$ and $\mathcal{L}_{\text{prp-rand}}^F$, knowing only that F is a 1-round Feistel cipher. In particular, the purpose is to attack the Feistel transform and not its round function, so your attack should work no matter what the round function is.
+6.16. Show that a 1-round keyed Feistel cipher **cannot** be a secure PRP, no matter what its round functions are. That is, construct a distinguisher that successfully distinguishes $\mathcal{L}_{\text{prp-real}}^F$ and $\mathcal{L}_{\text{prp-rand}}^F$, knowing only that F is a 1-round Feistel cipher. In particular, the purpose is to attack the Feistel transform and not its round function, so your attack should work no matter what the round function is.
 
-6.17. Showthat a 2-round keyed Feistel cipher cannot be a secure PRP, no matter what its round
-functions are. Your attack should work without knowing the round keys, and it should work even with different (independent) round keys.
+6.17. Show that a 2-round keyed Feistel cipher **cannot** be a secure PRP, no matter what its round functions are. Your attack should work without knowing the round keys, and it should work even with different (independent) round keys.
 >Hint: A successful attack requires two queries.
 >
-6.18. Show that any function F that is a 3-round keyed Feistel cipher **cannot** be a secure *strong* PRP. As above, your distinguisher shouldwork without knowing what the round functions
-are, and the attack should work with different (independent) round functions.
+6.18. Show that any function $F$ that is a 3-round keyed Feistel cipher **cannot** be a secure *strong* PRP. As above, your distinguisher should work without knowing what the round functions are, and the attack should work with different (independent) round functions.
 
 6.19. In this problem you will show that PRPs are hard to invert without the key (if the blocklength is large enough). Let $F$ be a candidate PRP with blocklength blen $\geqslant \lambda$. Suppose there is a program $\mathcal{A}$ where:
 $$
-\underset{y \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }}}{\operatorname{Pr}}\left[\mathcal{A}(y) \diamond \mathcal{L}_{\text {prf-real }}^{F} \text { outputs } F^{-1}(k, y)\right] \text { is non-negligible. }
+\underset{y \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }}}{\operatorname{Pr}}\left[\mathcal{A}(y) \diamond \mathcal{L}_{\text {prf-real }}^{F} \text { outputs } F^{-1}(k, y)\right] \text { is non-negligible. }
 $$
 The notation means that $\mathcal{A}$ receives a random block $y$ as an input (and is also linked to $\left.\mathcal{L}_{\text {prf-real }}\right) . k$ refers to the private variable within $\mathcal{L}_{\text {prf-real. }}$ So, when given the ability to evaluate $F$ in the forward direction only (via $\mathcal{L}_{\text {prf-real }}$ ), $\mathcal{A}$ can invert a uniformly chosen block $y$
 
 Prove that if such an $\mathcal{A}$ exists, then $F$ is not a secure PRP. Use $\mathcal{A}$ to construct a distinguisher that violates the PRP security definition. Where do you use the fact that blen $\geqslant \lambda ?$ How do you deal with the fact that $\mathcal{A}$ may give the wrong answer with high probability?
 
-6.20. Let $F$ be a secure PRP with blocklength blen $=\lambda$, and consider $\widehat{F}(k, x)=F(k, k) \oplus F(k, x)$.
+6.20. Let $F$ be a secure PRP with blocklength *blen* $=\lambda$, and consider $\widehat{F}(k, x)=F(k, k) \oplus F(k, x)$.
 
  $\quad$(a) Show that $\widehat{F}$ is not a strong PRP (even if $F$ is).
 $\ \star$ (b) Show that $\widehat{F}$ is a secure (normal) PRP.
