@@ -5,7 +5,7 @@ Our previous security definitions for encryption capture the case where a key is
 Fortunately we have arranged things so that we get the “correct” security definition when we modify the earlier definition in a natural way. We simply let the libraries choose a secret key once and for all, which is used to encrypt all plaintexts. More formally:
 
 **Definition 7.1 (CPA security)**
-Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **security against chosen-plaintext attacks (CPA security**) if $\mathcal{L}_{\text{cpa-L}}^{\Sigma}\approx\mathcal{L}_{\text{cpa-R}}^{\Sigma}$ where:
+*Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **security against chosen-plaintext attacks (CPA security**) if $\mathcal{L}_{\text{cpa-L}}^{\Sigma}\approx\mathcal{L}_{\text{cpa-R}}^{\Sigma}$ where:*
 
 $$
 \def\arraystretch{1.5}
@@ -13,14 +13,14 @@ $$
 \qquad\qquad \qquad \ \mathcal{L}_{\text{cpa-L}}^\Sigma\\\hline
 k\leftarrow\Sigma.\text{KeyGen}\\\\
 \underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
-\quad c:=\Sigma.\text{Enc}(l,\colorbox{yellow}{m}_L)\\
+\quad c:=\Sigma.\text{Enc}(k,\colorbox{yellow}{m}_L)\\
 \quad \text{return}\ c\\\hline
 \end{array}\quad
 \begin{array}{|l|}\hline
 \qquad\qquad \qquad \ \mathcal{L}_{\text{cpa-R}}^\Sigma\\\hline
 k\leftarrow\Sigma.\text{KeyGen}\\\\
 \underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
-\quad c:=\Sigma.\text{Enc}(l,\colorbox{yellow}{m}_R)\\
+\quad c:=\Sigma.\text{Enc}(k,\colorbox{yellow}{m}_R)\\
 \quad \text{return}\ c\\\hline
 \end{array}
 $$
@@ -32,10 +32,9 @@ Notice how the key k is chosen at initialization time and is static for all call
 We have already seen block ciphers / PRPs, which seem to satisfy everything needed for a secure encryption scheme. For a block cipher, $F$ corresponds to encryption, $F ^{-1}$ corresponds to decryption, and all outputs of $F$ look pseudorandom. What more could you ask for in a good encryption scheme?
 
 **Example**
-We will see that a block cipher, when used “as-is,” is **not** a CPA-secure encryption scheme. Let
-F denote the block cipher and suppose its block length is $blen$.
+*We will see that a block cipher, when used “as-is,” is **not** a CPA-secure encryption scheme. Let F denote the block cipher and suppose its block length is $blen$.*
 
-Consider the following adversary $\mathcal{A}$, that tries to distinguish the $\mathcal{L}_{\text{cpa}-\star}$ libraries:
+*Consider the following adversary $\mathcal{A}$, that tries to distinguish the $\mathcal{L}_{\text{cpa}-\star}$ libraries:*
 
 $$
 \def\arraystretch{1.5}
@@ -65,13 +64,13 @@ k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\\\
 \end{array}
 \quad
 \begin{array}{l}
-\text{When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{cpa-L}}$, the}\\
-\text{EAVESDROP \textit{algorithm} will encrypt}\\
-\text{its first argument. So, $c_1$ and $c_2$}\\
-\text{will both be computed as $F(k,\textcolor{brown}{0}^{blen})$.}\\
-\text{Since $F$ is a deterministic function, this}\\
-\text{results in identical outputs from EAVESDROP.}\\
-\text{In other words $c_1 = c_2$, and $\mathcal{A} \diamond \mathcal{L}_{\text{cpa-L}}$}\\ \text{\bf{always} outputs 1.}
+\textit{When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{cpa-L}}$, the}\\
+\textit{EAVESDROP \textit{algorithm} will encrypt}\\
+\textit{its first argument. So, $c_1$ and $c_2$}\\
+\textit{will both be computed as $F(k,\textcolor{brown}{0}^{blen})$.}\\
+\textit{Since $F$ is a deterministic function, this}\\
+\textit{results in identical outputs from EAVESDROP.}\\
+\textit{In other words $c_1 = c_2$, and $\mathcal{A} \diamond \mathcal{L}_{\text{cpa-L}}$}\\ \bm{always} \ \textit{outputs 1.}
 \end{array}
 $$
 
@@ -93,22 +92,22 @@ k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\\\
 \end{array}
 \quad
 \begin{array}{l}
-\text{When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{cpa-R}}$, the}\\
-\text{EAVESDROP \textit{algorithm} will encrypt}\\
-\text{its second argument. So, $c_1$ and $c_2$}\\
-\text{are computed as $c_1=F(k,\textcolor{brown}{0}^{blen})$.}\\
-\text{and $c_2=F(k,\textcolor{brown}{1}^{blen}).$ Since F is a}\\
-\text{permutation, $c_1 \neq c_2$, so $\mathcal{A} \diamond \mathcal{L}_{\text{cpa-R}}$}\\ \text{\bf{never} outputs 1.}
+\textit{When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{cpa-R}}$, the}\\
+\textit{EAVESDROP \textit{algorithm} will encrypt}\\
+\textit{its second argument. So, $c_1$ and $c_2$}\\
+\textit{are computed as $c_1=F(k,\textcolor{brown}{0}^{blen})$.}\\
+\textit{and $c_2=F(k,\textcolor{brown}{1}^{blen}).$ Since F is a}\\
+\textit{permutation, $c_1 \neq c_2$, so $\mathcal{A} \diamond \mathcal{L}_{\text{cpa-R}}$}\\ \bm{never} \ \textit{outputs 1.}
 \end{array}
 $$
 
-This adversary has advantage 1 in distinguishing the libraries, so the bare block cipher $F$
-is not a CPA-secure encryption scheme.
+*This adversary has advantage 1 in distinguishing the libraries, so the bare block cipher $F$ is **not** a CPA-secure encryption scheme.*
 
 ### Impossibility of Deterministic Encryption
 The reason a bare block cipher does not provide CPA security is that it is **deterministic**. Calling Enc$(k,m)$ twice — with the same key and same plaintext — leads to the same ciphertext.
-Even one-time pad is deterministic. One of the first and most important aspects of CPA security is that it is incompatible with deterministic encryption. Deterministic encryption can never be CPA-secure! In other words, we can attack the CPA-security of any scheme $\Sigma$, knowing only that it has deterministic encryption. The attack is a simple generalization of our attack against a bare PRP:
-
+Even one-time pad is deterministic. [^1] One of the first and most important aspects of CPA security is that it is incompatible with deterministic encryption. Deterministic encryption can never be CPA-secure! In other words, we can attack the CPA-security of any scheme $\Sigma$, knowing only that it has deterministic encryption. The attack is a simple generalization of our attack against a bare PRP:
+ [^1]:  Remember, we can always consider what will happen when running one-time pad encryption twice with the same key + plaintext. The one-time secrecy definition doesn’t give us any security guarantees about using one-time pad in this way, but we can still consider it as a thought experiment.
+ 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
@@ -131,50 +130,50 @@ There are 3 general ways to design an encryption scheme that is not deterministi
  
  - Encryption can be **randomized**. Each time a plaintext is encrypted, the Enc algorithm chooses fresh, independent randomness specific to that encryption. The main challenge in designing a randomized encryption method is to incorporate randomness into each ciphertext in such a way that decryption is still possible. Although this sounds quite challenging, we have already seen such a method, and we will prove its CPA security in the next sections. In this book we will focus almost entirely on randomized encryption.
  - Encryption can be **nonce-based**. A “nonce” stands for “number used only once,” and it refers to an extra argument that is passed to the Enc and Dec algorithms. A nonce does not need to be chosen randomly; it does not need to be secret; it only needs to be **distinct** among all calls made to Enc. By guaranteeing that some input to Enc will be different every time (even when the key and plaintext are repeated), the Enc algorithm can be deterministic and still provide CPA security.
- Nonce-based encryption requires a change to the interface of encryption, and therefore a change to the correctness & security definitions as well. The encryption/decryption algorithms syntax is updated to $\text{Enc}(k,v,m)$ and $\text{Dec}(k,v, c)$, where v is a nonce. The correctness property is that $\text{Dec}(k,v,\text{Enc}(k,v,m))$ = $m$ for all $k,v,m$, so both encryption & decryption algorithms should use the same nonce. The security definition allows the adversary to choose the nonce, but gives an error if the adversary tries to encrypt multiple ciphertexts with the same nonce. In this way, the definition enforces that the nonces are distinct.
+ 
+     Nonce-based encryption requires a change to the interface of encryption, and therefore a change to the correctness & security definitions as well. The encryption/decryption algorithms syntax is updated to $\text{Enc}(k,v,m)$ and $\text{Dec}(k,v, c)$, where $v$ is a nonce. The correctness property is that $\text{Dec}(k,v,\text{Enc}(k,v,m))$ = $m$ for all $k,v,m$, so both encryption & decryption algorithms should use the same nonce. The security definition allows the adversary to choose the nonce, but gives an error if the adversary tries to encrypt multiple ciphertexts with the same nonce. In this way, the definition enforces that the nonces are distinct.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 k\leftarrow\Sigma.\text{KeyGen}\\
-\colorbox{yellow}{V:=}\emptyset\\\\
-\underline{\text{EAVESDROP}(\colorbox{yellow}{v},m_L,m_R\in\Sigma.\mathcal{M}):}\\
-\quad \colorbox{yellow}{\text{if}\ V}\in V:\text{return}\ \textcolor{brown}{\texttt{err}}\\
-\quad \colorbox{yellow}{V:=V}\cup\{v\}\\
-\quad c:=\Sigma.\text{Enc}(k,\colorbox{yellow}{v},m_L)\\
+\colorbox{yellow}{\textit{V} :=}\emptyset\\\\
+\underline{\text{EAVESDROP}(\colorbox{yellow}{\textit{v}},m_L,m_R\in\Sigma.\mathcal{M}):}\\
+\quad \colorbox{yellow}{\text{if}\ \textit{v}}\in V:\text{return}\ \textcolor{brown}{\texttt{err}}\\
+\quad \colorbox{yellow}{\it{V} := V}\cup\{v\}\\
+\quad c:=\Sigma.\text{Enc}(k,\colorbox{yellow}{\textit{v}},m_L)\\
 \quad\text{return}\ c\\\hline
 \end{array}
-\quad
+\approx
 \begin{array}{|l|}\hline
 k\leftarrow\Sigma.\text{KeyGen}\\
-\colorbox{yellow}{V:=}\emptyset\\\\
-\underline{\text{EAVESDROP}(\colorbox{yellow}{v},m_L,m_R\in\Sigma.\mathcal{M}):}\\
-\quad \colorbox{yellow}{\text{if}\ V}\in V:\text{return}\ \textcolor{brown}{\texttt{err}}\\
-\quad \colorbox{yellow}{V:=V}\cup\{v\}\\
-\quad c:=\Sigma.\text{Enc}(k,\colorbox{yellow}{v},m_R)\\
+\colorbox{yellow}{\it{V}:=}\emptyset\\\\
+\underline{\text{EAVESDROP}(\colorbox{yellow}{\textit{v}},m_L,m_R\in\Sigma.\mathcal{M}):}\\
+\quad \colorbox{yellow}{\text{if}\ \textit{v}}\in V:\text{return}\ \textcolor{brown}{\texttt{err}}\\
+\quad \colorbox{yellow}{\it{V} := V}\cup\{v\}\\
+\quad c:=\Sigma.\text{Enc}(k,\colorbox{yellow}{\textit{v}},m_R)\\
 \quad\text{return}\ c\\\hline
 \end{array}
 $$
-Note that the calling program provides a single value $v$ (not a $v_L$ and $v_R$). Both libraries use the nonce $v$ that is given, and this implies that the encryption scheme does not need to *hide* $v$. If something is the same between both libraries, then it is not necessary to hide it in order to make the libraries indistinguishable.
+
+> Note that the calling program provides a single value $v$ (not a $v_L$ and $v_R$). Both libraries use the nonce $v$ that is given, and this implies that the encryption scheme does not need to *hide* $v$. If something is the same between both libraries, then it is not necessary to hide it in order to make the libraries indistinguishable.
+
 
 If an encryption scheme does not fall into one of these three categories, it cannot satisfy our definition of CPA-security. You can and should use deterministic encryption as a sanity check against any proposed encryption algorithm.
 
 ## 7.2 Pseudorandom Ciphertexts
 
-When we introduced one-time security of encryption (in Section 2.2), we had two variants
-of the definition. The more general variant said, roughly, that encryptions of $m_L$ should
-look like encryptions of $m_R$. The more specific variant said that encryptions of every m
-should look uniform.
+When we introduced one-time security of encryption (in Section 2.2), we had two variants of the definition. The more general variant said, roughly, that encryptions of $m_L$ should look like encryptions of $m_R$. The more specific variant said that encryptions of every m should look uniform.
 
 We can do something similar for CPA security, by defining a security definition that says “encryptions of $m$ look uniform.” Note that it is not sufficient to use the same security libraries from the one-time security definition. It is important for the library to allow multiple encryptions under the same key. Just because a single encryption is pseudorandom, it doesn’t mean that multiple encryptions appear *jointly* pseudorandom. In particular, they may not look *independent* (this was an issue we saw when discussing the difficulty of constructing a PRF from a PRG).
 
-**Definition 7.2 (CPA$\varPhi$ security)**
-Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **pseudorandom ciphertexts in the presence of chosen-plaintext attacks (CPA$\varPhi$ security)** if $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\approx\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma$ where:
+**Definition 7.2 (CPA$\Phi$ security)**
+*Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **pseudorandom ciphertexts in the presence of chosen-plaintext attacks (CPA$\varPhi$ security)** if $\mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\approx\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma$ where:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad\ \ \mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\\\hline
+\qquad\ \ \mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\\\hline
 k\leftarrow\Sigma.\text{KeyGen}\\\\
 \underline{\text{CTXT}(m\in\Sigma.\mathcal{M}):}\\
 \quad c:=\Sigma.\text{Enc}(k,m)\\
@@ -184,28 +183,29 @@ k\leftarrow\Sigma.\text{KeyGen}\\\\
 \begin{array}{|l|}\hline
 \qquad\ \ \mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma\\\hline
 \underline{\text{CTXT}(m\in\Sigma.\mathcal{M}):}\\
-\quad c:=\Sigma.\mathcal{C}\\
+\quad c\gets\Sigma.\mathcal{C}\\
 \quad \text{return}\ c\\\hline
 \end{array}
 $$
 
 This definition is also called “IND$-CPA”, meaning “indistinguishable from random under chosen plaintext attacks.” This definition will be useful to use since:
 
- - It is easier to prove CPA$\varPhi$ security than to prove CPA security. Proofs for CPA security tend to be about twice as long and twice as repetitive, since they involve getting to a “half-way hybrid” and then performing the same sequence of hybrids steps in reverse. Taking the proof only to the same half-way point is generally enough to prove CPA$\varPhi$ security
+ - It is easier to prove CPA$\Phi$ security than to prove CPA security. Proofs for CPA security tend to be about twice as long and twice as repetitive, since they involve getting to a “half-way hybrid” and then performing the same sequence of hybrids steps in reverse. Taking the proof only to the same half-way point is generally enough to prove CPA$\Phi$ security
 
- - CPA$\varPhi$ security implies CPA security. We show this below, but the main idea is the same as in the case of one-time security. If encryptions of all plaintexts look uniform, then encryptions of $m_L$ look like encryptions of $m_R$. 
+ - CPA$\Phi$ security implies CPA security. We show this below, but the main idea is the same as in the case of one-time security. If encryptions of all plaintexts look uniform, then encryptions of $m_L$ look like encryptions of $m_R$. 
  
  - Most of the schemes we will consider achieve CPA$\varPhi$ anyway.
 
 Still, most of our high-level discussion of security properties will be based on CPA security. It is the “minimal” (i.e., least restrictive) definition that appears to capture our security intuitions.
 
 **Claim 7.3**
-If an encryption scheme has CPA$\varPhi$ security, then it also has CPA security.
+*If an encryption scheme has CPA$\varPhi$ security, then it also has CPA security.*
 
 **Proof**
-We want to prove that $\mathcal{L}_{\text{cpa-L}}^\Sigma\approx\mathcal{L}_{\text{cpa-R}}^\Sigma$, *using* the assumption that  $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\approx\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma$. The sequence of hybrids follows:
+We want to prove that $\mathcal{L}_{\text{cpa-L}}^\Sigma\approx\mathcal{L}_{\text{cpa-R}}^\Sigma$, *using* the assumption that  $\mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\approx\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma$. The sequence of hybrids follows:
 
 $$
+\mathcal{L}_{\text{cpa-L}}^\Sigma: 
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad\ \ \mathcal{L}_{\text{cpa-L}}^\Sigma\\\hline
@@ -235,7 +235,7 @@ k\leftarrow\Sigma.\text{KeyGen}\\\\
 \begin{array}{l}
 \text{It may look strange, but we have further}\\
 \text{factored out the call to Enc into a subroutine.}\\
-\text{It looks like everything from $\mathcal{L}_{\text{cpa-L}}$ has been}\\
+\text{It looks like} \ everything \ \text{from $\mathcal{L}_{\text{cpa-L}}$ has been}\\
 \text{factored out, but actually the original library}\\
 \text{still “makes the choice” of which of $m_L,m_R$}\\
 \text{to encrypt.}
@@ -251,14 +251,14 @@ $$
 \end{array}
 \diamond
 \begin{array}{|l|}\hline
-\ \  \ \mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma\\\hline
+\ \  \ \mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma\\\hline
 \underline{\text{CTXT}(m):}\\
 \quad c:=\Sigma.\mathcal{C}\\
 \quad \text{return}\ c\\\hline
 \end{array}
 \quad
 \begin{array}{l}
-\text{We have replaced $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma$\ with\ $\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma$.}\\
+\text{We have replaced $\mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma$\ with\ $\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma$.}\\
 \text{By our assumption, the change is indistinguishable.}
 \end{array}
 $$
@@ -272,7 +272,7 @@ $$
 \end{array}
 \diamond
 \begin{array}{|l|}\hline
-\ \  \ \mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma\\\hline
+\ \  \ \mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma\\\hline
 \underline{\text{CTXT}(m):}\\
 \quad c\leftarrow\Sigma.\mathcal{C}\\
 \quad \text{return}\ c\\\hline
@@ -295,20 +295,21 @@ $$
 \end{array}
 \diamond
 \begin{array}{|l|}\hline
-\ \  \ \mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\\\hline
+\ \  \ \mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\\\hline
 k\leftarrow\Sigma.\text{KeyGen}\\\\
 \underline{\text{CTXT}(m):}\\
-\quad c\leftarrow\Sigma.\text{Enc}(k,m)\\
+\quad c:=\Sigma.\text{Enc}(k,m)\\
 \quad \text{return}\ c\\\hline
 \end{array}
 \quad
 \begin{array}{l}
 \text{The mirror image of a previous step; we}\\
-\text{replace $\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma$ with $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma$.}
+\text{replace $\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma$ with $\mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma$.}
 \end{array}
 $$
 
 $$
+\mathcal{L}_{\text{cpa-R}}^\Sigma:
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad \qquad  \ \mathcal{L}_{\text{cpa-R}}^\Sigma\\\hline
@@ -319,7 +320,7 @@ $$
 \end{array}
 \quad
 \begin{array}{l}
-\text{The $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}$ library has been inlined,}\\
+\text{The $\mathcal{L}_{\text{cpa}\Phi-\text{real}}$ library has been inlined,}\\
 \text{and the result is $\mathcal{L}_{\text{cpa-R}}^\Sigma$.}
 \end{array}
 $$
