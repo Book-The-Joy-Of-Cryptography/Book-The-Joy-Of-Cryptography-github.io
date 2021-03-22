@@ -342,19 +342,18 @@ It remains to decide how exactly Alice will choose $r$ values. We argued, inform
 
 In this section we will show the security proof for the case of randomized encryption, since it is the most traditional setting and also somewhat more robust than the others.
 
-The exercises explore how the nonce-based approach is more fragile when this scheme is
-extended in natural ways.
+The exercises explore how the nonce-based approach is more fragile when this scheme is extended in natural ways.
 
 **Construction 7.4**
-Let $F$ be a secure PRF with *in* = $\lambda$. Define the following encryption scheme based on $F$ :
+*Let $F$ be a secure PRF with *in* = $\lambda$. Define the following encryption scheme based on $F$ :*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \begin{array}{ll}
 & \underline{\text { Enc }(k, m):}\\
-\mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  &\quad r \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\ \mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {out }} &\quad x:=F(k, r) \oplus m \\
- C=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {out }} &\quad \text { return }(r, x) \\\\
+\mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  &\quad r \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\ \mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {out }} &\quad x:=F(k, r) \oplus m \\
+ C=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \times\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {out }} &\quad \text { return }(r, x) \\\\
  \underline{\text { KeyGen: }} & \underline{\operatorname{Dec}(k,(r, x)):}\\
  \quad k \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} &\quad m:=F(k, r) \oplus x\\
  \quad\text{return}\ k &\quad \text{return}\ m
@@ -365,62 +364,62 @@ $$
 It is easy to check that the scheme satisfies the correctness property.
 
 **Claim 7.5**
-Construction 7.4 has CPAS security (and therefore CPA security) if $F$ is a secure PRF.
+*Construction 7.4 has CPAS security (and therefore CPA security) if $F$ is a secure PRF.*
 
 The proof has more steps than other proofs we have seen before, and some steps are subtle. So let us use a Socratic dialogue to illustrate the strategy behind the proof:
 
 **SALVIATI:** 
-The ciphertexts of Construction 7.4 are indistinguishable from uniform randomness.
+*The ciphertexts of Construction 7.4 are indistinguishable from uniform randomness.*
 
 **SIMPLICIO:** 
 Salviati, you speak with such confidence! Do tell me why you say that these ciphertexts appear pseudorandom.
 
 **SALVIATI:** 
-Simple! The ciphertexts have the form $(r, F(k, r) \oplus m) .$ By its very definition, $r$ is chosen uniformly, while $F(k, r) \oplus m$ is like a one-time pad ciphertext which is also uniformly distributed.
+*Simple! The ciphertexts have the form $(r, F(k, r) \oplus m) .$ By its very definition, $r$ is chosen uniformly, while $F(k, r) \oplus m$ is like a one-time pad ciphertext which is also uniformly distributed.*
 
 **SIMPLICIO:** 
  Your statement about $r$ is self-evident but $F(k, r) \oplus m$ confuses me. This does not look like the one-time pad that we have discussed. For one thing, the same $k$ is used "every time," not "one-time."
 
 **SALVIATI:** 
- I did say it was merely "like" one-time pad. The one-time pad "key" is not k but $F(k, r)$. And since $F$ is a pseudorandom function, all its outputs will appear independently uniform (not to mention uncorrelated with their respectiver), even when the same seed is used every time. Is this not what we require from a one-time pad key?
+ *I did say it was merely "like" one-time pad. The one-time pad "key" is not k but $F(k, r)$. And since $F$ is a pseudorandom function, all its outputs will appear independently uniform (not to mention uncorrelated with their respectiver), even when the same seed is used every time. Is this not what we require from a one-time pad key?*
 
 **SIMPLICIO:** 
- I see, but surely the outputs of $F$ appear independent only when its inputs are distinct? I know that $F$ is deterministic, and this may lead to the same "onetime pad key" being used on different occasions.
+ I see, but surely the outputs of $F$ appear independent only when its inputs are distinct? I know that $F$ is deterministic, and this may lead to the same "one-time pad key" being used on different occasions.
 
 **SALVIATI:** 
-Your skepticism serves you well in this endeavor, Simplicio. Indeed, the heart of your concern is that Alice may choose $r$ such that it repeats. I say that this is negligibly likely, so that we can safely ignore such a bothersome event.
+*Your skepticism serves you well in this endeavor, Simplicio. Indeed, the heart of your concern is that Alice may choose $r$ such that it repeats. I say that this is negligibly likely, so that we can safely ignore such a bothersome event.*
 
 **SIMPLICIO:** 
  Bothersome indeed, but why do you say that $r$ is unlikely to repeat?
  
 **SALVIATI:**
-Oh Simplicio, now you are becoming bothersome! This value $r$ is $\lambda$ bits long and chosen uniformly at random each time. Do you not recall our agonizingly long discussion about the birthday paradox? 
+*Oh Simplicio, now you are becoming bothersome! This value $r$ is $\lambda$ bits long and chosen uniformly at random each time. Do you not recall our agonizingly long discussion about the birthday paradox?* 
 
 **SIMPLICIO:** 
 Oh yes, now I remember it well. Now I believe I understand all of your reasoning: Across all ciphertexts that are generated, $r$ is unlikely to repeat because of the birthday paradox. Now, provided that $r$ never repeats, Alice invokes the PRF on distinct inputs. A PRF invoked on distinct inputs provides outputs that are uniformly random for all intents and purposes. Hence, using these outputs as one-time pads completely hides the plaintext. Is that right, Salviati?
 
 **SALVIATI:**
-Excellent! Now we may return to discussing the motion of the Sun and Earth $\ldots$
+*Excellent! Now we may return to discussing the motion of the Sun and Earth $\ldots$*
 
 Look for Simplicio’s final summary to be reflected in the sequence of hybrids used in the formal proof:
 
 **Proof**
-We prove that $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\approx\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma$ using the hybrid technique:
+We prove that $\mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\approx\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma$ using the hybrid technique:
 
 $$
 \def\arraystretch{1.5}
- \mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma:\ \ 
+ \mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma:\ \ 
 \begin{array}{|l|}\hline
-\qquad  \mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\\\hline
+\qquad  \mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\\\hline
 k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\\\
 \underline{\text{CTXT}(m):}\\
-\quad \colorbox{yellow}{r}\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\
-\quad \colorbox{yellow}{x:=}F(k,r)\oplus m\\
-\quad \text{return}\ c\\\hline
+\quad \colorbox{yellow}{\textit{r}}\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\
+\quad \colorbox{yellow}{\textit{x} :=}F(k,r)\oplus m\\
+\quad \text{return}\ (r, x)\\\hline
 \end{array}
 \quad
 \begin{array}{l}
-\text{The starting point is $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma$. The details}\\
+\text{The starting point is $\mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma$. The details}\\
 \text{of $\Sigma$ have been filled in and highlighted.}
 \end{array}
 $$
@@ -430,7 +429,7 @@ $$
 \begin{array}{|l|}\hline
 \underline{\text{CTXT}(m):}\\
 \quad r\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\quad \colorbox{yellow}{z:=}\text{LOOKUP}(r) \\
+\quad \colorbox{yellow}{\textit{z} :=}\text{LOOKUP}(r) \\
 \quad x:=\colorbox{yellow}{z}\oplus m\\
 \quad \text{return}\ (r,x)\\\hline
 \end{array}
@@ -477,7 +476,7 @@ $$
 
 At this point in the proof, it is easy to imagine that we are done. Ciphertexts have the form $(r , x)$, where $r$ is chosen uniformly and $x$ is the result of encrypting the plaintext with what appears to be a one-time pad. Looking more carefully, however, the “one-time pad key" is $T[r]-$ a value that could potentially be used more than once if $r$ is ever repeated! 
 
-As Simplicio rightly pointed out, a PRF gives independently random(-looking) outputs when called on distinct inputs. But in our current hybrid there is no guarantee that PRF inputs are distinct! Our proof must explicitly contain reasoning about why PRF inputs are unlikely to be repeated. We do so by appealing to the sampling-with-replacement lemma of Lemma 4.11 .
+As Simplicio rightly pointed out, a PRF gives independently random(-looking) outputs when called on *distinct* inputs. But in our current hybrid there is no guarantee that PRF inputs are distinct! Our proof must explicitly contain reasoning about why PRF inputs are unlikely to be repeated. We do so by appealing to the sampling-with-replacement lemma of Lemma 4.11 .
 
 We first factor out the sampling of $r$ values into a subroutine. The subroutine corresponds to the $\mathcal{L}_{\text {samp-L }}$ library of Lemma 4.11 :
 
@@ -539,13 +538,13 @@ R:=\emptyset\\\\
 \end{array}
 $$
 
-Inspecting the previous hybrid, we can reason that the arguments to lookup are guaranteed to never repeat. Therefore the $\mathcal{L}_{\text{prf-rand}}^F$ library can be greatly simplified. In particular, the if-condition in $\mathcal{L}_{\text{prf-rand}}^F$ is always true. Simplifying has no effect on the library’s output behavior:
+Inspecting the previous hybrid, we can reason that the arguments to lookup are guaranteed to never repeat. Therefore the $\mathcal{L}_{\text{prf-rand}}$ library can be greatly simplified. In particular, the if-condition in $\mathcal{L}_{\text{prf-rand}}$ is always true. Simplifying has no effect on the library’s output behavior:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \underline{\text{CTXT}(m):}\\
-\quad r\leftarrow SAMP()\\
+\quad r\leftarrow \text{SAMP()}\\
 \quad z:=\text{LOOKUP}(r) \\
 \quad x:=z\oplus m\\
 \quad \text{return}\ (r,x)\\\hline
@@ -573,7 +572,7 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \underline{\text{CTXT}(m):}\\
-\quad r\leftarrow SAMP()\\
+\quad r\leftarrow \text{SAMP()}\\
 \quad z:=\text{LOOKUP}(r) \\
 \quad x:=z\oplus m\\
 \quad \text{return}\ (r,x)\\\hline
@@ -619,9 +618,9 @@ $$
 
 $$
 \def\arraystretch{1.5}
-\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma:\ 
+\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma:\ 
 \begin{array}{|l|}\hline
-\qquad\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma\\\hline
+\qquad\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma\\\hline
 \underline{\text{CTXT}(m):}\\
 \quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
 \quad \colorbox{yellow}{x}\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
@@ -632,11 +631,11 @@ $$
 \text{We have applied the one-time pad rule with respect to variables $z$}\\
 \text{and $x$, but omitted the very familiar steps (factor out, replace library,}\\
 \text{inline) that we have seen several times before. The resulting library is}\\
-\text{precisely $\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma$ since it samples uniformly from $\Sigma.\mathcal{C}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\times \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{text{out}}$.}
+\text{precisely $\mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma$ since it samples uniformly from $\Sigma.\mathcal{C}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\times \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit{out}}$.}
 \end{array}
 $$
 
-The sequence of hybrids shows that $\mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma \approx \mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma$, so $\Sigma$ has pseudorandom ciphertexts.
+The sequence of hybrids shows that $\mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma \approx \mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma$, so $\Sigma$ has pseudorandom ciphertexts. $\ \blacksquare$
 
 ### Exercises
 
@@ -663,17 +662,15 @@ $$\Sigma'.\text{Enc}(k,m)=\textcolor{brown}{00}\|\Sigma.\text{Enc}(k,m)$$
 
 The decryption algorithm in $\Sigma'$ simply throws away the first two bits of the ciphertext and then calls $\Sigma$.Dec.
 
-(a) Does $\Sigma'$ have CPA$\varPhi$ security? Prove or disprove (if disproving, show a distinguisher and calculate its advantage).
-(b) Does $\Sigma'$ have CPA security? Prove or disprove (if disproving, show a distinguisher and
-calculate its advantage).
+(a) Does $\Sigma'$ have CPA$\Phi$ security? Prove or disprove (if disproving, show a distinguisher and calculate its advantage).
+(b) Does $\Sigma'$ have CPA security? Prove or disprove (if disproving, show a distinguisher and calculate its advantage).
 
-7.3. Suppose a user is using Construction 7.4 and an adversary observes two ciphertexts that
-have the same $r$ value.
+7.3. Suppose a user is using Construction 7.4 and an adversary observes two ciphertexts that have the same $r$ value.
 
 (a) What exactly does the adversary learn about the plaintexts in this case?
 (b) How do you reconcile this with the fact that in the proof of Claim 7.5 there is a hybrid where $r$ values are *never* repeated?
 
-7.4. Construction 7.4 is a randomized encryption scheme, but we could also consider dening it as a **nonce-based** scheme, interpreting r as the nonce: $\text{Enc}(k,r,m)=(r,F(k,r)\oplus m)$. Formally prove that it is secure as a deterministic, nonce-based scheme. In other words, show that the following two libraries are indistinguishable, where $\Sigma$ refers to Construction 7.4.
+7.4. Construction 7.4 is a randomized encryption scheme, but we could also consider defining it as a **nonce-based** scheme, interpreting r as the nonce: $\text{Enc}(k,r,m)=(r,F(k,r)\oplus m)$. Formally prove that it is secure as a deterministic, nonce-based scheme. In other words, show that the following two libraries are indistinguishable, where $\Sigma$ refers to Construction 7.4.
 
 $$
 \def\arraystretch{1.5}
@@ -706,18 +703,18 @@ $$
 \begin{array}{|l|}\hline
 \begin{array}{lll}
 \mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  & \underline{\text { KeyGen: }} & \underline{\text { Enc }(k, m):}\\
-\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} &\quad k \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}   &\quad r \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\ C=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^2&\quad \text{return}\ k &\quad x:=F(k, r) \oplus m \\
-  & &\quad \text { return }(r, x) 
+\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} &\quad k \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}   &\quad v \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\ C=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^2&\quad \text{return}\ k &\quad x:=F(k, v \oplus m )\\
+  & &\quad \text { return }(v, x) 
  \end{array}\\\hline
 \end{array}
 $$
 
 (a) Give the decryption algorithm for this scheme.
-(b) Prove that the scheme has CPA$\varPhi$ security.
-(c ) Suppose that we interpret this scheme as a nonce-based scheme, where v is the nonce. Show that the scheme does not have nonce-based CPA security. The libraries for this definition are given in the previous problem.
-Note: Even in the standard CPA libraries, $v$ is given to the adversary and it is unlikely to repeat. However, in the nonce-based libraries the adversary can choose $v$, and this is what leads to problems.
+(b) Prove that the scheme has CPA$\Phi$ security.
+(c ) Suppose that we interpret this scheme as a nonce-based scheme, where $v$ is the nonce. Show that the scheme does **not** have nonce-based CPA security. The libraries for this definition are given in the previous problem.
+*Note:* Even in the standard CPA libraries, $v$ is given to the adversary and it is unlikely to repeat. However, in the nonce-based libraries the adversary can *choose* $v$, and this is what leads to problems.
 
-7.6. Let $F$ be a secure PRP with blocklength $blen =\lambda$. Show the the following scheme has pseudorandom ciphertexts:
+7.6. Let $F$ be a secure PRP with blocklength $blen =\lambda$. Show the following scheme has pseudorandom ciphertexts:
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
@@ -726,7 +723,7 @@ $$
 \mathcal{K}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  &\quad s \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\ \mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} &\quad z:=F(k, s \oplus m) \oplus m \\
  C=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^2 &\quad \text { return }(s\oplus m, z) \\\\
  \underline{\text { KeyGen: }} & \underline{\operatorname{Dec}(k,(r, z)):}\\
- \quad k \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} &\quad  \text{return}\ F(k, r) \oplus x\\
+ \quad k \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} &\quad  \text{return}\ F(k, r) \oplus z\\
  \quad\text{return}\ k &
  \end{array}\\\hline
 \end{array}
@@ -825,7 +822,6 @@ $$
 
 $$
 \def\arraystretch{1.5}
-\star\ \text{(g)}\quad
 \begin{array}{|l|}\hline
 \underline{\text { Enc }(k, m):}\\
 \quad r \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\
@@ -834,9 +830,9 @@ $$
 $$
 
 (a) Describe the corresponding decryption algorithm.
-(b) Prove that the scheme satisfies CPA$\varPhi$ security.
+(b) Prove that the scheme satisfies CPA$\Phi$ security.
 
-$\star$ 7.9. Suppose $F$ is a secure PRP with blocklength $\lambda$. Give the decryption algorithm for the following scheme and prove that it does not have CPA security:
+$\star$ 7.9. Suppose $F$ is a secure PRP with blocklength $\lambda$. Give the decryption algorithm for the following scheme and prove that it does **not** have CPA security:
 
 $$
 \def\arraystretch{1.5}
@@ -850,13 +846,13 @@ $$
 \end{array}
 $$
 
-$\star$ 7.10. Suppose $F$ is a secure PRP with blocklength $\lambda$. Give the decryption algorithm for the following scheme and prove that it satisfies CPA$\varPhi$ security:
+$\star$ 7.10. Suppose $F$ is a secure PRP with blocklength $\lambda$. Give the decryption algorithm for the following scheme and prove that it satisfies CPA$\Phi$ security:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \begin{array}{lll}
-\mathcal{K}=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^2  & \underline{\text { KeyGen: }} & \underline{\text { Enc }(k, m_1\|m_2):}\\
+\mathcal{K}=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^2  & \underline{\text { KeyGen: }} & \underline{\text { Enc }((k, r), m):}\\
 \mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} &\quad k \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}   &\quad s \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda} \\ C=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^2 & \quad r \leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}&\quad x:=F(k, s) \\
 &\quad \text{return}\ (k,r)  & \quad y:=F(k,s\oplus m\oplus r)\\
   & &\quad \text { return }(x,y) 
@@ -865,21 +861,21 @@ $$
 $$
 
 >Hint: You may find it useful to divide the Enc algorithm into two cases by introducing an “if $m = r$” statement.
+>
 
-Note: If $r = \textcolor{brown}{0}^\lambda$ then the scheme reduces to Exercise 7.7 (f). So it is important that $r$ is secret and random.
+*Note*: If $r = \textcolor{brown}{0}^\lambda$ then the scheme reduces to Exercise 7.7 (f). So it is important that $r$ is secret and random.
 
 7.11. Let $\Sigma$ be an encryption scheme with plaintext space $\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$ and ciphertext space $C=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n} .$ Prove that $\Sigma$ cannot have CPA security.
 
 Conclude that direct application of a PRP to the plaintext is not a good choice for an encryption scheme.
 
-$\star 7.12 .$ In all of the CPA-secure encryption schemes that we'll ever see, ciphertexts are at least $\lambda$ bits longer than plaintexts. This problem shows that such ciphertext expansion is essentially unavoidable for CPA security.
+$\star 7.12 .$ In all of the CPA-secure encryption schemes that we'll ever see, ciphertexts are at least $\lambda$ bits longer than plaintexts. This problem shows that such **ciphertext expansion** is essentially unavoidable for CPA security.
 
 Let $\Sigma$ be an encryption scheme with plaintext space $\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$ and ciphertext space $C=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n+\ell}$. Show that there exists a distinguisher that distinguishes the two CPA libraries with advantage $\Omega\left(1 / 2^{\ell}\right)$.
 
->Hint:  As a warmup, consider the case where each plaintext has exactly $2^\ell$ possible ciphertexts. However, this need not be true in general. For the general case, choose a random plaintextm and argue that with “good probability” (that you should precisely quantify)m has at most $2^{\ell+1}$ possible ciphertexts.
+>Hint:  As a warmup, consider the case where each plaintext has exactly $2^\ell$ possible ciphertexts. However, this need not be true in general. For the general case, choose a random plaintext $m$ and argue that with “good probability” (that you should precisely quantify) $m$ has at most $2^{\ell+1}$ possible ciphertexts.
 
-7.13. Show that an encryption scheme $\Sigma$ has CPA security if and only if the following two
-libraries are indistinguishable:
+7.13. Show that an encryption scheme $\Sigma$ has CPA security **if and only if** the following two libraries are indistinguishable:
 
 $$
 \def\arraystretch{1.5}
@@ -904,8 +900,8 @@ In plain language: if these libraries are indistinguishable, then encryptions of
 
 7.14. Let $\Sigma_{1}$ and $\Sigma_{2}$ be encryption schemes with $\Sigma_{1} \cdot \mathcal{M}=\Sigma_{2} \cdot \mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$.
 
-Consider the following approach for encrypting plaintext $m \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}:$ First, secret-share $m$ using any 2 -out-of- 2 secret-sharing scheme. Then encrypt one share under $\Sigma_{1}$ and the other share under $\Sigma_{2}$. Release both ciphertexts.
+Consider the following approach for encrypting plaintext $m \in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}:$ First, secret-share $m$ using any 2-out-of-2 secret-sharing scheme. Then encrypt one share under $\Sigma_{1}$ and the other share under $\Sigma_{2}$. Release both ciphertexts.
 
 (a) Formally describe the algorithms of this encryption method.
-(b) Prove that the scheme has CPA security if at least one of $\left\{\Sigma_{1}, \Sigma_{2}\right\}$ has CPA security. In other words, it is not necessary that *both* $\Sigma_{1}$ and $\Sigma_{2}$ are secure. This involves proving two cases (assuming $\Sigma_{1}$ is secure, and assuming $\Sigma_{2}$ is secure).
+(b) Prove that the scheme has CPA security if **at least one of** $\left\{\Sigma_{1}, \Sigma_{2}\right\}$ has CPA security. In other words, it is not necessary that *both* $\Sigma_{1}$ and $\Sigma_{2}$ are secure. This involves proving two cases (assuming $\Sigma_{1}$ is secure, and assuming $\Sigma_{2}$ is secure).
 
