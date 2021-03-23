@@ -1,12 +1,11 @@
 # 8 Block Cipher Modes of Operation
-One of the drawbacks of the previous CPA-secure encryption scheme is that its ciphertexts are $\lambda$ bits longer than its plaintexts. In the common case that we are using a block cipher with blocklength *$blen$* = $\lambda$, this means that ciphertexts are twice as long as plaintexts. Is there any way to encrypt data (especially lots of it) without requiring such a significant overhead?
+One of the drawbacks of the previous CPA-secure encryption scheme is that its ciphertexts are $\lambda$ bits longer than its plaintexts. In the common case that we are using a block cipher with blocklength *$blen$* = $\lambda$, this means that ciphertexts are **twice as long** as plaintexts. Is there any way to encrypt data (especially lots of it) without requiring such a significant overhead?
 
 A **block cipher mode** refers to a way to use a block cipher to efficiently encrypt a large amount of data (more than a single block). In this chapter, we will see the most common modes for CPA-secure encryption of long plaintexts.
 
 ## 8.1 A Tour of Common Modes
 
-As usual, $blen$ will denote the blocklength of a block cipher $F$ . In our diagrams, we’ll write
-Fk as shorthand for $F(k,\cdot)$. When $m$ is the plaintext, we will write $m=m_1\|m_2\|\cdots\|m_l,$ where each $m_i$ is a single block (so $\ell$ is the length of the plaintext measured in blocks). For now, we will assume that $m$ is an exact multiple of the block length.
+As usual, $blen$ will denote the blocklength of a block cipher $F$ . In our diagrams, we’ll write $F_k$ as shorthand for $F(k,\cdot)$. When $m$ is the plaintext, we will write $m=m_1\|m_2\|\cdots\|m_l,$ where each $m_i$ is a single block (so $\ell$ is the length of the plaintext measured in blocks). For now, we will assume that $m$ is an exact multiple of the block length.
 
 ### ECB: Electronic Codebook ($\textcolor{brown}{\texttt{NEVER\ NEVER\ USE\ THIS!\ NEVER!!}}$)
 
@@ -19,7 +18,7 @@ $$
 $$
 ### CBC: Cipher Block Chaining
 
-CBC (which stands for cipher block chaining) is the most common mode in practice. The CBC encryption of an $\ell-$block plaintext is $\ell+1$ blocks long. The first ciphertext block is called an **initialization vector (IV)**. Here we have described CBC mode as a randomized encryption, with the IV of each ciphertext being chosen uniformly. As you know, randomization is necessary (but not sufficient) for achieving CPA security, and indeed CBC mode provides CPA security.
+CBC (which stands for cipher block chaining) is the most common mode in practice. The CBC encryption of an $\ell-$block plaintext is $\ell+1$ blocks long. The first ciphertext block is called an **initialization vector (IV)**. Here we have described CBC mode as a *randomized* encryption, with the IV of each ciphertext being chosen uniformly. As you know, randomization is necessary (but not sufficient) for achieving CPA security, and indeed CBC mode provides CPA security.
 
 **Construction 8.2 (CBC Mode)**
 $$
@@ -51,7 +50,7 @@ $$
 ### Compare & Contrast
 CBC and CTR modes are essentially the only two modes that are ever considered in practice for CPA security. Both provide the same security guarantees, and so any comparison between the two must be based on factors outside of the CPA security definition. Here are a few properties that are often considered when choosing between these modes:
 
- - Although we have not shown the decryption algorithm for CTR mode, it does not even use the block cipher’s inverse $F ^{-1}$. This is similar to our PRF-based encryption scheme from the previous chapter (in fact, CTR mode collapses to that construction when restricted to 1-block plaintexts). Strictly speaking, this means CTR mode can be instantiated from a PRF; it doesn’t need a PRP. However, in practice it is rare to encounter an ecient PRF that is not a PRP.
+ - Although we have not shown the decryption algorithm for CTR mode, it does not even use the block cipher’s inverse $F ^{-1}$. This is similar to our PRF-based encryption scheme from the previous chapter (in fact, CTR mode collapses to that construction when restricted to 1-block plaintexts). Strictly speaking, this means CTR mode can be instantiated from a PRF; it doesn’t need a PRP. However, in practice it is rare to encounter an efficient PRF that is not a PRP.
  
  - CTR mode encryption can be parallelized. Once the IV has been chosen, the $i^{\text{th}}$ block of ciphertext can be computed without first computing the previous $i - 1$ blocks. CBC mode does not have this property, as it is inherently sequential. Both modes have a parallelizable *decryption* algorithm, though.
 
@@ -60,16 +59,16 @@ CBC and CTR modes are essentially the only two modes that are ever considered in
  - It is relatively easy to modify CTR to support plaintexts that are not an exact multiple of the blocklength. (This is left as an exercise.) We will see a way to make CBC mode support such plaintexts as well, but it is far from trivial.
 
  - So far all of the comparisons have favored CTR mode, so here is one important property that favors CBC mode. It is common for implementers to misunderstand the security implications of the IV in these modes. Many careless implementations allow an IV to be reused. Technically speaking, reusing an IV (other than by accident, as the birthday bound allows) means that the scheme was not implemented correctly. But rather than dumping the blame on the developer, it is good design practice to anticipate likely misuses of a system and, when possible, try to make them non-catastrophic.
- The effects of IV-reuse in CTR mode are quite devastating to message privacy (see the exercises). In CBC mode, reusing an IV can actually be safe, if the two plaintexts have different first blocks!
+ 
+    The effects of IV-reuse in CTR mode are quite devastating to message privacy (see the exercises). In CBC mode, reusing an IV can actually be safe, if the two plaintexts have different first blocks!
 
 ## 8.2 CPA Security and Variable-Length Plaintexts
 Here’s a big surprise: none of these block cipher modes achieve CPA security, or at least CPA security as we have been defining it.
 
 **Example**
-Consider a block cipher with *$blen$* = $\lambda$, used in CBC mode. As you will see, there is nothing particularly specific to CBC mode, and the same observations apply to the other modes.
+*Consider a block cipher with *$blen$* = $\lambda$, used in CBC mode. As you will see, there is nothing particularly specific to CBC mode, and the same observations apply to the other modes.*
 
-In CBC mode, a plaintext consisting of $\ell$ blocks is encrypted into a ciphertext of $\ell+ 1$
-blocks. In other words, the ciphertext **leaks the number of blocks in the plaintext**. We can leverage this observation into the following attack:
+*In CBC mode, a plaintext consisting of $\ell$ blocks is encrypted into a ciphertext of $\ell+ 1$ blocks. In other words, the ciphertext **leaks the number of blocks in the plaintext**. We can leverage this observation into the following attack:*
 
 $$
 \def\arraystretch{1.5}
@@ -80,11 +79,12 @@ c:=\text{EAVESDROP}(\textcolor{brown}{0}^\lambda,\textcolor{brown}{0}^{2\lambda}
 \end{array}
 $$
 
-The distinguisher chooses a 1-block plaintext and a 2-block plaintext. If this distinguisher is linked to $\mathcal{L}_{\text{cpa-L}}$, the 1-block plaintext is encrypted and the resulting ciphertext is 2 blocks (2$\lambda$ bits) long. If the distinguisher is linked to $\mathcal{L}_{\text{cpa-R}}$, the 2-block plaintext is encrypted and the resulting ciphertext is 3 blocks (3$\lambda$ bits) long. By simply checking the length of the ciphertext, this distinguisher can tell the difference and achieve advantage 1.
+*The distinguisher chooses a 1-block plaintext and a 2-block plaintext. If this distinguisher is linked to $\mathcal{L}_{\text{cpa-L}}$, the 1-block plaintext is encrypted and the resulting ciphertext is 2 blocks (2$\lambda$ bits) long. If the distinguisher is linked to $\mathcal{L}_{\text{cpa-R}}$, the 2-block plaintext is encrypted and the resulting ciphertext is 3 blocks (3$\lambda$ bits) long. By simply checking the length of the ciphertext, this distinguisher can tell the difference and achieve advantage 1.*
 
-So, technically speaking, these block cipher modes do not provide CPA security, since ciphertexts leak the length (measured in blocks) of the plaintext. But suppose we don't really care about hiding the length of plaintexts.  Is there a way to make a security definition that says: **ciphertexts hide everything about the plaintext, except their length?**
-
- It is clear from the previous example that a distinguisher can successfully distinguish the CPA libraries if it makes a query EAVESDROP $\left(m_{L}, m_{R}\right)$ with $\left|m_{L}\right| \neq\left|m_{R}\right| .$ A simple way to change the CPA security definition is to just disallow this kind of query. The libraries will give an error message if $\left|m_{L}\right| \neq\left|m_{R}\right| .$ This would allow the adversary to make the challenge plaintexts differ in any way of his/her choice, except in their length. It doesn't really matter whether $|m|$ refers to the length of the plaintext in bits or in blocks whichever makes the most sense for a particular scheme. 
+So, technically speaking, these block cipher modes do not provide CPA security, since ciphertexts leak the length (measured in blocks) of the plaintext. But suppose we don't really care about hiding the length of plaintexts. [^1]Is there a way to make a security definition that says: **ciphertexts hide everything about the plaintext, except their length?**
+ [^1]: Indeed, hiding the length of communication (in the extreme, hiding the *existence* of communication) is a very hard problem.
+ 
+ It is clear from the previous example that a distinguisher can successfully distinguish the CPA libraries if it makes a query EAVESDROP $\left(m_{L}, m_{R}\right)$ with $\left|m_{L}\right| \neq\left|m_{R}\right| .$ A simple way to change the CPA security definition is to just disallow this kind of query. The libraries will give an error message if $\left|m_{L}\right| \neq\left|m_{R}\right| .$ This would allow the adversary to make the challenge plaintexts differ in any way of his/her choice, *except* in their length. It doesn't really matter whether $|m|$ refers to the length of the plaintext in bits or in blocks - whichever makes the most sense for a particular scheme. 
  
 From now on, when discussing encryption schemes that support variable-length plaintexts, CPA security will refer to the following updated libraries:
 
@@ -109,12 +109,12 @@ k\leftarrow \Sigma.\text{KeyGen}\\\\
 \end{array}
 $$
 
-In the definition of CPA$\varPhi$ security (pseudorandom ciphertexts), the $\mathcal{L}_{\text {cpa}\varPhi-\text{rand }}$ library responds to queries with uniform responses. Since these responses must look like ciphertexts, they must have the appropriate length. For example, for the modes discussed in this chapter, an $\ell$ -block plaintext is expected to be encrypted to an $(\ell+1)$ -block ciphertext. So, based on the length of the plaintext that is provided, the library must choose the appropriate ciphertext length. We are already using $\Sigma . C$ to denote the set of possible ciphertexts of an encryption scheme $\Sigma$. So let's extend the notation slightly and write $\Sigma . C(\ell)$ to denote the set of possible ciphertexts for plaintexts of length $\ell$. Then when discussing encryption schemes supporting variable-length plaintexts, CPA$\varPhi$ security will refer to the following libraries:
+In the definition of CPA$\Phi$ security (pseudorandom ciphertexts), the $\mathcal{L}_{\text {cpa}\Phi-\text{rand }}$ library responds to queries with uniform responses. Since these responses must look like ciphertexts, they must have the appropriate length. For example, for the modes discussed in this chapter, an $\ell$ -block plaintext is expected to be encrypted to an $(\ell+1)$ -block ciphertext. So, based on the length of the plaintext that is provided, the library must choose the appropriate ciphertext length. We are already using $\Sigma . C$ to denote the set of possible ciphertexts of an encryption scheme $\Sigma$. So let's extend the notation slightly and write $\Sigma . C(\ell)$ to denote the set of possible ciphertexts for plaintexts of length $\ell$. Then when discussing encryption schemes supporting variable-length plaintexts, CPA$\Phi$ security will refer to the following libraries:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \qquad \mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\\\hline
+\qquad \qquad \mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\\\hline
 k\leftarrow \Sigma.\text{KeyGen}\\\\
 \underline{\text{CHANLLENGE}(m\in\Sigma.\mathcal{M}):}\\
 \quad c:=\Sigma.\text{Enc}(k,m_L)\\
@@ -122,25 +122,26 @@ k\leftarrow \Sigma.\text{KeyGen}\\\\
 \end{array}
 \quad
 \begin{array}{|l|}\hline
-\qquad \qquad \mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma\\\hline
+\qquad \qquad \mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma\\\hline
 \underline{\text{CHANLLENGE}(m\in\Sigma.\mathcal{M}):}\\
-\quad \leftarrow\Sigma.\mathcal{C}(|m|)\\
+\quad c \leftarrow\Sigma.\mathcal{C}(|m|)\\
 \quad \text{return}\ c\\\hline
 \end{array}
 $$
-Note that the $\mathcal{L}_{\text{cpa}\varPhi-\text{rand}}$ library does not use any information about $m$ other than its length. This again reflects the idea that ciphertexts leak nothing about plaintexts other than their length.
+Note that the $\mathcal{L}_{\text{cpa}\Phi-\text{rand}}$ library does not use any information about $m$ other than its length. This again reflects the idea that ciphertexts leak nothing about plaintexts other than their length.
 
-In the exercises, you are asked to prove that, with respect to these updated security definitions, CPA$\varPhi$ security implies CPA security as before.
+In the exercises, you are asked to prove that, with respect to these updated security definitions, CPA$\Phi$ security implies CPA security as before.
 
 ### Don’t Take Length-Leaking for Granted!
 
-We have just gone from requiring encryption to leak no partial *information* to casually allowing some specific information to leak. Let us not be too hasty about this!
+We have just gone from requiring encryption to leak *no partial information* to casually allowing some specific information to leak. Let us not be too hasty about this!
 
  If we want to truly support plaintexts of *arbitrary* length, then leaking the length is in fact unavoidable. But “unavoidable” doesn’t mean “free of consequences.” By observing only the length of encrypted network trafic, many serious attacks are possible. Here are several examples:
 
- - When accessing Google maps, your browser receives many image tiles that comprise the map that you see. Each image tile has the same pixel dimensions. However, they are compressed to save resources, and not all images compress as significantly as others. Every region of the world has its own rather unique “fingerprint” of imagetile lengths. So even though trafic to and from Google maps is encrypted, the sizes of the image tiles are leaked. This can indeed be used to determine the region for which a user is requesting a map. The same idea applies to auto-complete suggestions in a search form.
+ - When accessing Google maps, your browser receives many image tiles that comprise the map that you see. Each image tile has the same pixel dimensions. However, they are compressed to save resources, and not all images compress as significantly as others. Every region of the world has its own rather unique “fingerprint” of imagetile lengths. So even though trafic to and from Google maps is encrypted, the sizes of the image tiles are leaked. This can indeed be used to determine the region for which a user is requesting a map. [^2]  The same idea applies to auto-complete suggestions in a search form.
+ [^2]: http://blog.ioactive.com/2012/02/ssl-traffic-analysis-on-google-maps.html
  
- - Variable-bit-rate (VBR) encoding is a common technique in audio/video encoding. When the data stream is carrying less information (e.g., a scene with a fixed camera position, or a quiet section of audio), it is encoded at a lower bit rate, meaning that each unit of time is encoded in fewer bits. In an encrypted video stream, the changes in bit rate are reflected as changes in packet length. When a user is watching a movie on Netflix or a Youtube video (as opposed to a live event stream), the bit-rate changes are consistent and predictable. It is therefore rather straight-forward to determine which video is being watched, even on an encrypted connection, just by observing the packet lengths.
+ - Variable-bit-rate (VBR) encoding is a common technique in audio/video encoding. When the data stream is carrying less information (*e.g*., a scene with a fixed camera position, or a quiet section of audio), it is encoded at a lower bit rate, meaning that each unit of time is encoded in fewer bits. In an encrypted video stream, the changes in bit rate are reflected as changes in packet length. When a user is watching a movie on Netflix or a Youtube video (as opposed to a live event stream), the bit-rate changes are consistent and predictable. It is therefore rather straight-forward to determine which video is being watched, even on an encrypted connection, just by observing the packet lengths.
  
  - VBR is also used in many encrypted voice chat programs. Attacks on these tools have been increasing in sophistication. The first attacks on encrypted voice programs showed how to identify who was speaking (from a set of candidates), just by observing the stream of ciphertext sizes. Later attacks could determine the language being spoken. Eventually, when combined with sophisticated linguistic models, it was shown possible to even identify individual words to some extent!
 
