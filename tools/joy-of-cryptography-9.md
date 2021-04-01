@@ -5,18 +5,22 @@ In this chapter we discuss the limitations of the CPA security definition. In sh
 ## 9.1 Padding Oracle Attacks
 Imagine a webserver that receives CBC-encrypted ciphertexts for processing. When receiving a ciphertext, the webserver decrypts it under the appropriate key and then checks whether the plaintext has valid X.923 padding (Section 8.4).
 
-Importantly, suppose that the *observable behavior of the webserver changes depending on whether the padding* is valid. You can imagine that the webserver gives a special error message in the case of invalid padding. Or, even more cleverly (but still realistic), the *difference in response time* when processing a ciphertext with invalid padding is enough to allow the attack to work. The *mechanism* for learning padding validity is not important — what is important is simply the fact that an attacker has some way to determine whether a ciphertext encodes a plaintext with valid padding. No matter how the attacker comes by this information, we say that the attacker has access to a **padding oracle**, which gives the same information as the following subroutine:
+Importantly, suppose that the *observable behavior of the webserver changes depending on whether the padding* is valid. You can imagine that the webserver gives a special error message in the case of invalid padding. Or, even more cleverly (but still realistic), the *difference in response time* when processing a ciphertext with invalid padding is enough to allow the attack to work.[^1] The *mechanism* for learning padding validity is not important — what is important is simply the fact that an attacker has some way to determine whether a ciphertext encodes a plaintext with valid padding. No matter how the attacker comes by this information, we say that the attacker has access to a **padding oracle**, which gives the same information as the following subroutine:
 
+[^1]: For this reason, it is necessary to write the unpadding algorithm so that every execution path through the subroutine takes the same number of CPU cycles.
+ 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\text{PADDINGORACLE}(c):\\
-\quad m:=\text{Deck}(k,c)\\
+\underbar{\text{PADDINGORACLE}(c):}\\
+\quad m:=\text{Dec}(k,c)\\
 \quad \text{return VALIDPAD}(m)\\\hline
 \end{array}
 $$
 
-We call this a padding *oracle* because it answers only one specific kind of question about the input. In this case, the answer that it gives is always a single boolean value. It does not seem like a padding oracle is leaking useful information, and that there is no cause for concern. Surprisingly, we can show that an attacker who doesn’t know the encryption key $k$ can use a padding oracle alone to *decrypt **any** ciphertext of its choice*! This is true no matter what else the webserver does. As long as it leaks this one bit of information on ciphertexts that the attacker can choose, it might as well be leaking everything.
+We call this a padding *oracle* because it answers only one specific kind of question about the input. In this case, the answer that it gives is always a single boolean value. 
+
+It does not seem like a padding oracle is leaking useful information, and that there is no cause for concern. Surprisingly, we can show that an attacker who doesn’t know the encryption key $k$ can use a padding oracle alone to *decrypt **any** ciphertext of its choice*! This is true no matter what else the webserver does. As long as it leaks this one bit of information on ciphertexts that the attacker can choose, it might as well be leaking everything.
 
 ### Malleability of CBC Encryption
 
@@ -26,7 +30,7 @@ m_{i}:=F^{-1}\left(k, c_{i}\right) \oplus c_{i-1}
 $$
 From this we can deduce two important facts:
 - Two consecutive blocks $\left(c_{i-1}, c_{i}\right)$ taken in isolation are a valid encryption of $m_{i}$. Looking ahead, this fact allows the attacker to focus on decrypting a single block at a time.
-- XORing a ciphertext block with a known value (say, $x$ ) has the effect of xoring the corresponding plaintext block by the same value. In other words, for all $x,$ the ciphertext $\left(c_{i-1} \oplus x, c_{i}\right)$ decrypts to $m_{i} \oplus x:$
+- XORing a ciphertext block with a known value (say, $x$ ) has the effect of XORing the corresponding plaintext block by the same value. In other words, for all $x,$ the ciphertext $\left(c_{i-1} \oplus x, c_{i}\right)$ decrypts to $m_{i} \oplus x:$
 $$
 \operatorname{Dec}\left(k,\left(c_{i-1} \oplus x, c_{i}\right)\right)=F^{-1}\left(k, c_{i}\right) \oplus\left(c_{i-1} \oplus x\right)=\left(F^{-1}\left(k, c_{i}\right) \oplus c_{i-1}\right) \oplus x=m_{i} \oplus x
 $$
@@ -37,55 +41,55 @@ By carefully choosing different values $x$ and asking questions of this form to 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\text{// suppose $c$ encrypts an (unknown) plaintextm $m_1\|\cdots\|m_\ell$}\\
-\text{// does $m_i \oplus x$ end in one of the valid pading strings?}\\\\
+\textit{// suppose $c$ encrypts an (unknown) plaintextm $m_1\|\cdots\|m_\ell$}\\
+\textit{// does $m_i \oplus x$ end in one of the valid pading strings?}\\\\
 \underline{\text{CHECKXOR}(c,i,x):}\\
-\quad \text{return paddingoracle $(c_{i-1}\oplus x,c_i)$}\\\hline
+\quad \text{return PADDINGORACLE $(c_{i-1}\oplus x,c_i)$}\\\hline
 \end{array}
 $$
 
-Given a ciphertext $c$ that encrypts an unknown message $m$, we can see that an adversary can generate another ciphertext whose contents are related tom in a *predictable* way. This property of an encryption scheme is called **malleability**.
+Given a ciphertext $c$ that encrypts an unknown message $m$, we can see that an adversary can generate another ciphertext whose contents are *related to m in a predictable* way. This property of an encryption scheme is called **malleability**.
 
 ### Learning the Last Byte of a Block
 
 We now show how to use the CHECKXOR subroutine to determine the last byte of a plaintext block $m$. There are two cases to consider, depending on the contents of $m .$ The attacker does not initially know which case holds:
 
-For the first (and easier) of the two cases, suppose the second-to-last byte of $m$ is nonzero. We will try every possible byte $b$ and ask whether $m \oplus b$ has valid padding. Since $m$ is a block and $b$ is a single byte, when we write $m \oplus b$ we mean that $b$ is extended on the left with zeroes. Since the second-to-last byte of $m$ (and hence $m \oplus b$ ) is nonzero, only one of these possibilities will have valid padding $-$ the one in which $m \oplus b$ ends in byte $\colorbox{silver}{|O1|}$. Therefore, if $b$ is the candidate byte that succeeds (i.e., $m \oplus b$ has valid padding) then the last byte of $m$ must be $b \oplus \colorbox{silver}{|O1|}$.
+For the first (and easier) of the two cases, suppose the second-to-last byte of $m$ is nonzero. We will try every possible byte $b$ and ask whether $m \oplus b$ has valid padding. Since $m$ is a block and $b$ is a single byte, when we write $m \oplus b$ we mean that $b$ is extended on the left with zeroes. Since the second-to-last byte of $m$ (and hence $m \oplus b$ ) is nonzero, only one of these possibilities will have valid padding $-$ the one in which $m \oplus b$ ends in byte $\colorbox{silver}{|01|}$. Therefore, if $b$ is the candidate byte that succeeds (i.e., $m \oplus b$ has valid padding) then the last byte of $m$ must be $b \oplus \colorbox{silver}{|01|}$.
 
 **Example**
-Using LEARNLASTBYTE to learn the last byte of a plaintext block:
+*Using LEARNLASTBYTE to learn the last byte of a plaintext block:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\quad \ \text{$ \cdots \colorbox{silver}{| a0 | 42 | ?? |}\quad  m =$ unknown plaintext block}\\
-\underline{\oplus\  \cdots \colorbox{silver}{| a0 | 42 |\  b\   |}}\quad  b = \text{byte that causes oracle to return true}\\
-=\cdots \colorbox{silver}{| a0 | 42 | \textcolor{green}{ 01 |}}\quad \text{valid padding}\  \Leftrightarrow \colorbox{silver}{| b |}\ \oplus\ \colorbox{silver}{| ?? |}\ =\ \colorbox{silver}{| 01 |}\\
+\quad \ \text{$ \cdots \colorbox{silver}{| a0 | 42 | ?? |}\quad  m =$ \textit{unknown plaintext block}}\\
+\underline{\oplus\  \cdots \colorbox{silver}{| a0 | 42 |\  $b$\   |}}\quad  b = \textit{byte that causes oracle to return true}\\
+=\cdots \colorbox{silver}{| a0 | 42 | \textcolor{green}{ 01 |}}\quad \textit{valid padding}\  \Leftrightarrow \colorbox{silver}{| $b$ |}\ \oplus\ \colorbox{silver}{| ?? |}\ =\ \colorbox{silver}{| 01 |}\\
 \hspace{2.25in}\Leftrightarrow \colorbox{silver}{| ??|}\ \oplus\ \colorbox{silver}{| 01 |}\ \oplus\ \colorbox{silver}{|\  b\   |}\\\hline
 \end{array}
 $$
-For the other case, suppose the second-to-last byte ofm is zero. Then $m\oplus b$ will have valid padding for several candidate values of $b$:
+For the other case, suppose the second-to-last byte of m is zero. Then $m\oplus b$ will have valid padding for *several* candidate values of $b$:
 
 **Example**
-Using LEARNLASTBYTE to learn the last byte of a plaintext block:
+*Using LEARNLASTBYTE to learn the last byte of a plaintext block:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\quad \ \text{$ \cdots \colorbox{silver}{| a0 | 00 | ?? |}\quad  \quad \ \text{$ \cdots \colorbox{silver}{| a0 | 00 | ?? |}\quad  $ }m =$ unknown plaintext}\\
-\underline{\oplus\  \cdots \colorbox{silver}{| 00 | 00 |\  $b_1$   |}}\quad  \underline{\oplus\  \cdots \colorbox{silver}{| 00 | 00 |\  $b_2$   |}}\quad  b_1 = \text{candidate bytes}\\
-=\cdots \colorbox{silver}{| a0 | 00 | \textcolor{green}{ 01 |}}\quad =\cdots \colorbox{silver}{| a0 | 00 | \textcolor{green}{ 01 |}}\quad \text{two candidates cause oracle to return true} \\
+\quad \ \text{$ \cdots \colorbox{silver}{| a0 | 00 | ?? |}\quad  \quad \ \text{$ \cdots \colorbox{silver}{| a0 | 00 | ?? |}\quad  $ }m = unknown \ plaintext$}\\
+\underline{\oplus\  \cdots \colorbox{silver}{| 00 | 00 |\  $b_1$   |}}\quad  \underline{\oplus\  \cdots \colorbox{silver}{| 00 | 00 |\  $b_2$   |}}\quad  b_1 = \textit{candidate bytes}\\
+=\cdots \colorbox{silver}{| a0 | 00 | \textcolor{green}{ 01 |}}\quad =\cdots \colorbox{silver}{| a0\textcolor{green}{ | 00 | 02 |}}\quad \textit{two candidates cause oracle to return true} \\
 \qquad \quad\downarrow \qquad \qquad \qquad \qquad \qquad\downarrow\\
 \quad \ \text{$ \cdots \colorbox{silver}{| a0 | 00 | ?? |}\quad  \quad \ \text{$ \cdots \colorbox{silver}{| a0 | 00 | ?? |}\quad  $ }$ }\\
-\underline{\oplus\  \cdots \colorbox{silver}{| 00 | 01 |\  $b_1$   |}}\quad  \underline{\oplus\  \cdots \colorbox{silver}{| 00 | 01 |\  $b_2$   |}}\quad   \text{same $b_1,b_2$, but change next-to-last byte}\\
-=\cdots \colorbox{silver}{| a0 | 01 | \textcolor{green}{ 01 |}}\quad =\cdots \colorbox{silver}{| a0 | \textcolor{brown}{ 01} | \textcolor{brown}{ 02 |}}\quad \text{only one causes oracle to return true} \\
+\underline{\oplus\  \cdots \colorbox{silver}{| 00 | 01 |\  $b_1$   |}}\quad  \underline{\oplus\  \cdots \colorbox{silver}{| 00 | 01 |\  $b_2$   |}}\quad   \textit{same $b_1,b_2$, but change next-to-last byte}\\
+=\cdots \colorbox{silver}{| a0 | 01 | \textcolor{green}{ 01 |}}\quad =\cdots \colorbox{silver}{| a0 | \textcolor{brown}{ 01} | \textcolor{brown}{ 02 |}}\quad \textit{only one causes oracle to return true} \\
 \hspace{2.8in}\Rightarrow \colorbox{silver}{??}=\colorbox{silver}{$b_1$}\oplus\colorbox{silver}{$01$}\\\hline
 \end{array}
 $$
 
 Whenever more than one candidate $b$ value yields valid padding, we know that the second-to-last byte of $m$ is zero (in fact, by counting the number of successful candidates, we can know exactly how many zeroes precede the last byte of $m$ ).
 
-If the second-to-last byte of $m$ is zero, then the second-to-last byte of $m \oplus \colorbox{silver}{|01|b|} b$ is nonzero. The only way for both strings $m \oplus\colorbox{silver}{|01|b|} b$ and $m \oplus b$ to have valid padding is when $m \oplus b$ ends in byte $\colorbox{silver}{|01|b|}$ . We can re-try all of the successful candidate $b$ values again, this time with an extra nonzero byte in front. There will be a unique candidate $b$ that is successful in both rounds, and this will tell us that the last byte of $m$ is $b \oplus \colorbox{silver}{|01|b|}$.
+If the second-to-last byte of $m$ is zero, then the second-to-last byte of $m \oplus \colorbox{silver}{|01| \textit{b} |}$ is nonzero. The only way for both strings $m \oplus\colorbox{silver}{|01| \textit{b} |}$ and $m \oplus b$ to have valid padding is when $m \oplus b$ ends in byte $\colorbox{silver}{|01|}$ . We can re-try all of the successful candidate $b$ values again, this time with an extra nonzero byte in front. There will be a unique candidate $b$ that is successful in both rounds, and this will tell us that the last byte of $m$ is $b \oplus \colorbox{silver}{|01|}$.
 
 The overall approach for learning the last byte of a plaintext block is summarized in the LEARNLASTBYTE subroutine in Figure $9.1 .$ The set $B$ contains the successful candidate bytes from the first round. There are at most 16 elements in $B$ after the first round, since there are only 16 valid possibilities for the last byte of a properly padded block. In the worst case, LEARNLASTBYTE makes $256+16=272$ calls to the padding oracle (via CHECKXOR).
 
@@ -94,27 +98,28 @@ The overall approach for learning the last byte of a plaintext block is summariz
 Once we have learned one of the trailing bytes of a plaintext block, it is slightly easier to learn additional ones. Suppose we know the last 3 bytes of a plaintext block, as in the example below. We would like to use the padding oracle to discover the 4th-to-last byte.
 
 **Example**
-Using LEARNPREVBYTE to learn the 4th-to-last byte when the last 3 bytes of the block are already known.
+*Using LEARNPREVBYTE to learn the 4th-to-last byte when the last 3 bytes of the block are already known.*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\quad \ \text{$ \cdots \colorbox{silver}{| ?? | a0 | 42 | 3c|}\quad  m =$ unknown plaintext block}\\
-\oplus\  \cdots \colorbox{silver}{| 00 | 00 | 00 |04 |}\quad  p = \text{string ending in}\ \ \colorbox{silver}{|04|} \\
-\oplus\  \cdots \colorbox{silver}{| 00 | a0 | 42 |3c |}\quad  s = \text{known bytes of $m$}\\
-\underline{\oplus\  \cdots \colorbox{silver}{| b  | 00 | 00 | 00 |}}\quad  y = \text{candidate byte $b$ shifted into place}\\
-=\  \cdots \colorbox{silver}{| \textcolor{green}{00} | \textcolor{green}{00} | \textcolor{green}{00} |\textcolor{green}{00} |}\quad  \text{valid padding $\Rightarrow \colorbox{silver}{??}=\colorbox{silver}{b}$}\\\hline
+\quad \ \text{$ \cdots \colorbox{silver}{| ?? | a0 | 42 | 3c|}\quad  m = unknown\ plaintext\ block$}\\
+\oplus\  \cdots \colorbox{silver}{| 00 | 00 | 00 |04 |}\quad  p = \textit{string ending in}\ \ \colorbox{silver}{|04|} \\
+\oplus\  \cdots \colorbox{silver}{| 00 | a0 | 42 |3c |}\quad  s = \textit{known bytes of $m$}\\
+\underline{\oplus\  \cdots \colorbox{silver}{| b  | 00 | 00 | 00 |}}\quad  y = \textit{candidate byte $b$ shifted into place}\\
+=\  \cdots \colorbox{silver}{| \textcolor{green}{00} | \textcolor{green}{00} | \textcolor{green}{00} |\textcolor{green}{04} |}\quad  \textit{valid padding $\Rightarrow \colorbox{silver}{??}=\colorbox{silver}{b}$}\\\hline
 \end{array}
 $$
 
-Since we know the last 3 bytes of $m$, we can calculate a string $x$ such that $m \oplus x$ ends in $\colorbox{silver}{|00|00|04|}$ . Now we can try xor'ing the 4 th-to-last byte of $m \oplus x$ with different candidate bytes $b$, and asking the padding oracle whether the result has valid padding. Valid padding only occurs when the result has $\colorbox{silver}{|00|}$ in its 4 th-to-last byte, and this happens exactly when the 4 th-to-last byte of $m$ exactly matches our candidate byte $b$.
+Since we know the last 3 bytes of $m$, we can calculate a string $x$ such that $m \oplus x$ ends in $\colorbox{silver}{|00|00|04|}$ . Now we can try XOR'ing the 4 th-to-last byte of $m \oplus x$ with different candidate bytes $b$, and asking the padding oracle whether the result has valid padding. Valid padding only occurs when the result has $\colorbox{silver}{|00|}$ in its 4th-to-last byte, and this happens exactly when the 4th-to-last byte of $m$ exactly matches our candidate byte $b$.
 
 The process is summarized in the LEARNPREVBYTE subroutine in Figure $9.1 .$ In the worst case, this subroutine makes 256 queries to the padding oracle.
 
-**Putting it all together.** We now have all the tools required to decrypt any ciphertext using only the padding oracle. The process is summarized below in the LEARNALL. subroutine.
+**Putting it all together.** We now have all the tools required to decrypt *any ciphertext* using only the padding oracle. The process is summarized below in the LEARNALL. subroutine.
 
-In the worst case, 256 queries to the padding oracle are required to learn each byte of the plaintext. $^{2}$ However, in practice the number can be much lower. The example in this section was inspired by a real-life padding oracle attack ${ }^{3}$ which includes optimizations that allow an attacker to recover each plaintext byte with only 14 oracle queries on average.
-
+In the worst case, 256 queries to the padding oracle are required to learn each byte of the plaintext. [^2] However, in practice the number can be much lower. The example in this section was inspired by a real-life padding oracle attack [^3] which includes optimizations that allow an attacker to recover each plaintext byte with only 14 oracle queries on average.
+[^2]: It might take more than 256 queries to learn the last byte. But whenever learnlastbyte uses more than 256 queries, the side effect is that you’ve also learned that some other bytes of the block are zero. This saves you from querying the padding oracle altogether to learn those bytes.
+[^3]: *How to Break XML Encryption*, Tibor Jager and Juraj Somorovsky. ACM CCS 2011.
 ## 9.2 What Went Wrong?
 
 CBC encryption provides CPA security, so why didn't it save us from padding oracle attacks? How was an attacker able to completely obliterate the privacy of encryption?
