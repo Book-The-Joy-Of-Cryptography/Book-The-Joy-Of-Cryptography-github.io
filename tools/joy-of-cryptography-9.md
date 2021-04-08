@@ -123,8 +123,9 @@ In the worst case, 256 queries to the padding oracle are required to learn each 
 ## 9.2 What Went Wrong?
 
 CBC encryption provides CPA security, so why didn't it save us from padding oracle attacks? How was an attacker able to completely obliterate the privacy of encryption?
-1. First, CBC encryption (in fact, every encryption scheme we've seen so far) has a property called malleability. Given an encryption $c$ of an unknown plaintext $m$, it is possible to generate another ciphertext $c^{\prime}$ whose contents are related to $m$ in a predictable way. In the case of CBC encryption, if ciphertext $c_{0}\|\cdots\| c_{\ell}$ encrypts a plaintext $m_{1}\|\cdots\| m_{\ell}$, then ciphertext $\left(c_{i-1} \oplus x, c_{i}\right)$ encrypts the related plaintext $m_{i} \oplus x$
-In short, if an encryption scheme is malleable, then it allows information contained in one ciphertext to be "transferred" to another ciphertext.
+1. First, CBC encryption (in fact, every encryption scheme we've seen so far) has a property called **malleability**. Given an encryption $c$ of an unknown plaintext $m$, it is possible to generate another ciphertext $c^{\prime}$ whose contents are *related to $m$ in a predictable way*. In the case of CBC encryption, if ciphertext $c_{0}\|\cdots\| c_{\ell}$ encrypts a plaintext $m_{1}\|\cdots\| m_{\ell}$, then ciphertext $\left(c_{i-1} \oplus x, c_{i}\right)$ encrypts the *related* plaintext $m_{i} \oplus x$
+
+    In short, if an encryption scheme is malleable, then it allows information contained in one ciphertext to be "transferred" to another ciphertext.
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
@@ -134,31 +135,33 @@ $$
 
 But the padding oracle setting involved the Dec algorithm - in particular, the adversary was allowed to see some information about the result of Dec applied to adversarially-chosen ciphertexts. Because of that, the CPA security definition does not capture the padding oracle attack scenario.
 
-The bottom line is: give an attacker a malleable encryption scheme and access to any partial information related to decryption, and he/she can get information to leak out in surprising ways. As the padding-oracle attack demonstrates, even if only a single bit of information (i.e., the answer to a yes/no question about a plaintext) is leaked about the result of decryption, this is frequently enough to extract the entire plaintext.
+The bottom line is: give an attacker a malleable encryption scheme and access to any partial information related to decryption, and he/she can get information to leak out in surprising ways. As the padding-oracle attack demonstrates, even if *only a single bit of information* *(i.e.*, the answer to a yes/no question about a plaintext) is leaked about the result of decryption, this is frequently enough to extract the entire plaintext.
 
 If we want security even under the padding-oracle scenario, we need a better security definition and encryption schemes that achieve it. That's what the rest of this chapter is about.
 
 ### Discussion
 - **Is this a realistic concern?** You may wonder whether this whole situation is somewhat contrived just to give cryptographers harder problems to solve. That was probably a common attitude towards the security definitions introduced in this chapter. However, in 1998, Daniel Bleichenbacher demonstrated a devastating attack against early versions of the SSL protocol. By presenting millions of carefully crafted ciphertexts to a webserver, an attacker could eventually recover arbitrary SSL session keys.
-In practice, it is hard to make the external behavior of a server not depend on the result of decryption. This makes CPA security rather fragile in the real world. In the case of padding oracle attacks, mistakes in implementation can lead to different error messages for invalid padding. In other cases, even an otherwise careful implementation can provide a padding oracle through a timing side-channel (if the server's response time is different for valid/invalid padded plaintexts).
-As we will see, it is in fact possible to provide security in these kinds of settings, and with low additional overhead. These days there is rarely a good excuse for using encryption which is only CPA-secure.
+
+    In practice, it is hard to make the external behavior of a server *not* depend on the result of decryption. This makes CPA security rather fragile in the real world. In the case of padding oracle attacks, mistakes in implementation can lead to different error messages for invalid padding. In other cases, even an otherwise careful implementation can provide a padding oracle through a timing side-channel (if the server's *response time* is different for valid/invalid padded plaintexts).
+    
+    As we will see, it *is* in fact possible to provide security in these kinds of settings, and with low additional overhead. These days there is rarely a good excuse for using encryption which is only CPA-secure.
 - Padding is in the name of the attack. But padding is not the culprit. The culprit is using a (merely) CPA-secure encryption scheme while allowing some information to leak about the result of decryption. The exercises expand on this idea further.
-- **If padding is added to only the last block of the plaintext, how can this attack recover the entire plaintext?** This common confusion is another reason to not place so much blame on the padding scheme. A padding oracle has the following behavior: "give me an encryption of $m_{1}\|\cdots\| m_{\ell}$ and I'll tell you some information about $m_{\ell}$ (whether it ends with a certain suffix)." Indeed, the padding oracle checks only the last block. However, CBC mode has the property that if you have an encryption of $m_{1}\|\cdots\| m_{\ell},$ then you can easily construct a different ciphertext that encrypts $m_{1}\|\cdots\| m_{\ell-1} .$ If you send this ciphertext to the padding oracle, you will get information about $m_{\ell-1} .$ By modifying the ciphertext (via the malleability of $\mathrm{CBC}$ ), you give different plaintext blocks the chance to be the "last block" that the padding oracle looks at.
+- **If padding is added to only the *last block* of the plaintext, how can this attack recover the *entire* plaintext?** This common confusion is another reason to not place so much blame on the padding scheme. A padding oracle has the following behavior: "give me an encryption of $m_{1}\|\cdots\| m_{\ell}$ and I'll tell you some information about $m_{\ell}$ (whether it ends with a certain suffix)." Indeed, the padding oracle checks only the last block. However, CBC mode has the property that if you have an encryption of $m_{1}\|\cdots\| m_{\ell},$ then you can easily construct a different ciphertext that encrypts $m_{1}\|\cdots\| m_{\ell-1} .$ If you send this ciphertext to the padding oracle, you will get information about $m_{\ell-1} .$ By modifying the ciphertext (via the malleability of $\mathrm{CBC}$ ), you give different plaintext blocks the chance to be the "last block" that the padding oracle looks at.
 - The attack seems superficially like brute force, but it is not: The attack makes 256 queries per byte of plaintext, so it costs about $256 \ell$ queries for a plaintext of $\ell$ bytes. Brute-forcing the entire plaintext would cost $256^{\ell}$ since that's how many $\ell$ -byte plaintexts there are. So the attack is exponentially better than brute force. The lesson is: brute-forcing small pieces at a time is much better then brute-forcing the entire thing.
 
 ## 9.3 Defining CCA Security
 Our goal now is to develop a new security definition $-$ one that considers an adversary that can construct malicious ciphertexts and observe the effects caused by their decryption. We will start with the basic approach of CPA security, with left and right libraries that differ only in which of two plaintexts they encrypt.
 
-In a typical system, an adversary might be able to learn only some specific partial *information* about the Dec process. In the padding oracle attack, the adversary was able to learn only whether the result of decryption had valid padding.
+In a typical system, an adversary might be able to learn only some specific *partial information* about the Dec process. In the padding oracle attack, the adversary was able to learn only whether the result of decryption had valid padding.
 
-However, we are trying to come up with a security definition that is useful no matter how the encryption scheme is deployed. How can we possibly anticipate every kind of partial information that might make its way to the adversary in every possible usage of the encryption scheme? The safest choice is to be as pessimistic as possible, as long as we end up with a security notion that we can actually achieve in the end. **So let's just allow the adversary to totally decrypt arbitrary ciphertexts of its choice**. In other words, if we can guarantee security when the adversary has full information about decrypted ciphertexts, then we certainly have security when the adversary learns only partial information about decrypted ciphertexts (as in a typical real-world system).
+However, we are trying to come up with a security definition that is useful *no matter how* the encryption scheme is deployed. How can we possibly anticipate every kind of partial information that might make its way to the adversary in every possible usage of the encryption scheme? The safest choice is to be as pessimistic as possible, as long as we end up with a security notion that we can actually achieve in the end. So **let's just allow the adversary to totally decrypt arbitrary ciphertexts of its choice**. In other words, if we can guarantee security when the adversary has *full* information about decrypted ciphertexts, then we certainly have security when the adversary learns only *partial* information about decrypted ciphertexts (as in a typical real-world system).
 
 But this presents a significant problem. An adversary can do $c^{*}:=$ EAVESDROP $\left(m_{L}, m_{R}\right)$ to obtain a challenge ciphertext, and then immediately ask for that ciphertext $c^{*}$ to be decrypted. This will obviously reveal to the adversary whether it is linked to the left or right library.
 
-So, simply providing unrestricted Dec access to the adversary cannot lead to a reasonable security definition (it is a security definition that can never be satisfied). The simplest way to patch this obvious problem with the definition is to allow the adversary to ask for the decryption of **any ciphertext, except those produced in response to EAVESDROP** queries. In doing so, we arrive at the final security definition: security against chosenciphertext attacks, or CCA-security:
+So, simply providing unrestricted Dec access to the adversary cannot lead to a reasonable security definition (it is a security definition that can never be satisfied). The simplest way to patch this obvious problem with the definition is to allow the adversary to ask for the decryption of **any ciphertext, except those produced in response to EAVESDROP queries**. In doing so, we arrive at the final security definition: security against chosenciphertext attacks, or CCA-security:
 
 **Definition 9.1 (CCA security)**
-Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **security against chosen-ciphertext attacks (CCA security)** if $\mathcal{L}_{\text {cca-L }}^{\Sigma} \approx \mathcal{L}_{\text {cca-R }}^{\Sigma},$ where
+*Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **security against chosen-ciphertext attacks (CCA security)** if $\mathcal{L}_{\text {cca-L }}^{\Sigma} \approx \mathcal{L}_{\text {cca-R }}^{\Sigma},$ where*
 
 
 $$
@@ -192,13 +195,13 @@ S:=\emptyset\\\\
 \end{array}
 $$
 
-In this denition, the set $S$ keeps track of the ciphertexts that have been generated by the eavesdrop subroutine. The decrypt subroutine refuses to decrypt these ciphertexts, but will gladly decrypt any other ciphertext of the adversary’s choice.
+In this definition, the set $S$ keeps track of the ciphertexts that have been generated by the EAVESDROP subroutine. The decrypt subroutine refuses to decrypt these ciphertexts, but will gladly decrypt any other ciphertext of the adversary’s choice.
 
 ### An Example
 The padding oracle attack already demonstrates that CBC mode does not provide security in the presence of chosen ciphertext attacks. But that attack was quite complicated since the adversary was restricted to learn just 1 bit of information at a time about a decrypted ciphertext. An attack against full CCA security can be much more direct, since the adversary has full access to decrypted ciphertexts.
 
 **Example**
-Consider the adversary below attacking the CCA security of CBC mode (with block length blen)
+*Consider the adversary below attacking the CCA security of CBC mode (with block length blen)*
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
@@ -209,35 +212,10 @@ m:=\text{DECRYPT}(c_0\|c_1)\\
 \end{array}
 $$
 
-It can easily be verified that this adversary achieves advantage 1 distinguishing $\mathcal{L}_{\text {cca-L }}$ from $\mathcal{L}_{\text {cca-R. }}$ The attack uses the fact (also used in the padding oracle attack) that if $c_{0}\left\|c_{1}\right\| c_{2}$ encrypts $m_{1} \| m_{2},$ then $c_{0} \| c_{1}$ encrypts $m_{1} .$ To us, it is obvious that ciphertext $c_{0} \| c_{1}$ is related to $c_{0}\left\|c_{1}\right\| c_{2} .$ Unfortunately for $C B C$ mode, the security definition is not very clever $-$ since $c_{0} \| c_{1}$ is simply different than $c_{0}\left\|c_{1}\right\| c_{2},$ the DECRYPT subroutine happily decrypts it.
+*It can easily be verified that this adversary achieves advantage 1 distinguishing $\mathcal{L}_{\text {cca-L }}$ from $\mathcal{L}_{\text {cca-R. }}$ The attack uses the fact (also used in the padding oracle attack) that if $c_{0}\left\|c_{1}\right\| c_{2}$ encrypts $m_{1} \| m_{2},$ then $c_{0} \| c_{1}$ encrypts $m_{1} .$ To us, it is obvious that ciphertext $c_{0} \| c_{1}$ is related to $c_{0}\left\|c_{1}\right\| c_{2} .$ Unfortunately for $C B C$ mode, the security definition is not very clever $-$ since $c_{0} \| c_{1}$ is simply different than $c_{0}\left\|c_{1}\right\| c_{2},$ the DECRYPT subroutine happily decrypts it.*
 
 **Example**
-Perhaps unsurprisingly, there are many very simple ways to catastrophically attack the CCA security of CBC-mode encryption. Here are some more (where $\bar{x}$ denotes the result of flipping every bit in $x$ ):
-
-$$
-\def\arraystretch{1.5}
-\begin{array}{|l|}\hline
-\qquad \qquad \qquad \qquad \mathcal{A'}\\\hline
-c_0\|c_1\|c_2:=\text{EAVESDROP}(\textcolor{brown}{0}^{2blen},\textcolor{brown}{1}^{2blen})\\
-m:=\text{DECRYPT}(c_0\|c_1\|\overline{c_2})\\
-\text{if $m$ begins with $\textcolor{brown}{0}^{blen}$ return 1 else return 0}\\\hline
-\end{array}
-$$
-
-$$
-\def\arraystretch{1.5}
-\begin{array}{|l|}\hline
-\qquad \qquad \qquad \qquad \mathcal{A''}\\\hline
-c_0\|c_1\|c_2:=\text{EAVESDROP}(\textcolor{brown}{0}^{2blen},\textcolor{brown}{1}^{2blen})\\
-m:=\text{DECRYPT}(\overline{c_0}\|c_1\|c_2)\\
-\text{return}\ m\stackrel{?}{=}\textcolor{brown}{0}^{blen}\\\hline
-\end{array}
-$$
-
-It can easily be verified that this adversary achieves advantage 1 distinguishing $\mathcal{L}_{\text {cca-L }}$ from $\mathcal{L}_{\text {cca-R. }}$ The attack uses the fact (also used in the padding oracle attack) that if $c_{0}\left\|c_{1}\right\| c_{2}$ encrypts $m_{1} \| m_{2},$ then $c_{0} \| c_{1}$ encrypts $m_{1} .$ To us, it is obvious that ciphertext $c_{0} \| c_{1}$ is related to $c_{0}\left\|c_{1}\right\| c_{2} .$ Unfortunately for $C B C$ mode, the security definition is not very clever $-$ since $c_{0} \| c_{1}$ is simply different than $c_{0}\left\|c_{1}\right\| c_{2},$ the DECRYPT subroutine happily decrypts it.
-
-**Example**
-Perhaps unsurprisingly, there are many very simple ways to catastrophically attack the CCA security of $\mathrm{CBC}$ - mode encryption. Here are some more (where $\bar{x}$ denotes the result of flipping every bit in $x$ ):
+*Perhaps unsurprisingly, there are many very simple ways to catastrophically attack the CCA security of CBC-mode encryption. Here are some more (where $\bar{x}$ denotes the result of flipping every bit in $x$ ):*
 
 $$
 \def\arraystretch{1.5}
@@ -259,9 +237,9 @@ m:=\text{DECRYPT}(\overline{c_0}\|c_1\|c_2)\\
 \end{array}
 $$
 
-The first attack uses the fact that modifying $c_2$ has no effect on the first plaintext block. The second attack uses the fact that flipping every bit in the IV flips every bit inm1.
+*The first attack uses the fact that modifying $c_2$ has no effect on the first plaintext block. The second attack uses the fact that flipping every bit in the IV flips every bit in $m_1$.*
 
-Again, in all of these cases, the decrypt subroutine is being called on a different (but related) ciphertext than the one returned by eavesdrop.
+*Again, in all of these cases, the DECRYPT subroutine is being called on a different (but related) ciphertext than the one returned by EAVESDROP.*
 
 ### Discussion
 
@@ -277,10 +255,10 @@ Of course, if a real-world system allows an attacker to learn the result of decr
 
 CCA security is deeply connected with the concept of **malleability**. Malleability means that, given a ciphertext that encrypts an unknown plaintext $m,$ it is possible to generate a different ciphertext that encrypts a plaintext that is *related* to $m$ in a predictable way. For example:
 - If $c_{0}\left\|c_{1}\right\| c_{2}$ is a CBC encryption of $m_{1} \| m_{2}$, then $c_{0} \| c_{1}$ is a CBC encryption of $m_{1}$.
-- If $c_{0}\left\|c_{1}\right\| c_{2}$ is a CBC encryption of $m_{1} \| m_{2}$, then $c_{0}\left\|c_{1}\right\| c_{2} \| \textcolor{brown}{0}^{\text {blen }}$ is a CBC encryption of some plaintext that begins with $m_{1} \| m_{2}$.
+- If $c_{0}\left\|c_{1}\right\| c_{2}$ is a CBC encryption of $m_{1} \| m_{2}$, then $c_{0}\left\|c_{1}\right\| c_{2} \| \textcolor{brown}{0}^{\text {blen }}$ is a CBC encryption of *some plaintext that begins with* $m_{1} \| m_{2}$.
 - If $c_{0} \| c_{1}$ is a CBC encryption of $m_{1}$, then $\left(c_{0} \oplus x\right) \| c_{1}$ is a CBC encryption of $m_{1} \oplus x$.
 
-Note from the second example thatwe don’t need to knowexactly the relationship between the old and new ciphertexts.
+Note from the second example that we don’t need to know *exactly* the relationship between the old and new ciphertexts.
 
 If an encryption scheme is malleable, then a typical attack against its CCA security would work as follows:
 
@@ -292,50 +270,50 @@ Since $c' \neq c$, the security library allows $c'$ to be decrypted. The malleab
 says that the contents of $c'$ should be related to the contents of $c$. In other words, seeing the contents of $c'$ should allow the attacker to determine what was initially encrypted in $c$.
 
 ### Pseudorandom Ciphertexts
-We can also modify the pseudorandom-ciphertexts security definition (CPA$ security) in a similar way:
+We can also modify the pseudorandom-ciphertexts security definition (CPA$\Phi$ security) in a similar way:
 
-**Definition 9.2 (CCA$\varPhi$ security)**
+**Definition 9.2 (CCA$\Phi$ security)**
 
-Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **pseudorandom ciphertexts in the presence of chosen-ciphertext attacks (CCA$ security)** if $\mathcal{L}_{\text{cca}\varPhi\text{-real}}\approx\mathcal{L}_{\text{cca}\varPhi\text{-real}}$, where:
+*Let $\Sigma$ be an encryption scheme. We say that $\Sigma$ has **pseudorandom ciphertexts in the presence of chosen-ciphertext attacks (CCA$\varPhi$ security)** if $\mathcal{L}_{\text{cca}\Phi\text{-real}}\approx\mathcal{L}_{\text{cca}\Phi\text{-real}}$, where:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \qquad\mathcal{L}_{\text {cca}\varPhi-\text{real }}^{\Sigma}\\\hline
+\qquad \qquad\mathcal{L}_{\text {cca}\Phi-\text{real }}^{\Sigma}\\\hline
 k\leftarrow \Sigma.\text{KeyGen}\\
 S:=\emptyset\\\\
 \underline{\text{CTXT}(m\in \Sigma.\mathcal{M}):}\\
 \quad \colorbox{yellow}{c:=}\Sigma.\text{Enc}(k,m)\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{return}\ \Sigma.\text{Dec}(k,c)\\\hline
 \end{array}
 \quad
 \begin{array}{|l|}\hline
-\qquad \qquad \mathcal{L}_{\text {cca}\varPhi-\text{rand }}^{\Sigma}\\\hline
+\qquad \qquad \mathcal{L}_{\text {cca}\Phi-\text{rand }}^{\Sigma}\\\hline
 k\leftarrow \Sigma.\text{KeyGen}\\
 S:=\emptyset\\\\
 \underline{\text{CTXT}(m\in \Sigma.\mathcal{M}):}\\
-\quad \colorbox{yellow}{c:=}\Sigma.\text{Enc}(k,m)\\
+\quad \colorbox{yellow}{c}\leftarrow \Sigma.\textit{C}(|m|)\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{return}\ \Sigma.\text{Dec}(k,c)\\\hline
 \end{array}
 $$
 
-Just like for CPA security, if a scheme has CCA$\varPhi$ security, then it also has CCA security, but not vice-versa. See the exercises.
+Just like for CPA security, if a scheme has CCA$\Phi$ security, then it also has CCA security, but not vice-versa. See the exercises.
 
 ## $\star\quad$ 9.4 A Simple CCA-Secure Scheme
-Recall the definition of a strong pseudorandom permutation (PRP) (Definition 6.13). A strong PRP is one that is indistinguishable from a randomly chosen permutation, even to an adversary that can make both forward (i.e., to $F$ ) and reverse (i.e., to $F^{-1}$ ) queries.
+Recall the definition of a **strong** pseudorandom permutation (PRP) (Definition 6.13). A strong PRP is one that is indistinguishable from a randomly chosen permutation, even to an adversary that can make both *forward* (*i.e*., to $F$ ) and *reverse* (*i.e*., to $F^{-1}$ ) queries.
 
 This concept has some similarity to the definition of CCA security, in which the adversary can make queries to both Enc and its inverse Dec. Indeed, a strong PRP can be used to construct a CCA-secure encryption scheme in a natural way:
 
 **Construction 9.3**
-Let $F$ be a pseudorandom permutation with block length blen $=n+\lambda .$ Define the following encryption scheme with message space $\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$
+*Let $F$ be a pseudorandom permutation with block length blen $=n+\lambda .$ Define the following encryption scheme with message space $\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$*
 
 $$
 \def\arraystretch{1.5}
@@ -357,16 +335,16 @@ In this scheme, $m$ is encrypted by appending a random value $r$ to it, then app
 We now prove the CCA security of Construction 9.3 formally:
 
 **Claim 9.4**
-If $F$ is a strong PRP (Definition 6.13) then Construction 9.3 has CCA$\varPhi$ security (and therefore CCA security).
+*If $F$ is a strong PRP (Definition 6.13) then Construction 9.3 has CCA$\varPhi$ security (and therefore CCA security).*
 
 **Proof**
 As usual, we prove the claim in a sequence of hybrids.
 
 $$
 \def\arraystretch{1.5}
-\mathcal{L}_{\text {cca}\varPhi-\text{real }}^{\Sigma}:\ 
+\mathcal{L}_{\text {cca}\Phi-\text{real }}^{\Sigma}:\ 
 \begin{array}{|l|}\hline
-\qquad \qquad\mathcal{L}_{\text {cca}\varPhi-\text{real }}^{\Sigma}\\\hline
+\qquad \qquad\mathcal{L}_{\text {cca}\Phi-\text{real }}^{\Sigma}\\\hline
 k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 S:=\emptyset\\\\
 \underline{\text{CTXT}(m):}\\
@@ -374,13 +352,13 @@ S:=\emptyset\\\\
 \quad c:=F(k,m\|r)\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{return first $n$ bits of}\ F^{-1}(k,c)\\\hline
 \end{array}
 \quad
 \begin{array}{l}
-\text{The starting point is $\mathcal{L}_{\text {cca}\varPhi-\text{real }}^{\Sigma}$ as expected, where}\\
+\text{The starting point is $\mathcal{L}_{\text {cca}\Phi-\text{real }}^{\Sigma}$ as expected, where}\\
 \text{$\Sigma$ refers to Construction 9.3.}
 \end{array}
 $$
@@ -389,21 +367,21 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 S:=\emptyset\\
-\text{$T,T_{inv}$ := empty assoc. arrays}\\\\
+\colorbox{Yellow}{\textit{T, $T_{inv}$} := empty assoc. arrays}\\\\
 \underline{\text{CTXT}(m):}\\
 \quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
-\quad \text{if $T [m\| r] $ undefined:}\\
-\qquad c\leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash T.\text{values}\\
-\qquad T[m\|r]:=c;T_{inv}[c]:=m\|r\\
-\quad c:=T[m\|r]\\
+\quad \colorbox{Yellow}{\text{if $T [m\| r] $ undefined:}}\\
+\qquad \colorbox{Yellow}{c$\leftarrow$\{\textcolor{brown}{0}, \textcolor{brown}{1}\}$^{blen}$}\backslash \colorbox{Yellow}{$T$. values}\\
+\qquad  \colorbox{Yellow}{$T$[$m\|r$] := c;\   $T_{inv}$[$c$] := $m\|r$}\\
+\quad c:=\colorbox{Yellow}{$T$[$m\|r$]}\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
-\quad \text{if $T_{inv} [c] $ undefined:}\\
-\qquad m\|r \leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash T_{inv}.\text{values}\\
-\qquad T_{inv}[c]:=m\|r;T[m\|r]:=c\\
-\quad \text{return first $n$ bits of}\ T_{inv}[c]\\\hline
+\quad \colorbox{Yellow}{\text{if $T_{inv} [c] $ undefined:}}\\
+\qquad \colorbox{Yellow}{m$\|$r $\leftarrow$\{\textcolor{brown}{0}, \textcolor{brown}{1}\}$^{blen}$} \backslash \colorbox{Yellow} {$T_{inv}$.values}\\
+\qquad \colorbox{Yellow}{$T_{inv}$[$c$]:=$m\|r$;T[$m\|r$]:=$c$}\\
+\quad \text{return first $n$ bits of}\ \colorbox{Yellow}{$T_{inv}$[$c$]}\\\hline
 \end{array}
 \quad
 \begin{array}{l}
@@ -415,32 +393,33 @@ S:=\emptyset\\
 \end{array}
 $$
 
-This proof has some subtleties, so it's a good time to stop and think about what needs to be done. To prove CCA\$-security, we must reach a hybrid in which the responses of $\mathrm{CTXT}$ are uniform. In the current hybrid there are two properties in the way of this goal:
+This proof has some subtleties, so it's a good time to stop and think about what needs to be done. To prove CCA$\Phi$-security, we must reach a hybrid in which the responses of $\mathrm{CTXT}$ are uniform. In the current hybrid there are two properties in the way of this goal:
 
-- The ciphertext values $c$ are sampled from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }} \backslash T$.values, rather than $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }}$.
-- When the if-condition in crxt is false, the return value of crxt is not a fresh random value but an old, repeated one. This happens when $T[m \| r]$ is already defined. Note that both crxt and DECRYPT assign to $T,$ so either one of these subroutines may be the cause of a pre-existing $T[m \| r]$ value.
+- The ciphertext values $c$ are sampled from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }} \backslash T$.values, rather than $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }}$.
+- When the if-condition in CTXT is false, the return value of CTXT is not a fresh random value but an old, repeated one. This happens when $T[m \| r]$ is already defined. Note that both CTXT and DECRYPT assign to $T,$ so either one of these subroutines may be the cause of a pre-existing $T[m \| r]$ value.
 
-Perhaps the most subtle fact about our current hybrid is that arguments of crxt can affect responses from DECRYPT! In crxt, the library assigns $m \| r$ to a value $T_{\text {inv }}[c]$. Later calls to DECRYPT will not read this value directly; these values of $c$ are off-limits due to the guard condition in the first line of $\mathrm{DECRYPT}$. However, DECRYPT samples a value from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\text {blen }} \backslash T_{\text {inv. }}$ values, which indeed uses the values $T_{\text {inv }}[c]$. To show CCA$\varPhi$ security, we must remove this dependence of DECRYPT on previous values given to CTXT.
+Perhaps the most subtle fact about our current hybrid is that arguments of CTXT can affect responses from DECRYPT! In CTXT, the library assigns $m \| r$ to a value $T_{\textit {inv }}[c]$. Later calls to DECRYPT will not read this value directly; these values of $c$ are off-limits due to the guard condition in the first line of $\mathrm{DECRYPT}$. However, DECRYPT samples a value from $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\textit {blen }} \backslash T_{\textit {inv. }}$ values, which indeed uses the values $T_{\textit {inv }}[c]$. To show CCA$\Phi$ security, we must remove this dependence of DECRYPT on previous values given to CTXT.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-S:=\emptyset; \quad \mathcal{R}:=\emptyset\\
+S:=\emptyset; \quad \colorbox{Yellow}{$\mathcal{R}:=\emptyset$} \\
 \text{$T,T_{inv}$ := empty assoc. arrays}\\\\
 \underline{\text{CTXT}(m):}\\
 \quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \quad \text{if $T [m\| r] $ undefined:}\\
 \qquad c\leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash T.\text{values}\\
-\qquad T[m\|r]:=c;T_{inv}[c]:=m\|r\\
+\qquad T[m\|r]:=c; T_{inv}[c]:=m\|r\\
+\qquad \colorbox{Yellow}{$\mathcal{R} := \mathcal{R} \ \cup \{r\}$}\\
 \quad c:=T[m\|r]\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{if $T_{inv} [c] $ undefined:}\\
 \qquad m\|r \leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash T_{inv}.\text{values}\\
 \qquad T_{inv}[c]:=m\|r;T[m\|r]:=c\\
-\quad \mathcal{R}:=\mathcal{R}\cup\{r\}\\
+\qquad \colorbox{Yellow}{$\mathcal{R}:=\mathcal{R}\cup\{r\}$}\\
 \quad \text{return first $n$ bits of}\ T_{inv}[c]\\\hline
 \end{array}
 \quad
@@ -449,8 +428,8 @@ S:=\emptyset; \quad \mathcal{R}:=\emptyset\\
 \text{anywhere. Every time an assignment of the form}\\
 \text{$T[m\|r]$ happens, we add $r$ to the set $\mathcal{R}$. Looking}\\
 \text{ahead, we eventually want to ensure that $r$ is chosen}\\
-\text{so that the if-statement in ctxt is always taken, and}\\
-\text{the return value of CTXT is always a *fresh* random value.}
+\text{so that the if-statement in CTXT is always taken, and}\\
+\text{the return value of CTXT is always a $fresh$ random value.}
 \end{array}
 $$
 
@@ -460,32 +439,44 @@ $$
 S:=\emptyset; \quad \mathcal{R}:=\emptyset\\
 \text{$T,T_{inv}$ := empty assoc. arrays}\\\\
 \underline{\text{CTXT}(m):}\\
-\quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash \mathcal{R}\\
+\quad r\leftarrow \colorbox{Yellow}{\{\textcolor{brown}{0}, \textcolor{brown}{1}\}$^\lambda\backslash\mathcal{R}$} \\
 \quad \text{if $T [m\| r] $ undefined:}\\
-\qquad c\leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash \\
+\qquad c\leftarrow \colorbox{Yellow}{\{\textcolor{brown}{0}, \textcolor{brown}{1}\}$^{blen}$}  \\
 \qquad T[m\|r]:=c;T_{inv}[c]:=m\|r\\
 \quad \quad \mathcal{R}:=\mathcal{R}\cup\{r\}\\
 \quad c:=T[m\|r]\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{if $T_{inv} [c] $ undefined:}\\
-\qquad m\|r \leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\\
-\qquad T_{inv}[c]:=m\|r;T[m\|r]:=c\\
+\qquad m\|r \leftarrow \colorbox{Yellow}{\{\textcolor{brown}{0},\textcolor{brown}{1}\}$^{blen}$} \\
+\qquad T_{inv}[c]:=m\|r; T[m\|r]:=c\\
 \quad \mathcal{R}:=\mathcal{R}\cup\{r\}\\
 \quad \text{return first $n$ bits of}\ T_{inv}[c]\\\hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{We have applied Lemma 4.12 three separate times.} \\ 
+\text{The standard intermediate steps (factor out, swap }\\
+\text{library, inline) have been skipped, and this shows}\\ \text{only the final result.} \\
+\\
+\text{In CTXT, we’ve added a restriction to how $r$ is sampled.}\\
+\text{Looking ahead, sampling $r$ in this way means that the}\\
+\text{if-statement in CTXT is always taken.}\\
+\\
+\text{In CTXT, we’ve removed the restriction in how $c$ is}\\
+\text{sampled. Since $c$ is the final return value of CTXT, this }\\
+\text{us closer to our goal of this return value being uniformly }\\
+\text{random.} \\
+\\
+\text{In DECRYPT, we have removed the restriction in how} \\
+\text{$m\|r$ is sampled. As described above, this is}\\
+\text{because $T_{inv}$. values contains previous arguments of }\\
+\text{CTXT, and we don’t want these arguments to affect the} \\
+\text{result of decrypt in any way.}
+\end{array}
 $$
-
-We have applied Lemma 4.12 three separate times. The standard intermediate steps (factor out, swap library, inline) have been skipped, and this shows only the final result.
-
-In CTXT, we’ve added a restriction to how $r$ is sampled. Looking ahead, sampling $r$ in this way means that the if-statement in CTXT is always taken.
-
-In CTXT, we’ve removed the restriction in how $c$ is sampled. Since $c$ is the final return value of CTXT, this gets us closer to our goal of this return value being uniformly random.
-
-In decrypt, we have removed the restriction in how $m\|r$ is sampled. As described above, this is
-because $T_{inv}$:values contains previous arguments of CTXT, and we don’t want these arguments to affect the result of decrypt in any way.
 
 $$
 \def\arraystretch{1.5}
@@ -494,9 +485,9 @@ S:=\emptyset; \quad \mathcal{R}:=\emptyset\\
 \text{$T,T_{inv}$ := empty assoc. arrays}\\\\
 \underline{\text{CTXT}(m):}\\
 \quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\backslash \mathcal{R}\\
-\quad c\leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\\
-\quad T[m\|r]:=c;T_{inv}[c]:=m\|r\\
-\quad  \mathcal{R}:=\mathcal{R}\cup\{r\}\\
+\quad \colorbox{Yellow}{$c\leftarrow$\{\textcolor{brown}{0}, \textcolor{brown}{1}\}$^{blen}$} \\
+\quad \colorbox{Yellow} {$T[m\|r]:=c;T_{inv}[c]:=m\|r$}\\
+\quad  \colorbox{Yellow} {$\mathcal{R}:=\mathcal{R}\cup\{r\}$}\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
 \underline{\text{DECRYPT}}(c\in \Sigma.C):\\
@@ -510,7 +501,7 @@ S:=\emptyset; \quad \mathcal{R}:=\emptyset\\
 \quad
 \begin{array}{l}
 \text{In the previous hybrid, the if-statement in CTXT is}\\
-\text{always taken. This is because if $T[m\|r]$ is already}\\
+\text{$always\ taken$. This is because if $T[m\|r]$ is already}\\
 \text{defined, then $r$ would already be in $\mathcal{R}$, but we are}\\
 \text{sampling $r$ to avoid everything in $\mathcal{R}$. We can therefore}\\
 \text{simply execute the body of the if-statement without}\\
@@ -540,12 +531,12 @@ S:=\emptyset; \quad \mathcal{R}:=\emptyset\\
 \end{array}
 \quad
 \begin{array}{l}
-\text{In the previous hybrid, no line of code ever reads}\\
-\text{from $T$ ; they only write to $T$ . It has no effect to remove}\\
+\text{In the previous hybrid, no line of code ever $reads$}\\
+\text{from $T$ ; they only $write$ to $T$ . It has no effect to remove}\\
 \text{a line that assigns to $T$ , so we do so in CTXT.}\\\\
-\text{CTXT also writes to $T[m\|r]$, but for a value $c\in S$.}\\
-\text{The only line that reads from $T_{inv}$ is in decrypt,}\\
-\text{but the first line of decrypt prevents it from being}\\
+\text{CTXT also writes to $T_{inv}$[$c$], but for a value $c\in S$.}\\
+\text{The only line that reads from $T_{inv}$ is in DECRYPT,}\\
+\text{but the first line of DECRYPT prevents it from being}\\
 \text{reached for such a $c\in S$. It therefore has no effect}\\
 \text{to remove this assignment to $T_{inv}$.}
 \end{array}
