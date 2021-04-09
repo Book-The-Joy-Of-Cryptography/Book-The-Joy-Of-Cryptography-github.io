@@ -584,7 +584,7 @@ S:=\emptyset\\
 \underline{\text{DECRYPT}}(c\in \Sigma.C):\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{if $T_{inv} [c] $ undefined:}\\
-\qquad m\|r \leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash \colorbox{yellow}{T}_{inv.}\text{values}\\
+\qquad m\|r \leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash \colorbox{yellow}{T$_{inv}$.values}\\
 \qquad T_{inv}[c]:=m\|r;T[m\|r]:=c\\
 \quad \text{return first $n$ bits of}\ T_{inv}[c]\\\hline
 \end{array}
@@ -593,13 +593,13 @@ S:=\emptyset\\
 \text{We have applied Lemma 4.12 to the sampling step}\\
 \text{in DECRYPT. The standard intermediate steps have}\\
 \text{been skipped. Now the second if-statement in}\\
-\text{decrypt exactly matches $\mathcal{L}_{\text{sprp-rand}}$.}
+\text{DECRYPT exactly matches $\mathcal{L}_{\text{sprp-rand}}$.}
 \end{array}
 $$
 
 $$
 \def\arraystretch{1.5}
-\mathcal{L}_{\text{cca}\varPhi-\text{rand}}^\Sigma:\ 
+\mathcal{L}_{\text{cca}\Phi-\text{rand}}^\Sigma:\ 
 \begin{array}{|l|}\hline
 \qquad \qquad\ \mathcal{L}_{\text{cca}\varPhi-\text{rand}}^\Sigma\\\hline
 k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\
@@ -610,17 +610,17 @@ S:=\emptyset\\\\
 \quad\text{return}\ c\\\\
 \underline{\text{DECRYPT}}(c\in \Sigma.C):\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
-\quad \text{return first $n$ bits of}\ \colorbox{yellow}{F}^{-1}(k,c)\\\hline
+\quad \text{return first $n$ bits of}\ \colorbox{yellow}{F$^{-1}(k,c)$}\\\hline
 \end{array}
 \quad
 \begin{array}{l}
 \text{We have applied the strong PRP security of $F$ to}\\
 \text{replace $\mathcal{L}_{\text{sprp-rand}}$ with $\mathcal{L}_{\text{sprp-real}}$. The standard intermediate}\\
-\text{steps have been skipped. The result is $\mathcal{L}_{\text{cca}\varPhi-\text{rand}}$.}\\
+\text{steps have been skipped. The result is $\mathcal{L}_{\text{cca}\Phi-\text{rand}}$.}\\
 \end{array}
 $$
 
-We showed that $\mathcal{L}_{\text {ccas-real }}^{\Sigma} \approx \mathcal{L}_{\text {ccas-rand }}^{\Sigma}$, so the scheme has CCA\$ security.
+We showed that $\mathcal{L}_{\text {cca}\Phi-\text{real}}^{\Sigma} \approx \mathcal{L}_{\text {cca}\Phi-\text{rand}}^{\Sigma}$, so the scheme has CCA$\Phi$ security. $\quad \blacksquare$
 
 ### Exercises
 9.1. There is nothing particularly bad about padding schemes. They are only a target because padding is a commonly used structure in plaintexts that is verified at the time of decryption.
