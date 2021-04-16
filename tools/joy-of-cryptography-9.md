@@ -584,7 +584,7 @@ S:=\emptyset\\
 \underline{\text{DECRYPT}}(c\in \Sigma.C):\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{if $T_{inv} [c] $ undefined:}\\
-\qquad m\|r \leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash \colorbox{yellow}{T$_{inv}$.values}\\
+\qquad m\|r \leftarrow  \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash \colorbox{yellow}{\textit{T}$_{inv}$.values}\\
 \qquad T_{inv}[c]:=m\|r;T[m\|r]:=c\\
 \quad \text{return first $n$ bits of}\ T_{inv}[c]\\\hline
 \end{array}
@@ -610,7 +610,7 @@ S:=\emptyset\\\\
 \quad\text{return}\ c\\\\
 \underline{\text{DECRYPT}}(c\in \Sigma.C):\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
-\quad \text{return first $n$ bits of}\ \colorbox{yellow}{F$^{-1}(k,c)$}\\\hline
+\quad \text{return first $n$ bits of}\ \colorbox{yellow}{\textit{F}$^{-1}(k,c)$}\\\hline
 \end{array}
 \quad
 \begin{array}{l}
@@ -625,7 +625,7 @@ We showed that $\mathcal{L}_{\text {cca}\Phi-\text{real}}^{\Sigma} \approx \math
 ### Exercises
 9.1. There is nothing particularly bad about padding schemes. They are only a target because padding is a commonly used structure in plaintexts that is verified at the time of decryption.
 
-A null character is simply the byte $\colorbox{silver}{00}$. We say that a string is properly null terminated if its last character is null, but no other characters are null. Suppose you have access to the following oracle:
+A **null character** is simply the byte $\colorbox{silver}{00}$. We say that a string is **properly null terminated** if its last character is null, but no other characters are null. Suppose you have access to the following oracle:
 
 $$
 \def\arraystretch{1.5}
@@ -638,12 +638,11 @@ $$
 \end{array}
 $$
 
-Suppose you are given a CTR-mode encryption of an unknown (but properly null terminated) plaintext $m^*$ under unknown key $k$. Suppose that plaintexts of arbitrary length are supported by truncating the CTR-stream to the appropriate length before xoring with the plaintext.
+Suppose you are given a CTR-mode encryption of an unknown (but properly null terminated) plaintext $m^*$ under unknown key $k$. Suppose that plaintexts of arbitrary length are supported by truncating the CTR-stream to the appropriate length before XORing with the plaintext.
 
 Show how to completely recover $m^*$ in the presence of this null-termination oracle.
 
-9.2. Show how to completely recover the plaintext of an arbitrary CBC-mode ciphertext in the
-presence of the following oracle:
+9.2. Show how to completely recover the plaintext of an arbitrary CBC-mode ciphertext in the presence of the following oracle:
 
 $$
 \def\arraystretch{1.5}
@@ -658,11 +657,10 @@ $$
 
 Assume that the victim ciphertext encodes a plaintext that does not use any padding (its plaintext is an exact multiple of the block length).
 
-9.3. Show how to perform a padding oracle attack, to decrypt arbitrary messages that use
-PKCS#7 padding (where all padded strings end with $\colorbox{silver}{|01|,|02|02|, |03|03|03|}$ , etc.).
+9.3. Show how to perform a padding oracle attack, to decrypt arbitrary messages that use PKCS#7 padding (where all padded strings end with $\colorbox{silver}{|01|,|02|02|, |03|03|03|}$ , etc.).
 
 9.4. Sometimes encryption is as good as decryption, to an adversary.
-(a) Suppose you have access to the following encryption oracle, where s is a secret that is consistent across all calls:
+- (a) Suppose you have access to the following **encryption** oracle, where $s$ is a secret that is consistent across all calls:
 
 $$
 \def\arraystretch{1.5}
@@ -674,11 +672,10 @@ $$
 \end{array}
 $$
 
-Yes, this question is referring to the awful **ECB** encryption mode (Construction 8.1). Describe an attack that efficiently recovers all of s using access to ecboracle. Assume that if the length of $m\|s$ is not a multiple of the blocklength, then ECB mode will pad it with null bytes.
+Yes, this question is referring to the awful **ECB** encryption mode (Construction 8.1). Describe an attack that efficiently recovers all of s using access to ECBORACLE. Assume that if the length of $m\|s$ is not a multiple of the blocklength, then ECB mode will pad it with null bytes.
 >Hint: By varying the length ofm, you can control where the block-division boundaries are in $s$.
 
-(b) Now suppose you have access to a CBC encryption oracle, where you can control the
-IV that is used:
+- (b) Now suppose you have access to a CBC encryption oracle, where you can control the IV that is used:
 
 $$
 \def\arraystretch{1.5}
@@ -694,7 +691,7 @@ Describe an attack that efficiently recovers all of $s$ using access to CBCORACL
 
 $\star$ 9.5. Show how a padding oracle (for CBC-mode encryption with X.923 padding) can be used to **generate a valid encryption** of any chosen plaintext, under the same (secret) key that the padding oracle uses. In this problem, you are not given access to an encryption subroutine, or any valid ciphertexts - only the padding oracle subroutine.
 
-9.6. Prove formally that CCA$\varPhi$ security implies CCA security.
+9.6. Prove formally that CCA$\Phi$ security implies CCA security.
 
 9.7. Let $\Sigma$ be an encryption scheme with message space $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$ and define $\Sigma^{2}$ to be the following encryption scheme with message space $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2 n}$
 
@@ -710,8 +707,8 @@ $$
 \end{array}
 $$
 
-(a) Prove that if $\Sigma$ has CPA security, then so does $\Sigma^{2}$.
-(b) Show that even if $\Sigma$ has CCA security, $\Sigma^{2}$ does not. Describe a successful distinguisher and compute its distinguishing advantage.
+- (a) Prove that if $\Sigma$ has CPA security, then so does $\Sigma^{2}$.
+- (b) Show that even if $\Sigma$ has CCA security, $\Sigma^{2}$ does not. Describe a successful distinguisher and compute its distinguishing advantage.
 
 9.8. Show that the following block cipher modes do not have CCA security. For each one, describe a successful distinguisher and compute its distinguishing advantage.
 (a) OFB mode
@@ -720,7 +717,7 @@ $$
 
 9.9. Show that none of the schemes in Exercise 7.7 have CCA security. For each one, describe a successful distinguisher and compute its distinguishing advantage.
 
-9.10. Let F be a secure block cipher with blocklength  $\lambda$. Below is an encryption scheme for plaintexts $\mathcal{M} =\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$. Formally describe its decryption algorithm and show that it does not have CCA security.
+9.10. Let $F$ be a secure block cipher with blocklength  $\lambda$. Below is an encryption scheme for plaintexts $\mathcal{M} =\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$. Formally describe its decryption algorithm and show that it does **not** have CCA security.
 
 $$
 \def\arraystretch{1.5}
@@ -733,7 +730,7 @@ $$
 \end{array}
 $$
 
-9.11. Let $F$ be a secure block cipher with blocklength  $\lambda$. Below is an encryption scheme for plaintexts $\mathcal{M} =\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$. Formally describe its decryption algorithm and show that it does not have CCA security.
+9.11. Let $F$ be a secure block cipher with blocklength  $\lambda$. Below is an encryption scheme for plaintexts $\mathcal{M} =\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$. Formally describe its decryption algorithm and show that it does **not** have CCA security.
 
 $$
 \def\arraystretch{1.5}
@@ -757,7 +754,7 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|ll|}\hline
 \underline{\Sigma'.\text{KeyGen}:} &  \underline{\Sigma'.\text{Dec}(k,c):} \\
-\quad k\leftarrow \text{CBC.KeyGen} & \quad m_1\|m_2:=\text{CBC.Dec(k,c)}\\
+\quad k\leftarrow \text{CBC.KeyGen} & \quad m_1\|m_2:=\text{CBC.Dec}(k,c)\\
 \quad \text{return}\ k &\quad \text{if}\ m_1=\textcolor{brown}{0}^{blen};\\
 & \qquad \text{return}\ m_2\\
 \underline{\Sigma'.\text{Enc}(k,m):} & \text{else return}\ \textcolor{brown}{\texttt{err}}\\
@@ -765,13 +762,12 @@ $$
 \end{array}
 $$
 
-Show that $\Sigma'$ does not have CCA security. Describe a distinguisher and compute its distinguishing advantage. What part of Alice’s reasoning was not quite right?
-> Hint: Obtain a ciphertext $c=c_0\|c_1\|c_2$ and another ciphertext $c=c'_0\|c'_1\|c'_2$, both with known plaintexts. Ask the library to decrypt $c_0\|c_1\|c'_2$
+Show that $\Sigma'$ does **not** have CCA security. Describe a distinguisher and compute its distinguishing advantage. What part of Alice’s reasoning was not quite right?
+> Hint: Obtain a ciphertext $c=c_0\|c_1\|c_2$ and another ciphertext $c'=c'_0\|c'_1\|c'_2$, both with known plaintexts. Ask the library to decrypt $c_0\|c_1\|c'_2$
 
 9.13. CBC and OFB modes are malleable in very different ways. For that reason, Mallory claims that encrypting a plaintext (independently) with both modes results in CCA security, when the Dec algorithm rejects ciphertexts whose OFB and CBC plaintexts don’t match. The reasoning is that it will be hard to tamper with both ciphertexts in a way that achieves the same effect on the plaintext.
 
-Let CBC denote the encryption scheme obtained by using a secure PRF in CBC mode. Let
-OFB denote the encryption scheme obtained by using a secure PRF in OFB mode. Below
+Let CBC denote the encryption scheme obtained by using a secure PRF in CBC mode. Let OFB denote the encryption scheme obtained by using a secure PRF in OFB mode. Below
 we define an encryption scheme $\Sigma'$:
 
 $$
@@ -806,9 +802,9 @@ $$
 \end{array}
 $$
 
-Show that $\Sigma^{\prime}$ does not have CCA security, even if both $\Sigma_{1}$ and $\Sigma_{2}$ have $\mathrm{CCA}$ (yes, CCA) security. Describe a distinguisher and compute its distinguishing advantage.
+Show that $\Sigma^{\prime}$ does **not** have CCA security, even if both $\Sigma_{1}$ and $\Sigma_{2}$ have $\mathrm{CCA}$ (yes, CCA) security. Describe a distinguisher and compute its distinguishing advantage.
 
-9.15. Consider any padding scheme consisting of subroutines PAD (which adds valid padding to its argument) and valitpead (which checks its argument for valid padding and returns true/false). Assume that VALIDPAD(PAD($x$))=true for all strings $x$.
+9.15. Consider any padding scheme consisting of subroutines PAD (which adds valid padding to its argument) and VALIDPAD (which checks its argument for valid padding and returns true/false). Assume that VALIDPAD(PAD($x$)) = true for all strings $x$.
 
 Show that if an encryption scheme $\Sigma$ has CCA security, then the following two libraries are indistinguishable:
 
@@ -829,7 +825,7 @@ k\leftarrow \Sigma.\text{KeyGen}\\
 k\leftarrow \Sigma.\text{KeyGen}\\
 \underline{\text{EAVESDROP}(m_L,m_R\in\Sigma.\mathcal{M})}:\\
 \quad \text{if $|m_L|\neq |m_R|$ return \textcolor{brown}{\texttt{err}}}\\
-\quad \text{return $\Sigma$.Enc}(k,\text{PAD}(m_L))\\\\
+\quad \text{return $\Sigma$.Enc}(k,\text{PAD}(m_R))\\\\
 \underline{\text{PADDINGORACLE}(c\in\Sigma.C)}:\\
 \text{return VALIDPAD}(\Sigma.\text{Dec}(k,c))\\\hline
 \end{array}
@@ -839,7 +835,7 @@ That is, a CCA-secure encryption scheme hides underlying plaintexts in the prese
 
 Note: The distinguisher can even send a ciphertext $c$ obtained from EAVESDROP as an argument to PADDINGORACLE. Your proof should somehow account for this when reducing to the CCA security of $\Sigma$.
 
-9.16. Show that an encryption scheme $\Sigma$ has CCA$\varPhi$ security if and only if the following two libraries are indistinguishable:
+9.16. Show that an encryption scheme $\Sigma$ has CCA$\Phi$ security if and only if the following two libraries are indistinguishable:
 
 $$
 \def\arraystretch{1.5}
@@ -854,6 +850,7 @@ k\leftarrow \Sigma.\text{KeyGen}\\
 \quad
 \begin{array}{|l|}\hline
 \qquad \qquad \quad\mathcal{L}_{\text{right}}^{\Sigma}\\\hline
+k\leftarrow \Sigma.\text{KeyGen}\\
 D:=\text{empty assoc. array}\\\\
 \underline{\text{EAVESDROP}(m\in\Sigma.\mathcal{M})}:\\
 \quad c\leftarrow\Sigma.C(|m|)\\
@@ -865,4 +862,4 @@ D:=\text{empty assoc. array}\\\\
 \end{array}
 $$
 
-Note: In $\mathcal{L}_{\text {left }}$, the adversary can obtain the decryption of any ciphertext via DECRYPT. In $\mathcal{L}_{\text {right }}$, the DECRYPT subroutine is "patched" (via $D$ ) to give reasonable answers to ciphertexts generated in EAVESDROP.
+*Note*: In $\mathcal{L}_{\text {left }}$, the adversary can obtain the decryption of any ciphertext via DECRYPT. In $\mathcal{L}_{\text {right }}$, the DECRYPT subroutine is "patched" (via $D$ ) to give reasonable answers to ciphertexts generated in EAVESDROP.
