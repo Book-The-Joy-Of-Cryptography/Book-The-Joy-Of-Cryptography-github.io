@@ -265,17 +265,22 @@ k \leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda} \\
 \underline{\text{CHECKTAG}(m,t):} \\
 \quad \text{return } t \overset{?}{=} F(k,m) \\ \hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{The starting point is the}\\
+\text{$\mathcal{L}_{\text{mac-real}}$ library, with the}\\
+\text{details of this MAC scheme}\\
+\text{filled in}
+\end{array}
 $$
-
-The starting point is the $\mathcal{L}_{\text{mac-real}}$ library, with the details of this MAC scheme filled in.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 \underline{\text{GETTAG}(m):} \\
-\quad \text{return LOOKUP} (m) \\ 
+\quad \text{return} \colorbox{Yellow}{LOOKUP($m$)} \\ 
 \underline{\text{CHECKTAG}(m,t):} \\
-\quad \text{return } t \overset{?}{=} \text{LOOKUP}(m) \\ \hline
+\quad \text{return } t \overset{?}{=} \colorbox{Yellow}{LOOKUP($m$)} \\ \hline
 \end{array}
 \diamond
 \begin{array}{|l|} \hline
@@ -284,9 +289,14 @@ k \leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda} \\
 \underline{\text{LOOKUP}(x):} \\
 \quad \text{return } F(k,x) \\ \hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{We have factored out the PRF}\\
+\text{operations in terms of the library} \\
+\text{$\mathcal{L}_{\text{prf-real}}$ from the PRF}\\
+\text{security definition.}\\
+\end{array}
 $$
-
-We have factored out the PRF operations in terms of the library $\mathcal{L}_{\text{prf-real}}$ from the PRF security definition.
 
 $$
 \def\arraystretch{1.5}
@@ -305,34 +315,44 @@ T := \text{empty assoc. array} \\
 \qquad T[x]\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{out} \\
 \quad \text{return } T(x) \\ \hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{We have applied the PRF-}\\
+\text{security of $F$ and replaced} \\
+\text{$\mathcal{L}_{\text{prf-real}}$ with $\mathcal{L}_{\text{prf-rand}}$.}\\
+\end{array}
 $$
-
-We have applied the PRF security of $F$ and replaced $\mathcal{L}_{\text{prf-real}}$ with $\mathcal{L}_{\text{prf-rand}}$.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 \underline{\text{GETTAG}(m):} \\
-\quad \text{return REVEAL} (m) \\ 
+\quad \text{return }\colorbox{Yellow}{REVEAL($m$) } \\ 
 \underline{\text{CHECKTAG}(m,t):} \\
-\quad \text{return }  \text{GUESS}(m,t) \\ \hline
+\quad \text{return }  \colorbox{Yellow}{GUESS($m,t$)} \\ \hline
 \end{array}
 \diamond
 \begin{array}{|l|} \hline
-\quad\qquad\mathcal{L}^{F}_{\text{guess-L}} \\ \hline
+\quad\qquad\mathcal{L}_{\text{guess-L}} \\ \hline
 T := \text{empty assoc. array} \\
 \underline{\text{GUESS}(m,g):} \\
 \quad \text{if } T[m] \text{ undefined:} \\
 \qquad T[m]\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^\lambda \\
 \quad \text{return } g\stackrel{?}{=}T[m]\\ 
 \underline{\text{REVEAL}(m):}\\
-\quad \text{if}\ T[m]\ undefined:\\
+\quad \text{if}\ T[m]\ \text{undefined:}\\
 \qquad T[m]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \quad \text{return}\ T[m]\\\hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{We can express the previous}\\
+\text{hybrid in terms of the $\mathcal{L}_{\text{guess-L}}$} \\
+\text{library from Claim 10.3. The}\\
+\text{change has no effect on the}\\
+\text{calling program.} \\
+\end{array}
 $$
-
-We can express the previous hybrid in terms of the $\mathcal{L}^{F}_{\text{guess-L}}$ library from Claim 10.3. The change has no effect on the calling program.
 
 $$
 \def\arraystretch{1.5}
@@ -344,26 +364,33 @@ $$
 \end{array}
 \diamond
 \begin{array}{|l|} \hline
-\quad\qquad\mathcal{L}^{F}_{\text{guess-R}} \\ \hline
+\quad\qquad\mathcal{L}_{\text{guess-R}} \\ \hline
 T := \text{empty assoc. array} \\
 \underline{\text{GUESS}(m,g):} \\
 \quad \text{return } g\stackrel{?}{=}T[m]\\ 
 \underline{\text{REVEAL}(m):}\\
-\quad \text{if}\ T[m]\ undefined:\\
+\quad \text{if}\ T[m]\ \text{undefined:}\\
 \qquad T[m]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \quad \text{return}\ T[m]\\\hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{We have applied Claim 10.3 to}\\
+\text{ replace $\mathcal{L}^{F}_{\text{guess-L}}$ with $\mathcal{L}^{F}_{\text{guess-R}}$.} \\
+\text{This involves simply removing}\\
+\text{the if-statement from GUESS. }\\
+\text{As a result, GUESS$(m,g)$ will return} \\
+\text{$\mathtt{false}$ if $T[m]$ is undefined.} \\
+\end{array}
 $$
-
-We have applied Claim 10.3 to replace $\mathcal{L}^{F}_{\text{guess-L}}$ with $\mathcal{L}^{F}_{\text{guess-R}}$. This involves simply removing the if-statement from guess. As a result, GUESS $(m,g)$ will return false if $T[m]$ is undefined.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-\mathcal{T}:=\emptyset\\
+\colorbox{Yellow}{$\mathcal{T}:=\emptyset$} \\
 \underline{\text{GETTAG}(m):} \\
-\quad t:=\text{REVEAL} (m) \\ 
-\quad \mathcal{T}:=\mathcal{T}\cup \{(m,t)\}\\
+\quad \colorbox{Yellow}{t:=\text{REVEAL} ($m$)} \\ 
+\quad \colorbox{Yellow}{$\mathcal{T}:=\mathcal{T}\cup \{(m,t)\}$}\\
 \quad \text{return}\ t\\
 \underline{\text{CHECKTAG}(m,t):} \\
 \quad \text{return }  \text{GUESS}(m,t) \\ \hline
@@ -375,20 +402,26 @@ T := \text{empty assoc. array} \\
 \underline{\text{GUESS}(m,g):} \\
 \quad \text{return } g\stackrel{?}{=}T[m]\\ 
 \underline{\text{REVEAL}(m):}\\
-\quad \text{if}\ T[m]\ undefined:\\
+\quad \text{if}\ T[m]\ \text{undefined:}\\
 \qquad T[m]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \quad \text{return}\ T[m]\\\hline
 \end{array}
+\begin{array}{l}
+\text{Extra bookkeeping information}\\
+\text{is added, but not used} \\
+\text{anywhere. There is no effect}\\
+\text{on the calling program.}\\
+\end{array}
 $$
 
-Extra bookkeeping information is added, but not used anywhere. There is no effect on the calling program.
+   
 
 Consider the hybrid experiment above, and suppose the calling program makes a call to CHECKTAG $(m, t)$. There are two cases:
-- Case 1 : there was a previous call to GETTAG $(m)$. In this case, the value $T[m]$ is defined in $\mathcal{L}_{\text {guess-R }}$ and $(m, T[m])$ already exists in $\mathcal{T}$. In this case, the result of $\operatorname{GUESS}(m, t)$ (and hence, of $\operatorname{cHECKTAG}(m, t))$ will be $t \stackrel{?}{=} T[m]$.
+- Case 1 : there was a previous call to GETTAG $(m)$. In this case, the value $T[m]$ is defined in $\mathcal{L}_{\text {guess-R }}$ and $(m, T[m])$ already exists in $\mathcal{T}$. In this case, the result of $\operatorname{GUESS}(m, t)$ (and hence, of $\operatorname{CHECKTAG}(m, t))$ will be $t \stackrel{?}{=} T[m]$.
 
-- Case 2: there was no previous call to GETTAG $(m)$. Then there is no value of the form $(m,\star)$ in $\mathcal{T}$.  Furthermore, $T[m]$ is undefined in $\mathcal{L}^{F}_{\text{guess-R}}$. The call to guess $(m,t)$ will return false, and so will the call to CHECKTAG $(m,t)$ that we consider.
-- 
-In both cases, the result of CHECKTAG $(m,t)$ is true if and only if $(m,t)\in\mathcal{T}$.
+- Case 2: there was no previous call to GETTAG $(m)$. Then there is no value of the form $(m,\star)$ in $\mathcal{T}$.  Furthermore, $T[m]$ is undefined in $\mathcal{L}_{\text{guess-R}}$. The call to GUESS $(m,t)$ will return $\mathtt{false}$, and so will the call to CHECKTAG $(m,t)$ that we consider.
+
+In both cases, the result of CHECKTAG $(m,t)$ is true **if and only if** $(m,t)\in\mathcal{T}$.
 
 $$
 \def\arraystretch{1.5}
@@ -399,29 +432,31 @@ $$
 \quad \mathcal{T}:=\mathcal{T}\cup \{(m,t)\}\\
 \quad \text{return}\ t\\
 \underline{\text{CHECKTAG}(m,t):} \\
-\quad \text{return }  (m,t)\stackrel{?}{\in}\mathcal{T} \\ \hline
+\quad \text{return }  \colorbox{Yellow}{$(m,t)\stackrel{?}{\in}\mathcal{T}$} \\ \hline
 \end{array}
 \diamond
 \begin{array}{|l|} \hline
-\quad\qquad\mathcal{L}^{F}_{\text{guess-R}} \\ \hline
+\quad\qquad\mathcal{L}_{\text{guess-R}} \\ \hline
 T := \text{empty assoc. array} \\
 \underline{\text{GUESS}(m,g):} \\
 \quad \text{return } g\stackrel{?}{=}T[m]\\ 
 \underline{\text{REVEAL}(m):}\\
-\quad \text{if}\ T[m]\ undefined:\\
+\quad \text{if}\ T[m]\ \text{undefined:}\\
 \qquad T[m]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \quad \text{return}\ T[m]\\\hline
 \end{array}
+\begin{array}{l}
+\text{We have modified CHECKTAG}\\
+\text{according to the discussion above.} \\
+\end{array}
 $$
-
-We have modified checktag according to the discussion above.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 \mathcal{T}:=\emptyset\\
 \underline{\text{GETTAG}(m):} \\
-\quad t:=\text{LOOKUP} (m) \\ 
+\quad t:= \colorbox{Yellow}{$\text{LOOKUP} ($m$)$} \\ 
 \quad \mathcal{T}:=\mathcal{T}\cup \{(m,t)\}\\
 \quad \text{return}\ t\\
 \underline{\text{CHECKTAG}(m,t):} \\
@@ -432,13 +467,19 @@ $$
 \quad\qquad\mathcal{L}^{F}_{\text{prf-rand}} \\ \hline
 T := \text{empty assoc. array} \\
 \underline{\text{LOOKUP}(x):} \\
-\quad \text{if}\ T[m]\ undefined:\\
-\qquad T[m]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
+\quad \text{if}\ T[x]\ \text{undefined:}\\
+\qquad T[x]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
 \quad \text{return}\ T[x]\\\hline
 \end{array}
+\begin{array}{l}
+\text{In the previous hybrid, the GUESS}\\
+\text{subroutine is never called. Removing} \\
+\text{that unused subroutine and renaming} \\
+\text{REVEAL to LOOKUP results in} \\
+\text{the $\mathcal{L}_{\text{prf-ideal}}$ library from the PRF} \\
+\text{security definition.} \\
+\end{array}
 $$
-
-In the previous hybrid, the guess subroutine is never called. Removing that unused subroutine and renaming reveal to lookup results in the $\mathcal{L}^{F}_{\text{prf-ideal}}$ library from the PRF security definition.
 
 $$
 \def\arraystretch{1.5}
@@ -458,18 +499,23 @@ k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 \underline{\text{LOOKUP}(x):} \\
 \quad \text{return}\ F(k,x)\\\hline
 \end{array}
+\begin{array}{l}
+\text{We have applied the PRF security}\\
+\text{of $F$ again, replacing $\mathcal{L}_{\text{prf-ideal}}$ with} \\
+\text{$\mathcal{L}_{\text{prf-real}}$.}\\
+\end{array}
 $$
 
-We have applied the PRF security of $F$ again, replacing $\mathcal{L}^{F}_{\text{prf-ideal}}$ with  $\mathcal{L}^{F}_{\text{prf-real}}$.
+   
 
 Inlining $\mathcal{L}_{\text {prf-real }}$ in the final hybrid, we see that the result is exactly $\mathcal{L}_{\text {mac-fake }}^{F} .$ Hence, we have shown that $\mathcal{L}_{\text {mac-real }}^{F} \approx \mathcal{L}_{\text {mac-fake }}^{F}$, which completes the proof.
 
 ### Discussion
 **If PRFs are MACs, why do we even need a definition for MACs?** The simplest answer to this question is that the concepts of PRF and MAC are indeed different:
-- Not every PRF is a MAC. Only sufficiently long random values are hard to guess, so only PRFs with long outputs (out $\geqslant \lambda)$ are MACs. It is perfectly reasonable to consider a PRF with short outputs.
-- Not every MAC is a PRF. Just like not every encryption scheme has pseudorandom ciphertexts, not every MAC scheme has pseudorandom tags. Imagine taking a secure MAC scheme and modifying it as $\operatorname{MAC}^{\prime}(k, m)=\operatorname{MAC}(k, m) \| \theta^{\lambda}$. Adding Os to every tag prevents the tags from looking pseudorandom, but does not make the tags any easier to guess. Something doesn't have to be uniformly random in order to be hard to guess.
+- Not every PRF is a MAC. **Only sufficiently long random values are hard to guess**, so only PRFs with long outputs (out $\geqslant \lambda)$ are MACs. It is perfectly reasonable to consider a PRF with short outputs.
+- Not every MAC is a PRF. Just like not every encryption scheme has pseudorandom ciphertexts, not every MAC scheme has pseudorandom tags. Imagine taking a secure MAC scheme and modifying it as $\operatorname{MAC}^{\prime}(k, m)=\operatorname{MAC}(k, m) \|  \textcolor{Red}0^{\lambda}$. Adding $\textcolor{Red}{0}$s to every tag prevents the tags from looking pseudorandom, but does not make the tags any easier to guess. **Something doesn't have to be uniformly random in order to be hard to guess.**
 
-It is true that in the vast majority of cases we will encounter MAC schemes with random tags, and PRFs with long outputs (out $\geqslant \lambda)$. But it is good practice to know whether you really need something that is pseudorandom or hard to guess.
+It is true that in the vast majority of cases we will encounter MAC schemes with random tags, and PRFs with long outputs (out $\geqslant \lambda)$. But it is good practice to know whether you really need something that is *pseudorandom or hard to guess*.
 
 ## 10.3 MACs for Long Messages
 Using a PRF as a MAC is useful only for short, fixed-length messages, since most PRFs that exist in practice are limited to such inputs. Can we somehow extend a PRF to construct a MAC scheme for long messages, similar to how we used block cipher modes to construct encryption for long messages?
