@@ -520,9 +520,9 @@ It is true that in the vast majority of cases we will encounter MAC schemes with
 ## 10.3 MACs for Long Messages
 Using a PRF as a MAC is useful only for short, fixed-length messages, since most PRFs that exist in practice are limited to such inputs. Can we somehow extend a PRF to construct a MAC scheme for long messages, similar to how we used block cipher modes to construct encryption for long messages?
 ### How NOT to do it
-To understand the challenges of constructing a MAC for long messages, we first explore some approaches that don't work. The things that can go wrong in an insecure MAC are quite different in character to the things that can go wrong in a block cipher mode, so pay attention closely!
+To understand the challenges of constructing a MAC for long messages, we first explore some approaches that *don't* work. The things that can go wrong in an insecure MAC are quite different in character to the things that can go wrong in a block cipher mode, so pay attention closely!
 
-Let $F$ be a PRF with *in* = *out* = $\lambda$. Below is a MAC approach for messages of length $2\lambda$. It is inspired by ECB mode, so you know it’s going to be a disaster:
+*Let $F$ be a PRF with *in* = *out* = $\lambda$. Below is a MAC approach for messages of length $2\lambda$. It is inspired by ECB mode, so you know it’s going to be a disaster:*
 
 $$
 \def\arraystretch{1.5}
@@ -534,23 +534,23 @@ $$
 \end{array}
 $$
 
-One problem with this approach is that, although the PRF authenticates each block $m_1,m_2$ individually, it does nothing to authenticate that $m_1$ is the first block but $m_2$ is the second one. Translating this observation into an attack, an adversary can ask for the MAC tag of $m_1\|m_2$ and then predict/forge the tag for $m_1\|m_2:
+*One problem with this approach is that, although the PRF authenticates each block $m_1,m_2$ individually, it does nothing to authenticate that $m_1$ is the first block but $m_2$ is the second one. Translating this observation into an attack, an adversary can ask for the MAC tag of $m_1\|m_2$ and then predict/forge the tag for $m_2\|m_1$:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 \qquad \qquad \qquad \quad\mathcal{A}:\\\hline
 t_1\|t_2:=\text{GETTAG}(\textcolor{brown}{0}^\lambda\|\textcolor{brown}{1}^\lambda)\\
-\text{return CHECKTAG}(\textcolor{brown}{0}^\lambda\|\textcolor{brown}{1}^\lambda,t_2\|t_1)\\\hline
+\text{return CHECKTAG}(\textcolor{brown}{1}^\lambda\|\textcolor{brown}{0}^\lambda,t_2\|t_1)\\\hline
 \end{array}
 $$
 
-When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{mac-real}}$, it always return true, since we can tell that $t_2\|t_1$ is indeed the valid tag for $\textcolor{brown}{1}^\lambda\|\textcolor{brown}{0}^\lambda$. When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{mac-fake}}$, it always return false, since the calling program never called GETTAG with input $\textcolor{brown}{1}^\lambda\|\textcolor{brown}{0}^\lambda$. Hence, $\mathcal{A}$ distinguishes the libraries with advantage 1.
+*When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{mac-real}}$, it always return  $\mathit{true}$, since we can tell that $t_2\|t_1$ is indeed the valid tag for $\textcolor{brown}{1}^\lambda\|\textcolor{brown}{0}^\lambda$. When $\mathcal{A}$ is linked to $\mathcal{L}_{\text{mac-fake}}$, it always return  $\mathit{false}$, since the calling program never called GETTAG with input $\textcolor{brown}{1}^\lambda\|\textcolor{brown}{0}^\lambda$. Hence, $\mathcal{A}$ distinguishes the libraries with advantage 1.*
 
 This silly MAC construction treats both $m_1$ and $m_2$ identically, and an obvious way to try to fix the problem is to treat the different blocks differently somehow:
 
 **Example**
-Let $F$ be a PRF with in = $\lambda + 1$ and out = $\lambda$. Below is another MAC approach for messages of length $2\lambda$:
+*Let $F$ be a PRF with in = $\lambda + 1$ and out = $\lambda$. Below is another MAC approach for messages of length 2$\lambda$:*
 
 $$
 \def\arraystretch{1.5}
@@ -562,22 +562,22 @@ $$
 \end{array}
 $$
 
-This MAC construction does better, as it treats the two message blocks $m_1$ and $m_2$ differently. Certainly the previous attack of swapping the order of $m_1$ and $m_2$ doesn’t work anymore. (Can you see why?)
+*This MAC construction does better, as it treats the two message blocks $m_1$ and $m_2$ differently. Certainly the previous attack of swapping the order of $m_1$ and $m_2$ doesn’t work anymore. (Can you see why?)*
 
-The construction authenticates (in some sense) the fact that $m_1$ is the first message block, and $m_2$ is the second block. However, this construction doesn’t authenticate **the fact that this particular $m_1$ and $m_2$ belong together**. More concretely, we can “mix and match” blocks of the tag corresponding to different messages:
+*The construction authenticates (in some sense) the fact that $m_1$ is the first message block, and $m_2$ is the second block. However, this construction doesn’t authenticate **the fact that this particular $m_1$ and $m_2$ belong together**. More concretely, we can “mix and match” blocks of the tag corresponding to different messages:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-\mathcal{A}:\\\hline
+\qquad \qquad \qquad \mathcal{A}:\\\hline
 \quad t_1\|t_2:=\text{GETTAG}(\textcolor{brown}{0}^{2\lambda})\\
 \quad t'_1\|t'_2:=\text{GETTAG}(\textcolor{brown}{1}^{2\lambda})\\
 \quad \text{return CHECKTAG}(\textcolor{brown}{0}^{\lambda}\|\textcolor{brown}{1}^{\lambda},t_1\|t'_2)\\\hline
 \end{array}
 $$
-In this attack, we combine the $t_1$ block from the First tag and the $t_2$ block from the second tag.
+*In this attack, we combine the $t_1$ block from the First tag and the $t_2$ block from the second tag.*
 
-We are starting to see the challenges involved in constructing a MAC scheme for long messages. A secure MAC should authenticate each message block, the order of the message blocks, and the fact that these *particular message* blocks are appearing in a single message. In short, it must authenticate the entirety of the message.
+We are starting to see the challenges involved in constructing a MAC scheme for long messages. A secure MAC should authenticate each message block, the order of the message blocks, and the fact that these *particular message blocks are appearing in a single message*. In short, it must authenticate the *entirety* of the message.
 
 Think about how authentication is significantly different than privacy/hiding in this respect. At least for CPA security, we can hide an entire plaintext by hiding each individual piece of the plaintext separately (encrypting it with a CPA-secure encryption). Authentication is fundamentally different.
 
@@ -585,7 +585,7 @@ Think about how authentication is significantly different than privacy/hiding in
 We have seen some insecure ways to construct a MAC for longer messages. Now let's see a secure way. A common approach to constructing a MAC for long messages involves the CBC block cipher mode.
 
 **Construction 10.5 (CBC-MAC)**
-Let $F$ be a PRF with *in* $=$ *out* $=\lambda .$ CBC-MAC refers to the following MAC scheme:
+*Let $F$ be a PRF with *in* $=$ *out* $=\lambda .$ CBC-MAC refers to the following MAC scheme:*
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
@@ -595,26 +595,27 @@ Unlike CBC encryption, CBC-MAC uses no initialization vector (or, you can think 
 
 **Theorem 10.6**
 
-If $F$ is a secure PRF with in $=$ out $=\lambda,$ then for any fixed $\ell, C B C-M A C$ is a secure MAC when used with message space $\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda \ell}$
+*If $F$ is a secure PRF with in $=$ out $=\lambda,$ then for any fixed $\ell, C B C-M A C$ is a secure MAC when used with message space $\mathcal{M}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda \ell}$*
 
-Pay close attention to the security statement. It says that if you only ever authenticate 4-block messages, CBC-MAC is secure. If you only ever authenticate 24 -block messages, CBC-MAC is secure. However, if you want to authenticate both 4 -block and 24 -block messages (i.e., under the same key), then CBC-MAC is not secure. In particular, seeing the CBC-MAC of several 4-block messages allows an attacker to generate a forgery of a 24-block message. The exercises explore this property.
+Pay close attention to the security statement. It says that if you only ever authenticate 4-block messages, CBC-MAC is secure. If you only ever authenticate 24 -block messages, CBC-MAC is secure. However, if you want to authenticate both 4 -block and 24 -block messages (*i.e.*, under the same key), then CBC-MAC is not secure. In particular, seeing the CBC-MAC of several 4-block messages allows an attacker to generate a forgery of a 24-block message. The exercises explore this property.
 
 ### More Robust CBC-MAC
 If $\mathrm{CBC}-\mathrm{MAC}$ is so fragile, is there a way to extend it to work for messages of mixed lengths? One approach is called $\mathrm{ECBC}-\mathrm{MAC},$ and is shown below. It works by treating the last block differently - specifically, it uses an independent PRF key for the last block in the CBC chain.
 
 **Construction 10.7 (ECBC-MAC)**
-Let $F$ be a PRF with in $=$ out $=\lambda .$ ECBC-MAC refers to the following scheme:
+*Let $F$ be a PRF with in $=$ out $=\lambda .$ ECBC-MAC refers to the following scheme:*
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
 $$
 
 **Theorem 10.8**
-If $F$ is a secure PRF with *in* = *out* = $\lambda$, then ECBC-MAC is a secure MAC for message space $\mathcal{M}=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^*$.
+*If $F$ is a secure PRF with *in* = *out* = $\lambda$, then ECBC-MAC is a secure MAC for message space $\mathcal{M}=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^*$.*
 
 In other words, ECBC-MAC is safe to use with messages of any length (that is a multiple of the block length).
 
-To extend ECBC-MAC to messages of any length (not necessarily a multiple of the block length), one can use a padding scheme as in the case of encryption.
+To extend ECBC-MAC to messages of *any* length (not necessarily a multiple of the block length), one can use a padding scheme as in the case of encryption.[^1]
+[^1]: Note that if the message is already a multiple of the block length, then padding adds an extra block. There exist clever ways to avoid an extra padding block in the case of MACs, which we don’t discuss further.
 
 ## 10.4 Encrypt-Then-MAC
 Our motivation for studying MACs is that they seem useful in constructing a CCA-secure encryption scheme. The idea is to add a MAC to a CPA-secure encryption scheme. The decryption algorithm can raise an error if the MAC is invalid, thereby ensuring that adversarially-generated (or adversarially-modified) ciphertexts are not accepted. There are several natural ways to combine a MAC and encryption scheme, but not all are secure! (See the exercises.) The safest way is known as encrypt-then-MAC:
