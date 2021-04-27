@@ -618,29 +618,29 @@ To extend ECBC-MAC to messages of *any* length (not necessarily a multiple of th
 [^1]: Note that if the message is already a multiple of the block length, then padding adds an extra block. There exist clever ways to avoid an extra padding block in the case of MACs, which we don’t discuss further.
 
 ## 10.4 Encrypt-Then-MAC
-Our motivation for studying MACs is that they seem useful in constructing a CCA-secure encryption scheme. The idea is to add a MAC to a CPA-secure encryption scheme. The decryption algorithm can raise an error if the MAC is invalid, thereby ensuring that adversarially-generated (or adversarially-modified) ciphertexts are not accepted. There are several natural ways to combine a MAC and encryption scheme, but not all are secure! (See the exercises.) The safest way is known as encrypt-then-MAC:
+Our motivation for studying MACs is that they seem useful in constructing a CCA-secure encryption scheme. The idea is to add a MAC to a CPA-secure encryption scheme. The decryption algorithm can raise an error if the MAC is invalid, thereby ensuring that adversarially-generated (or adversarially-modified) ciphertexts are not accepted. There are several natural ways to combine a MAC and encryption scheme, but *not all are secure!* (See the exercises.) The safest way is known as encrypt-then-MAC:
 
 **Construction 10.9 (Enc-then-MAC)**
-Let $E$ denote an encryption scheme, and $M$ denote a MAC scheme where $E . C \subseteq M . \mathcal{M}$ (i.e., the MAC scheme is capable of generating MACs of ciphertexts in the E scheme). Then let EtM denote the **encrypt-then-MAC** construction given below:
+*Let $E$ denote an encryption scheme, and $M$ denote a MAC scheme where $E . C \subseteq M . \mathcal{M}$ (i.e., the MAC scheme is capable of generating MACs of ciphertexts in the E scheme). Then let EtM denote the **encrypt-then-MAC** construction given below:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|ll|}\hline
 &\underline{\text{Enc}((k_e,k_m),m):}\\
-\mathcal{K}=E.\mathcal{K}\times M.\mathcal{K} & \quad c:=\text{E.Enc}(k_e,m)\\
+\mathcal{K}=E.\mathcal{K}\times M.\mathcal{K} & \quad c:=E\text{.Enc}(k_e,m)\\
 \mathcal{M}=E.\mathcal{M} & \quad t:=M.\text{MAC}(k_m,c)\\
 C=E.C\times M.\mathcal{T} & \quad \text{return}\ (c,t)\\
 \underline{\text{KeyGen:}} &\underline{\text{Dec}((k_e,k_m),(c,t)):}\\
-k_e\leftarrow \text{E.KeyGen} & \quad \text{if}\ t\neq M.\text{MAC}(k_m,c):\\
-k_m\leftarrow M.\text{KeyGen} & \qquad \text{return \textcolor{brown}{\texttt{err}}}\\
-\text{return}\ (k_e,k_m) & \quad \text{return}\ E.\text{Dec}(k_e,c)\\\hline
+\quad k_e\leftarrow \text{E.KeyGen} & \quad \text{if}\ t\neq M.\text{MAC}(k_m,c):\\
+\quad k_m\leftarrow M.\text{KeyGen} & \qquad \text{return \textcolor{brown}{\texttt{err}}}\\
+\quad \text{return}\ (k_e,k_m) & \quad \text{return}\ E.\text{Dec}(k_e,c)\\\hline
 \end{array}
 $$
 
 Importantly, the scheme computes a MAC of the CPA ciphertext, and not of the plaintext! The result is a CCA-secure encryption scheme:
 
 **Claim 10.10**
-If E has CPA security and M is a secure MAC, then EtM (Construction 10.9) has CCA security.
+*If E has CPA security and M is a secure MAC, then EtM (Construction 10.9) has CCA security.*
 
 **Proof**
 As usual, we prove the claim with a sequence of hybrid libraries:
@@ -649,27 +649,40 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{cca-L}}^{EtM}\\\hline
-k_e\leftarrow E.\text{KeyGen}\\
-k_m\leftarrow M.\text{KeyGen}\\
+\colorbox{Yellow}{$k_e\leftarrow E.\text{KeyGen}$} \\
+\colorbox{Yellow}{$k_m\leftarrow M.\text{KeyGen}$}\\
 S:=\emptyset\\
 \underline{\text{EAVESDROP}(m_L,m_R):}\\
 \quad \text{if}\ |m_L|\neq |m_R|\\
 \qquad\text{return null}\\
-\quad c:=E.\text{Enc}(k_e,m_L)\\
-\quad t\leftarrow M.\text{MAC}(k_m,c)\\
-\quad S:=S\cup\{(c,t)\}\\
-\quad \text{return}\ (c,t)\\
+\quad \colorbox{Yellow}{$c:=E.\text{Enc}(k_e,m_L)$}\\
+\quad \colorbox{Yellow}{$t\leftarrow M.\text{MAC}(k_m,c)$}\\
+\quad S:=S\cup\{\colorbox{Yellow}{($c,t$)}\}\\
+\quad \text{return}\ \colorbox{Yellow}{($c,t$)}\\
 \underline{\text{Dec}(c,t):}\\
 \quad \text{if}\ (c,t)\in S\ \text{return null}\\
 \quad \text{if}\ t\neq M.\text{MAC}(k_m,c):\\
 \qquad \text{return \textcolor{brown}{err}}\\
-\quad \text{return E.Dec}(k_e,c)\\\hline
+\quad \text{return $E$.Dec}(k_e,c)\\\hline
+\end{array}
+\begin{array}{l}
+\text{The starting point is $\mathcal{L}_{\text{cca-L}}^{EtM}$, shown here with the details of}\\
+\text{the encrypt-then-MAC construction highlighted. Our goal is} \\
+\text{to eventually swap $m_L$ with $m_R$. But the CPA security of $E$}\\
+\text{should allow us to do just that, so what’s the catch?}\\
+\\
+\text{To apply the CPA-security of $E$, we must factor out the relevant} \\
+\text{call to $E.$Enc in terms of the CPA library $\mathcal{L}_{\text{cpa-L}}^{E}$. This}\\
+\text{means that $k_e$ becomes private to the $\mathcal{L}_{\text{cpa-L}}$ library. But $k_e$}\\
+\text{is also used in the last line of the library as $E$.Dec$(k_e,c)$. The}\\
+\text{$CPA$ security library for E provides no way to carry out such}\\
+\text{$E$:Dec statements!}\\
 \end{array}
 $$
 
-The starting point is $\mathcal{L}_{\text{cca-L}}^{EtM}$, shown here with the details of the encrypt-then-MAC construction highlighted. Our goal is to eventually swap $m_L$ with $m_R$. But the CPA security of $E$ should allow us to do just that, so what’s the catch?
+   
 
-To apply the CPA-security of $E$, we must factor out the relevant call to $E.$Enc in terms of the CPA library $\mathcal{L}_{\text{cpa-L}}^{E}$. This means that ke becomes private to the $\mathcal{L}_{\text{cpa-L}}^{E}$ library. But ke is also used in the last line of the library as E.Dec$(k_e,c)$. The CPA security library for E provides no way to carry out such E:Dec statements!
+     
 
 $$
 \def\arraystretch{1.5}
@@ -680,28 +693,37 @@ S:=\emptyset\\
 \quad \text{if}\ |m_L|\neq |m_R|\\
 \qquad\text{return null}\\
 \quad c:=E.\text{Enc}(k_e,m_L)\\
-\quad t:=\text{GETTAG}(c)\\
+\quad t:=\colorbox{Yellow}{$\text{GETTAG}(c)$}\\
 \quad S:=S\cup\{(c,t)\}\\
 \quad \text{return}\ (c,t)\\
 \underline{\text{Dec}(c,t):}\\
 \quad \text{if}\ (c,t)\in S\\
 \qquad \text{return null}\\
-\quad \text{if}\ t\text{not CHECKTAG}(c,t)\\
+\quad \text{if}\ \colorbox{Yellow}{$\text{not CHECKTAG}(c,t)$}\\
 \qquad \text{return \textcolor{brown}{err}}\\
 \quad \text{return E.Dec}(k_e,c)\\\hline
 \end{array}
-\quad
+\diamond
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{mac-real}}^M\\\hline
 k_m\leftarrow E.\text{KeyGen}\\
 \underline{\text{GETTAG}(c):}\\
-\quad\text{return M.MAC}(k_m,c)\\
+\quad\text{return $M$.MAC}(k_m,c)\\
 \underline{\text{CHECKTAG}(c,t):}\\
-\quad \text{return}\ t\stackrel{?}{=}M.MAC(k_m,c)\\\hline
+\quad \text{return}\ t\stackrel{?}{=}\textit{M}.\text{MAC}(k_m,c)\\\hline
 \end{array}
-$$
-
-The operations of the MAC scheme have been factored out in terms of $\mathcal{L}_{\text{mac-real}}^M$. Notably, in the DEC subroutine the condition “$t\neq M.MAC(k_M,c)$” has been replaced with “not CHECKTAG$(c,t)$”
+\quad
+\begin{array}{l}
+\text{The operations of the}\\
+\text{MAC scheme have been}\\
+\text{factored out in terms of}\\
+\text{$\mathcal{L}_{\text{mac-real}}^M$. Notably, in the}\\
+\text{DEC subroutine the condition}\\
+\text{“$t\neq M.\text{MAC}(k_M,c)$”}\\
+\text{has been replaced with}\\
+\text{“not CHECKTAG$(c,t)$”}\\
+\end{array}
+$$ 
 
 $$
 \def\arraystretch{1.5}
@@ -718,53 +740,73 @@ S:=\emptyset\\
 \underline{\text{Dec}(c,t):}\\
 \quad \text{if}\ (c,t)\in S\\
 \qquad \text{return null}\\
-\quad \text{if}\ t\text{not CHECKTAG}(c,t)\\
+\quad \text{if}\ \text{not CHECKTAG}(c,t)\\
 \qquad \text{return \textcolor{brown}{err}}\\
-\quad \text{return E.Dec}(k_e,c)\\\hline
+\quad \text{return $E$.Dec}(k_e,c)\\\hline
 \end{array}
-\quad
+\diamond
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{mac-real}}^M\\\hline
 k_m\leftarrow M.\text{KeyGen}\\
-\mathcal{T}=\emptyset\\
+\colorbox{Yellow}{$\mathcal{T}=\emptyset$}\\
 \underline{\text{GETTAG}(c):}\\
-\quad t:=M>MAC(k_m,c)\\
-\quad \mathcal{T}:=\mathcal{T}\cup\{(c,t)\}\\
+\quad t:=M.\text{MAC}(k_m,c)\\
+\quad \colorbox{Yellow}{$\mathcal{T}:=\mathcal{T}\cup\{(c,t)\}$}\\
 \quad\text{return}\ t\\
 \underline{\text{CHECKTAG}(c,t):}\\
-\quad \text{return}\ (c,t)\stackrel{?}{\in}\mathcal{T}\\\hline
+\quad \text{return}\ \colorbox{Yellow}{$(c,t)\stackrel{?}{\in}\mathcal{T}$}\\\hline
+\end{array}
+\quad
+\begin{array}{l}
+\text{We have applied the security of the}\\
+\text{MAC scheme, and replaced $\mathcal{L}_{\text{mac-real}}$}\\
+\text{with $\mathcal{L}_{\text{mac-fake}}.$}\\
 \end{array}
 $$
 
-We have applied the security of the MAC scheme, and replaced $\mathcal{L}_{\text{mac-real}}$ with $\mathcal{L}_{\text{mac-fake}}$
+  
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 k_e\leftarrow E.\text{KeyGen}\\
-k_m\leftarrow M.\text{KeyGen}\\
-\mathcal{T}:=\emptyset\\
+\colorbox{Yellow}{$k_m\leftarrow M.\text{KeyGen}$}\\
+\colorbox{Yellow}{$\mathcal{T}:=\emptyset$}\\
 S:=\emptyset\\
 \underline{\text{EAVESDROP}(m_L,m_R):}\\
 \quad \text{if}\ |m_L|\neq |m_R|\\
 \qquad\text{return null}\\
 \quad c:=E.\text{Enc}(k_e,m_L)\\
-\quad t:=M.MAC(k_m,c)\\
-\quad\mathcal{T}:=\mathcal{T}\cup\{(c,t)\}\\
+\quad t:=\colorbox{Yellow}{$M.\text{MAC}(k_m,c)$}\\
+\quad \colorbox{Yellow}{$\mathcal{T}:=\mathcal{T}\cup\{(c,t)\}$}\\
 \quad S:=S\cup\{(c,t)\}\\
 \quad \text{return}\ (c,t)\\
-\underline{\text{Dec}(c,t):}\\
+\underline{\text{DEC}(c,t):}\\
 \quad \text{if}\ (c,t)\in S\\
 \qquad \text{return null}\\
-\quad \text{if}\ (c,t)\notin \mathcal{T}:\\
+\quad \text{if}\ \colorbox{Yellow}{$(c,t)\notin \mathcal{T}:$}\\
 \qquad \text{return \textcolor{brown}{err}}\\
-\quad \text{return E.Dec}(k_e,c)\\\hline
+\quad \text{return $E$.Dec}(k_e,c)\\\hline
+\end{array}
+\quad
+\begin{array}{l}
+\text{We have inlined the $\mathcal{L}_{\text {mac-fake }}$ library. This library keeps track}\\
+\text{of a set $\mathcal{S}$ of values for the purpose of the CCA interface, but}\\
+\text{also a set $\mathcal{T}$ of values for the purposes of the MAC. However, it}\\
+\text{is clear from the code of this library that $\mathcal{S}$ and $\mathcal{T}$ always have}\\
+\text{the same contents.}\\
+\\
+\text{Therefore, the two conditions " $(c, t) \in \mathcal{S}$ " and " $(c, t) \notin \mathcal{T}$ " in the}\\
+\text{DEC subroutine are $exhaustive!$ The final line of $\mathrm{DEC}$ is $unreachable$.}\\
+\text{This hybrid highlights the intuitive idea that an adversary}\\
+\text{can either query DEC with a ciphertext generated by EAVESDROP}\\
+\text{(the $(c, t) \in \mathcal{S}$ case $)-$ in which case the response is null $-$ or}\\
+\text{with a different ciphertext $-$ in which case the response will be}\\
+\text{$\textcolor{brown}{\text{err}}$ since the MAC will not verify.}\\
 \end{array}
 $$
 
-We have inlined the $\mathcal{L}_{\text {mac-fake }}$ library. This library keeps track of a set $\mathcal{S}$ of values for the purpose of the CCA interface, but also a set $\mathcal{T}$ of values for the purposes of the MAC. However, it is clear from the code of this library that $\mathcal{S}$ and $\mathcal{T}$ always have the same contents.
-
-Therefore, the two conditions " $(c, t) \in \mathcal{S}$ " and " $(c, t) \notin \mathcal{T}$ " in the DEC subroutine are *exhaustive*! The final line of $\mathrm{DEC}$ is unreachable. This hybrid highlights the intuitive idea that an adversary can either query DEC with a ciphertext generated by EAVESDROP (the $(c, t) \in \mathcal{S}$ case $)-$ in which case the response is null $-$ or with a different ciphertext $-$ in which case the response will be brr since the MAC will not verify.
+      
 
 $$
 \def\arraystretch{1.5}
@@ -776,19 +818,25 @@ S:=\emptyset\\
 \quad \text{if}\ |m_L|\neq |m_R|\\
 \qquad\text{return null}\\
 \quad c:=E.\text{Enc}(k_e,m_L)\\
-\quad\mathcal{T}:=\mathcal{T}\cup\{(c,t)\}\\
+\quad t:=M.\text{MAC}(k_m, c)\\
 \quad S:=S\cup\{(c,t)\}\\
 \quad \text{return}\ (c,t)\\
 \underline{\text{Dec}(c,t):}\\
 \quad \text{if}\ (c,t)\in S\\
 \qquad \text{return null}\\
-\quad \text{if}\ (c,t)\notin \mathcal{S}:\\
+\quad \text{if}\ (c,t)\notin \colorbox{Yellow}{$\mathcal{S}:$}\\
 \qquad \text{return \textcolor{brown}{err}}\\
 \quad \text{// unreachable}\\\hline
 \end{array}
+\begin{array}{l}
+\text{The unreachable statement has been removed and the redundant}\\
+\text{variables $S$ and $\mathcal{T}$ have been unified. Note that this hybrid library}\\
+\text{never uses E.Dec, making it possible to express its use of}\\
+\text{the $E$ encryption scheme in terms of $\mathcal{L}_{\text{cpa-L}}$.}\\
+\end{array}
 $$
 
-The unreachable statement has been removed and the redundant variables $S$ and $\mathcal{T}$ have been unied. Note that this hybrid library never uses E.Dec, making it possible to express its use of the $E$encryption scheme in terms of $\mathcal{L}_{\text{cpa-L}}$.
+   
 
 $$
 \def\arraystretch{1.5}
@@ -798,29 +846,36 @@ S:=\emptyset\\
 \underline{\text{EAVESDROP}(m_L,m_R):}\\
 \quad \text{if}\ |m_L|\neq |m_R|\\
 \qquad\text{return null}\\
-\quad c:=\text{CPA.EAVESDROP}(m_L,m_R)\\
-\quad t:=M.MAC(k_m,c)\\
+\quad c:=\colorbox{Yellow}{$\text{CPA.EAVESDROP}(m_L,m_R)$}\\
+\quad t:=M.\text{MAC}(k_m,c)\\
 \quad S:=S\cup\{(c,t)\}\\
 \quad \text{return}\ (c,t)\\
-\underline{\text{Dec}(c,t):}\\
+\underline{\text{DEC}(c,t):}\\
 \quad \text{if}\ (c,t)\in S\\
 \qquad \text{return null}\\
 \quad \text{if}\ (c,t)\notin \mathcal{S}:\\
 \qquad \text{return \textcolor{brown}{err}}\\\hline
 \end{array}
-\quad
+\diamond
 \begin{array}{|l|}\hline
 \qquad \qquad \quad\mathcal{L}_{\text{cpa-L}}^E\\\hline
 k_e\leftarrow E.\text{KeyGen}\\
 \underline{\text{CPA.EAVESDROP}(m_L,m_R):}\\
-\quad c:=E.\text{Enc}(k_e,m_L)
+\quad c:=E.\text{Enc}(k_e,m_L) \\
 \quad \text{return}\ c\\\hline
+\end{array}
+\begin{array}{l}
+\text{The statements involving}\\
+\text{the encryption}\\
+\text{scheme $E$ have been}\\
+\text{ factored out in terms}\\
+\text{of $\mathcal{L}_{\text{cpa-L}}$.}
 \end{array}
 $$
 
-The statements involving the encryption scheme $E$ have been factored out in terms $\mathcal{L}_{\text{cpa-L}}$.
+  
 
-We have now reached the half-way point of the proof. The proof proceeds by replacing $\mathcal{L}_{\text {cpa-L }}$ with $\mathcal{L}_{\text {cpa-R }}$ (so that $m_{R}$ rather than $m_{L}$ is encrypted), applying the same modifications as before (but in reverse order), to finally arrive at $\mathcal{L}_{\text {cca-R. }}$ The repetitive details have been omitted, but we mention that when listing the same steps in reverse, the changes appear very bizarre indeed. For instance, we add an unreachable statement to the DEC subroutine; we create a redundant variable $\mathcal{T}$ whose contents are the same as $\mathcal{S}$; we mysteriously change one instance of $\mathcal{S}$ (the condition of the second if-statement in DEC) to refer to the other variable $\mathcal{T}$. Of course, all of this is so that we can factor out the statements referring to the MAC scheme (along with $\mathcal{T}$ ) in terms of $\mathcal{L}_{\text {mac-fake }}$ and finally  replace  $\mathcal{L}_{\text {mac-fake }}$ with $\mathcal{L}_{\text {mac-real }}$.
+We have now reached the half-way point of the proof. The proof proceeds by replacing $\mathcal{L}_{\text {cpa-L }}$ with $\mathcal{L}_{\text {cpa-R }}$ (so that $m_{R}$ rather than $m_{L}$ is encrypted), applying the same modifications as before (but in reverse order), to finally arrive at $\mathcal{L}_{\text {cca-R. }}$ The repetitive details have been omitted, but we mention that when listing the same steps in reverse, the changes appear very bizarre indeed. For instance, we add an unreachable statement to the DEC subroutine; we create a redundant variable $\mathcal{T}$ whose contents are the same as $\mathcal{S}$; we mysteriously change one instance of $\mathcal{S}$ (the condition of the second if-statement in DEC) to refer to the other variable $\mathcal{T}$. Of course, all of this is so that we can factor out the statements referring to the MAC scheme (along with $\mathcal{T}$ ) in terms of $\mathcal{L}_{\text {mac-fake }}$ and finally  replace  $\mathcal{L}_{\text {mac-fake }}$ with $\mathcal{L}_{\text {mac-real }}$.  $\ \ \blacksquare$
 
 ###  Exercises 
 10.1. Consider the following MAC scheme, where F is a secure PRF with *in* = *out* = $\lambda$:
@@ -828,7 +883,7 @@ We have now reached the half-way point of the proof. The proof proceeds by repla
 $$
 \def\arraystretch{1.5}
 \begin{array}{|ll|}\hline
-\underline{\text{KeyGen:}} & \underline{\text{MAC}(k,m_1\|\cdots\|m_\ell):}//\text{each $m_i$ is $\lambda$ bits}\\
+\underline{\text{KeyGen:}} & \underline{\text{MAC}(k,m_1\|\cdots\|m_\ell):}//\textit{each $m_i$ is $\lambda$ bits}\\
 \quad k\leftarrow \{\textcolor{brown}{0}.\textcolor{brown}{1}\}^\lambda & \quad m^*:=\textcolor{brown}{0}^\lambda\\
 \quad \text{return}\ k & \quad \text{for}\ i=1\ \text{to}\ \ell:\\
 & \qquad m^*:=m^*\oplus m_i\\
@@ -836,14 +891,14 @@ $$
 \end{array}
 $$
 
-Show that the scheme is not a secure MAC. Describe a distinguisher and compute its advantage.
+Show that the scheme is **not** a secure MAC. Describe a distinguisher and compute its advantage.
 
 10.2. Consider the following MAC scheme, where $F $is a secure PRF with *in* = *out* = $\lambda$:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|ll|}\hline
-\underline{\text{KeyGen:}} & \underline{\text{MAC}(k,m_1\|\cdots\|m_\ell):}//\text{each $m_i$ is $\lambda$ bits}\\
+\underline{\text{KeyGen:}} & \underline{\text{MAC}(k,m_1\|\cdots\|m_\ell):}//\textit{each $m_i$ is $\lambda$ bits}\\
 \quad k\leftarrow \{\textcolor{brown}{0}.\textcolor{brown}{1}\}^\lambda & \quad t:=\textcolor{brown}{0}^\lambda\\
 \quad \text{return}\ k & \quad \text{for}\ i=1\ \text{to}\ \ell:\\
 & \qquad t:=t\oplus F(k,m_i)\\
@@ -851,26 +906,26 @@ $$
 \end{array}
 $$
 
-Show that the scheme is not a secure MAC. Describe a distinguisher and compute its advantage.
+Show that the scheme is **not** a secure MAC. Describe a distinguisher and compute its advantage.
  
 10.3. Suppose $\mathrm{MAC}$ is a secure $\mathrm{MAC}$ algorithm. Define a new algorithm $\mathrm{MAC}^{\prime}(k, m)=$ $\operatorname{MAC}(k, m) \| \operatorname{MAC}(k, m)$. Prove that $\mathrm{MAC}^{\prime}$ is also a secure MAC algorithm.
 
-Note: MAC' cannot be a secure PRF. This shows that MAC security is different than PRF security.
+*Note*: MAC' cannot be a secure PRF. This shows that MAC security is different than PRF security.
 
 10.4. Suppose $\mathrm{MAC}$ is a secure MAC scheme, whose outputs are $\ell$ bits long. Show that there is an efficient adversary that breaks MAC security (i.e., distinguishes the relevant libraries) with advantage $\Theta\left(1 / 2^{\ell}\right)$. This implies that MAC tags must be reasonably long in order to be secure.
 
 
-10.5. Suppose we use $\mathrm{CBC}$ -MAC with message space $\mathcal{M}=\left(\{\textcolor{brown}{0}.\textcolor{brown}{1}\}^{\lambda}\right)^{*}$. In other words, a single MAC key will be used on messages of any length that is an exact multiple of the block length. Show that the result is not a secure MAC. Construct a distinguisher and compute its advantage.
+10.5. Suppose we use $\mathrm{CBC}$ -MAC with message space $\mathcal{M}=\left(\{\textcolor{brown}{0}.\textcolor{brown}{1}\}^{\lambda}\right)^{*}$. In other words, a single MAC key will be used on messages of *any* length that is an exact multiple of the block length. Show that the result is **not** a secure MAC. Construct a distinguisher and compute its advantage.
 
 >Hint: Request a MAC on two single-block messages, then use the result to forge the MAC of a two-block message.
 
-$\star$ 10.6. Here is a different way to extend CBC-MAC for mixed-length messages, when the length
-of each message is known in advance. Assume that $F$ is a secure PRF with *in* = *out* = $\lambda$.
+
+$\star$ 10.6. Here is a different way to extend CBC-MAC for mixed-length messages, when the length of each message is known in advance. Assume that $F$ is a secure PRF with *in* = *out* = $\lambda$.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{\text{NEWMAC}^F(k,m_1\|\cdots\|m_\ell}\\
+\underline{\text{NEWMAC}^F(k,m_1\|\cdots\|m_\ell)}\\
 \quad k^*:=F(k,\ell)\\
 \text{return CBCMAC}^F(k^*,m_1\|\cdots \|m_\ell\\\hline
 \end{array}
@@ -878,34 +933,32 @@ $$
 
 Prove that this scheme is a secure MAC for message space $\mathcal{M}=(\{\textcolor{brown}{0},\textcolor{brown}{1}^\lambda)^*$. You can use the fact that CBC-MAC is secure for messages of fixed-length.
 
-10.7. Let E be a CPA-secure encryption scheme and $M$ be a secure MAC. Show that the following
-encryption scheme (called encrypt & MAC) is not CCA-secure:
+10.7. Let $E$ be a CPA-secure encryption scheme and $M$ be a secure MAC. Show that the following encryption scheme (called encrypt & MAC) is **not** CCA-secure:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|lll|}\hline
-\underline{\Sigma'.\text{KeyGen}:} &  \underline{\Sigma'.\text{Enc}((k_e,k_m),m):} &  \underline{\Sigma'.\text{Dec}((k_e,k_m),(c,c')):}\\
+\underline{E\&M.\text{KeyGen}:} &  \underline{E\&M.\text{Enc}((k_e,k_m),m):} &  \underline{E\&M.\text{Dec}((k_e,k_m),(c,t)):}\\
 \quad k_e\leftarrow E.\text{KeyGen} & \quad c:=E.\text{Enc}(k_e,m)& \quad m:=E.\text{Dec}(k_e,c)\\
-\quad k_m\leftarrow M.\text{KeyGen} & \quad t:=M.\text{MAC}(k_m,m) & \quad t:=E.\text{Dec}(k_e,c')\\
-\quad \text{return}\ (k_e,k_m)& \quad c'\leftarrow E.\text{Enc}(k_e,t) &\quad \text{if}\ t\neq M.\text{MAC}(k_m,m):\\
-&\quad \text{return}\  (c,c') &  \quad \text{return \textcolor{brown}{\texttt{err}}}\\
-& & \quad \text{return}\ m\\\hline
+\quad k_m\leftarrow M.\text{KeyGen} & \quad t:=M.\text{MAC}(k_m,m) & \quad \text{if}\ t\neq M.\text{MAC}(k_m,m):\\
+\quad \text{return}\ (k_e,k_m)& \quad \text{return}\  (c,t) &  \quad   \quad \text{return}\ \textcolor{brown}{\texttt{err}}\\
+\quad & & \quad \text{return}\ m\\
+\hline
 \end{array}
 $$
 
 Describe a distinguisher and compute its advantage.
 
-10.8. Let E be a CPA-secure encryption scheme and M be a secure MAC. Show that the following
-encryption scheme $\Sigma$ (which I call encrypt-and-encrypted-MAC) is not CCA-secure:
+10.8. Let $E$ be a CPA-secure encryption scheme and $M$ be a secure MAC. Show that the following encryption scheme $\Sigma$ (which I call encrypt-and-encrypted-MAC) is **not** CCA-secure:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|lll|}\hline
-\underline{\Sigma'.\text{KeyGen}:} &  \underline{\Sigma'.\text{Enc}((k_e,k_m),m):} &  \underline{\Sigma'.\text{Dec}((k_e,k_m),(c,c')):}\\
+\underline{\Sigma.\text{KeyGen}:} &  \underline{\Sigma.\text{Enc}((k_e,k_m),m):} &  \underline{\Sigma.\text{Dec}((k_e,k_m),(c,c')):}\\
 \quad k_e\leftarrow E.\text{KeyGen} & \quad c:=E.\text{Enc}(k_e,m)& \quad m:=E.\text{Dec}(k_e,c)\\
 \quad k_m\leftarrow M.\text{KeyGen} & \quad t:=M.\text{MAC}(k_m,m) & \quad t:=E.\text{Dec}(k_e,c')\\
 \quad \text{return}\ (k_e,k_m)& \quad c'\leftarrow E.\text{Enc}(k_e,t) &\quad \text{if}\ t\neq M.\text{MAC}(k_m,m):\\
-&\quad \text{return}\  (c,c') &  \quad \text{return \textcolor{brown}{\texttt{err}}}\\
+&\quad \text{return}\  (c,c') &  \quad \quad \text{return \textcolor{brown}{\texttt{err}}}\\
 & & \quad \text{return}\ m\\\hline
 \end{array}
 $$
@@ -919,42 +972,43 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|lll|}\hline
 \underline{\text{KeyGen}:} &  \underline{\text{Enc}((k_e,k_m),m):} &  \underline{\text{Dec}((k_e,k_m),(r,x,t)):}\\
-\quad k_e\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  & \quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}& \quad \text{if}\ t\neq M.MAC(k_m,x):\\
+\quad k_e\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  & \quad r\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}& \quad \text{if}\ t\neq M.\text{MAC}(k_m,x):\\
 \quad k_m\leftarrow M.\text{KeyGen} & \quad x:=F(k_e,r)\oplus m& \quad \text{return \textcolor{brown}{\texttt{err}}}\\
-\quad \text{return}\ (k_e,k_m)& \quad t:=M.MAC(k_m,x) &\quad \text{else return}\ F(k_e,r)\oplus x\\
+\quad \text{return}\ (k_e,k_m)& \quad t:=M.\text{MAC}(k_m,x) &\quad \text{else return}\ F(k_e,r)\oplus x\\
 &\quad \text{return}\  (r,x,t) &  \\\hline
 \end{array}
 $$
 
-Show that the scheme does not have CCA security. Describe a successful attack and compute its advantage.
+Show that the scheme does **not** have CCA security. Describe a successful attack and compute its advantage.
+>Hint: Suppose (r, x, t) and (r′, x′, t′) are valid encryptions, and consider Dec(($k_e$, $k_m$), (r′, x, t)) ⊕ x ⊕ x′.
 
-10.10. When we combine different cryptographic ingredients (e.g., combining a CPA-secure encryption scheme with a MAC to obtain a CCA-secure scheme) we generally require the two ingredients to use separate, independent keys. It would be more convenient if the entire scheme just used a single $\lambda$ -bit key.
-(a) Suppose we are using Encrypt-then-MAC, where both the encryption scheme and MAC have keys that are $\lambda$ bits long. Refer to the proof of security of Claim 12.5 and describe where it breaks down whenwe modify Encrypt-then-MAC to use the same key for both the encryption & MAC components:
+10.10. When we combine different cryptographic ingredients (e.g., combining a CPA-secure encryption scheme with a MAC to obtain a CCA-secure scheme) we generally require the two ingredients to use *separate*, *independent keys*. It would be more convenient if the entire scheme just used a single $\lambda$ -bit key.
+(a) Suppose we are using Encrypt-then-MAC, where both the encryption scheme and MAC have keys that are $\lambda$ bits long. Refer to the proof of security of Claim 12.5 and **describe where it breaks down** when we modify Encrypt-then-MAC to use the same key for both the encryption & MAC components:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|lll|}\hline
-\underline{\text{KeyGen}:} &  \underline{\text{Enc}(k,m),:} &  \underline{\text{Dec}(k,(c,t))):}\\
-\quad k_e\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  & \quad c:=E.\text{Enc}(k,m)& \quad \text{if}\ t\neq M.MAC(k,c):\\
-\quad \text{return}\ k & \quad t:=M.MAC(k_m,x)& \quad \text{return \textcolor{brown}{\texttt{err}}}\\
-& \quad \text{return}\  (c,t) &\quad \text{return}\ E\text{Dec}(k,c)\\\hline
+\underline{\text{KeyGen}:} &  \underline{\text{Enc}(\colorbox{Yellow}{$k$},m),:} &  \underline{\text{Dec}(\colorbox{Yellow}{$k$},(c,t))):}\\
+\quad \colorbox{Yellow}{$k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$}  & \quad c:=E.\text{Enc}(\colorbox{Yellow}{$k$},m)& \quad \text{if}\ t\neq M.\text{MAC}(\colorbox{Yellow}{$k$},c):\\
+\quad \text{return}\ k & \quad t:=M.\text{MAC}(\colorbox{Yellow}{$k$}, c)& \quad \text{return \textcolor{brown}{\texttt{err}}}\\
+& \quad \text{return}\  (c,t) &\quad \text{return}\ E.\text{Dec}(\colorbox{Yellow}{$k$},c)\\\hline
 \end{array}
 $$
 
-(b) While Encrypt-then-MAC requires independent keys $k_e$ and $k_m$ for the two components, show that they can both be derived from a single key using a PRF. In more detail, let $F$ be a PRF with *in* = 1 and out = $\lambda$. Prove that the following modified Encrypt-then-MAC construction is CCA-secure:
+(b) While Encrypt-then-MAC requires independent keys $k_e$ and $k_m$ for the two components, show that they can both be *derived* from a single key using a PRF. In more detail, let $F$ be a PRF with *in* = 1 and out = $\lambda$. Prove that the following modified Encrypt-then-MAC construction is CCA-secure:
 $$
 \def\arraystretch{1.5}
 \begin{array}{|lll|}\hline
-\underline{\text{KeyGen}:} &  \underline{\text{Enc}(k^*,m),:} &  \underline{\text{Dec}(k^*,(c,t))):}\\
-\quad k_e\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}  & \quad k_e:=F(k^*,\textcolor{brown}{0})&\quad k_e:=F(k^*,\textcolor{brown}{0})\\
-\quad \text{return}\ k^* &\quad  k_m:=F(k^*,\textcolor{brown}{1})& \quad  k_m:=F(k^*,\textcolor{brown}{1})\\
-& \quad c:=E.\text{Enc}(k_e,m)&\quad \text{if}\ t\neq M.MAC(k_m,c):\\
-&\quad t:=M.MAC(k_m,c) &\qquad \text{return \textcolor{brown}{\texttt{err}}}\\
+\underline{\text{KeyGen}:} &  \underline{\text{Enc}(\colorbox{Yellow}{$k^*$},m),:} &  \underline{\text{Dec}(\colorbox{Yellow}{$k^*$},(c,t))):}\\
+\quad \colorbox{Yellow}{$k^*\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}$}  & \quad \colorbox{Yellow}{$k_e:=F(k^*,\textcolor{brown}{0})$}&\quad \colorbox{Yellow}{$k_e:=F(k^*,\textcolor{brown}{0})$}\\
+\quad \text{return}\ k^* &\quad  \colorbox{Yellow}{$k_m:=F(k^*,\textcolor{brown}{1})$}& \quad  \colorbox{Yellow}{$k_m:=F(k^*,\textcolor{brown}{1})$}\\
+& \quad c:=E.\text{Enc}(k_e,m)&\quad \text{if}\ t\neq M.\text{MAC}(k_m,c):\\
+&\quad t:=M.\text{MAC}(k_m,c) &\qquad \text{return \textcolor{brown}{\texttt{err}}}\\
 &\quad \text{return}\ (c,t) &\quad \text{return}\ E.\text{Dec}(k_e,c)\\\hline
 \end{array}
 $$
 
-You should not have to re-prove all the tedious steps of the Encrypt-then-MAC security proof. Rather, you should apply the security of the PRF in order to reach the original Encrypt-then-MAC construction, whose securitywe already proved (so you don’t have to repeat).
+You should not have to re-prove all the tedious steps of the Encrypt-then-MAC security proof. Rather, you should apply the security of the PRF in order to reach the *original* Encrypt-then-MAC construction, whose security we already proved (so you don’t have to repeat).
 
 
 
