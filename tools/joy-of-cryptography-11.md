@@ -1,10 +1,11 @@
+
 # 11 Hash Functions
 
 Suppose you share a huge file with a friend, but you are not sure whether you both have the same version of the file. You could send your version of the file to your friend and they could compare to their version. Is there any way to check that involves less communication than this?
 
-Let's call your version of the file $x$ (a string) and your friend's version $y .$ The goal is to determine whether $x=y$. A natural approach is to agree on some deterministic function $H,$ compute $H(x),$ and send it to your friend. Your friend can compute $H(y)$ and, since $H$ is deterministic, compare the result to your $H(x)$. In order for this method to be fool-proof, we need $H$ to have the property that different inputs always map to different outputs $-$ in other words, $H$ must be injective $(1-$ to- 1$) .$ Unfortunately, if $H$ is injective and $H:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {in }} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\text {out }}$ is injective, then out $\geqslant$ in. This means that sending $H(x)$ is no better/shorter than sending $x$ itself!
+Let's call your version of the file $x$ (a string) and your friend's version $y .$ The goal is to determine whether $x=y$. A natural approach is to agree on some deterministic function $H,$ compute $H(x),$ and send it to your friend. Your friend can compute $H(y)$ and, since $H$ is deterministic, compare the result to your $H(x)$. In order for this method to be fool-proof, we need $H$ to have the property that different inputs always map to different outputs $-$ in other words, $H$ must be **injective** (1-to- 1) . Unfortunately, if $H$ is injective and $H:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit{in}} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\textit{out}}$ is injective, then out $\geqslant$ in. This means that sending $H(x)$ is no better/shorter than sending $x$ itself!
 
-Let us call a pair $(x, y)$ a collision in $H$ if $x \neq y$ and $H(x)=H(y)$. An injective function has no collisions. One common theme in cryptography is that you don't always need something to be impossible; it's often enough for that thing to be just highly unlikely. Instead of saying that $H$ should have no collisions, what if we just say that collisions should be hard (for polynomial-time algorithms) to find? An $H$ with this property will probably be good enough for anything we care about. It might also be possible to construct such an $H$ with outputs that are shorter than its inputs!
+Let us call a pair $(x, y)$ a **collision** in $H$ if $x \neq y$ and $H(x)=H(y)$. An injective function has no collisions. One common theme in cryptography is that you don't always need something to be *impossible*; it's often enough for that thing to be just highly unlikely. Instead of saying that $H$ should have *no* collisions, what if we just say that collisions should be hard (for polynomial-time algorithms) to find? An $H$ with this property will probably be good enough for anything we care about. It might also be possible to construct such an $H$ with outputs that are shorter than its inputs!
 
 What we have been describing is exactly a **cryptographic hash function**. A hash function has long inputs and short outputs $-$ typically $H:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{*} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n} .$ Such an $H$ must necessarily have many collisions. The security property of a hash function is that it is hard to find any such collision. Another good name for a hash function (which I just made up, and no one else uses) would be a "pseudo-injective" function. Although it is not injective, it behaves like one for our purposes.
 
@@ -46,7 +47,7 @@ $$
 \begin{array}{|l|}\hline
 \text{Second preimage brute force:}\\\hline
 \mathcal{A}_{2\text{pi}}(x):\\
-\text{while true:}\\
+\text{while} \ \texttt{true:}\\
 \quad x' \leftarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{m}\\
 \quad y':=H(x')\\
 \quad \text{if }\ y'=H(x):\ \text{return} \ x'\\\hline
@@ -55,14 +56,15 @@ $$
 
 Under the simplifying assumption on $H,$ the collision-resistance brute force attack $\mathcal{A}_{\mathrm{cr}}$ is essentially choosing each $y_{i}$ uniformly at random. Since each $y_{i} \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n},$ the probability of finding a repeated value after $q$ times through the main loop is roughly $\Theta\left(q^{2} / 2^{n}\right)$ by the birthday bound. While in the **worst case** it could take $2^{n}$ steps to find a collision in $H,$ the birthday bound implies that it takes only $2^{n / 2}$ attempts to find a collision with $99 \%$ probability (or any constant probability).
 
-On the other hand, the second-preimage brute force attack $\mathcal{A}_{2 \mathrm{pi}}$ is given $y$ as input and (under our simplifying assumption on $H$ ) essentially samples $y^{\prime}$ uniformly at random until $y$ is the result. It will therefore take $\Theta\left(2^{n}\right)$ attempts in expectation to terminate successfully.
+On the other hand, the second-preimage brute force attack $\mathcal{A}_{2 \mathrm{pi}}$ is given $y$ as input and (under our simplifying assumption on $H$ ) essentially samples $y^{\prime}$ uniformly at random until $y$ is the result. It will therefore take $\Theta\left(2^{n}\right)$ attempts in expectation to terminate successfully.[^1]
+[^1]: A well-known and useful fact from probability theory is that if an event happens with probability $p$, then the expected number of times to repeat before seeing the event is 1/$p$. For example, the probability of rolling a 1 on a D6 die is 1/6, so it takes 6 rolls in expectation before seeing a 1. The probability of sampling a particular $y$ from {0, 1}<sup>n</sup> in one try is 1/2<sup>n</sup> , so the expected number of trials before seeing $y$ is 2<sup>n</sup> .
 
-There is a fundamental difference in how hard it is to break collision resistance and second-preimage resistance. Breaking collision-resistance is like inviting more people into the room until the room contains 2 people with the same birthday. Breaking secondpreimage resistance is like inviting more people into the room until the room contains another person with your birthday. One of these fundamentally takes longer than the other.
+There is a fundamental difference in how hard it is to break collision resistance and second-preimage resistance. Breaking collision-resistance is like inviting more people into the room until the room contains 2 people with the same birthday. Breaking second-preimage resistance is like inviting more people into the room until the room contains another person with *your* birthday. One of these fundamentally takes longer than the other.
 
-This difference explains why you will typically see cryptographic hash functions in practice that have 256 - to 512 -bit output length (but not 128 -bit output length), while you only typically see block ciphers with 128 -bit or 256 -bit keys. In order to make brute force attacks cost $2^{n}$, a block cipher needs only an $n$ -bit key while a collision-resistant hash function needs a $2 n$ -bit output.
+This difference explains why you will typically see cryptographic hash functions in practice that have 256 - to 512-bit output length (but not 128 -bit output length), while you only typically see block ciphers with 128-bit or 256-bit keys. In order to make brute force attacks cost $2^{n}$, a block cipher needs only an $n$-bit key while a collision-resistant hash function needs a $2 n$-bit output.
 
 **to-do**
->Discussion of these attacks in terms of graphs, where # of edges is the "number of chances to get a collision. Collision-resistance brute force is a complete graph (need $\sqrt{N}$ vertices to have N edges / chances for a collision). Second-preimage brute force is a star graph (need $N$ vertices to $N$ edges). Can generalize to consider complete bipartite graph between $\sqrt{N}+\sqrt{N}$ vertices.
+> *Discussion of these attacks in terms of graphs, where # of edges is the "number of chances to get a collision. Collision-resistance brute force is a complete graph (need $\sqrt{N}$ vertices to have N edges / chances for a collision). Second-preimage brute force is a star graph (need $N$ vertices to $N$ edges). Can generalize to consider complete bipartite graph between $\sqrt{N}+\sqrt{N}$ vertices.*
 
 
 ### Hash Function Security In Practice
@@ -75,13 +77,13 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \underline{\text{TEST}(x,x'):}\\
-\quad \text{if}\ x \neq x'\ \text{and}\ H(x)=H(x'):\ \text{return true}\\
-\quad \text{else: return false}\\\hline
+\quad \text{if}\ x \neq x'\ \text{and}\ H(x)=H(x'):\ \text{return} \ \texttt{true}\\
+\quad \text{else: return} \ \texttt{false}\\\hline
 \end{array}
 \approx
 \begin{array}{|l|}\hline
 \underline{\text{TEST}(x,x'):}\\
-\quad \text{return false}\\\hline
+\quad \text{return} \ \texttt{false}\\\hline
 \end{array}
 $$
 
@@ -99,12 +101,12 @@ $$
 \end{array}
 $$
 
-Here, the values $x$ and $x^{\prime}$ are hard-coded into $\mathcal{A} .$ The algorithm $\mathcal{A}$ is clearly polynomialtime (in fact, constant time). The "loophoole" is that the definition considers only the cost of running the algorithm $\mathcal{A},$ and not the cost of finding the source code of $\mathcal{A} 
+Here, the values $x$ and $x^{\prime}$ are hard-coded into $\mathcal{A} .$ The algorithm $\mathcal{A}$ is clearly polynomial-time (in fact, constant time). The "loophoole" is that the definition considers only the cost of *running* the algorithm $\mathcal{A},$ and not the cost of finding the source code of $\mathcal{A}$
 
-The way this kind of situation is avoided in other security definitions is that the libraries have some secret randomness. While the attacker is allowed to depend arbitrarily on the source code of the libraries, it is not allowed to depend on the *choice of outcomes* for random events in the libraries, like sampling a secret key. Since the calling program can't "prepare" for the random choice that it will be faced with, we don't have such trivial attacks. On the other hand, these two libraries for collision resistance are totally deterministic. There are no "surprises" about which function $H$ the calling program will be asked to compute a collision for, so there is nothing to prevent a calling program from being "prepared" with a pre-computed collision in $H$.
+The way this kind of situation is avoided in other security definitions is that the libraries have some secret randomness. While the attacker is allowed to depend arbitrarily on the *source code* of the libraries, it is not allowed to depend on the *choice of outcomes* for random events in the libraries, like sampling a secret key. Since the calling program can't "prepare" for the random choice that it will be faced with, we don't have such trivial attacks. On the other hand, these two libraries for collision resistance are totally deterministic. There are no "surprises" about which function $H$ the calling program will be asked to compute a collision for, so there is nothing to prevent a calling program from being "prepared" with a pre-computed collision in $H$.
 
 ### Hash Function Security In Theory
-The way around this technical issue is to introduce some randomness into the libraries and into the inputs of $H .$ We define hash functions to take two arguments: a randomly chosen, public value $s$ called a salt, and an adversarially chosen input $x$.
+The way around this technical issue is to introduce some randomness into the libraries and into the inputs of $H .$ We define hash functions to take two arguments: a randomly chosen, public value $s$ called a **salt**, and an adversarially chosen input $x$.
 
 **Definition 11.1**
 A hash function $H$ is collision-resistant if $\mathcal{L}_{\text {cr-real }}^{\mathcal{H}} \approx \mathcal{L}_{\text {cr-fake }}^{\mathcal{H}},$ where:
@@ -117,8 +119,8 @@ s\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^\lambda\\
 \underline{\text{GETSALT():}}\\
 \quad \text{return}\ s\\
 \underline{\text{TEST}(x,x'\in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^*):}\\
-\quad \text{if $x \neq x'$ and $H(s, x) = H(s, x')$: return true}\\
-\quad \text{return false}\\\hline
+\quad \text{if $x \neq x'$ and $H(s, x) = H(s, x')$: return} \ \texttt{true}\\
+\quad \text{return} \ \texttt{false}\\\hline
 \end{array}\quad
 \begin{array}{|l|}\hline
 \qquad \qquad  \mathcal{L}_{\text{cr-fake}}^\mathcal{H}\\\hline
@@ -126,13 +128,15 @@ s\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^\lambda\\
 \underline{\text{GETSALT():}}\\
 \quad \text{return}\ s\\
 \underline{\text{TEST}(x,x'\in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^*):}\\
-\quad \text{return false}\\\hline
+\quad \text{return} \ \texttt{false}\\\hline
 \end{array}
 $$
 
 The library initially samples the salt s. Unlike in other libraries, this value $s$ is meant to be provided to the calling program, and so the library provides a way (GETSALT) for the calling program to learn it. The calling program then attempts to find a collision $x \neq x^{\prime}$ where $H(s, x)=H\left(s, x^{\prime}\right)$
 
-I don't know why the term "salt" is used with hash functions. The reason appears to be a mystery to the Internet. $^{2}$ Think of salt as an extra value that "personalizes" the hash function for a given application. Here is a good analogy: an encryption scheme can be thought of as a different encryption algorithm $\operatorname{Enc}(k, \cdot)$ for each choice of key $k .$ When $\mathrm{I}$ choose a random $k,$ I get a personalized encryption algorithm $\operatorname{Enc}(k, \cdot)$ that is unrelated to the algorithm $\operatorname{Enc}\left(k^{\prime}, \cdot\right)$ that someone else would get when they choose their own $k$. When I choose a salt $s,$ I get a personalized hash function $H(s, \cdot)$ that is unrelated to other $H\left(s^{\prime}, \cdot\right)$ functions. Because the salt is chosen uniformly from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda},$ a calling program cannot predict what salt (which personalized hash function) it will be challenged with. 
+I don't know why the term "salt" is used with hash functions. The reason appears to be a mystery to the Internet.[^2] Think of salt as an extra value that **"personalizes" the hash function** for a given application. Here is a good analogy: an encryption scheme can be thought of as a different encryption algorithm $\operatorname{Enc}(k, \cdot)$ for each choice of key $k .$ When $\mathrm{I}$ choose a random $k,$ I get a personalized encryption algorithm $\operatorname{Enc}(k, \cdot)$ that is unrelated to the algorithm $\operatorname{Enc}\left(k^{\prime}, \cdot\right)$ that someone else would get when they choose their own $k$. When I choose a salt $s,$ I get a personalized hash function $H(s, \cdot)$ that is unrelated to other $H\left(s^{\prime}, \cdot\right)$ functions. Because the salt is chosen uniformly from $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda},$ a calling program cannot predict what salt (which personalized hash function) it will be challenged with. 
+
+[^2]: If you have an additional random argument to a hash function, but you keep it secret, it is called a “pepper.” I’m serious, this is a real thing.
 
 Definition 11.1 is a valid definition for collision resistance, free of strange loopholes like the "folklore" definition. However, it is not a particularly *useful* definition to use in security proofs, when a hash function is used as a building block in a bigger system.
 
@@ -142,14 +146,15 @@ In this chapter, we won’t see provable statements of security referring to thi
 
 ### Salts in Practice
 When we define hash functions in theory, we require that the hash function accept two inputs, the first of which is interpreted as a salt. The hash functions that you see in practice have only one input, a string of arbitrary length. You can simulate the effect of a salt for such a hash function by simply concatenating the two inputs $-$ e.g., $H(s \| x)$ instead of $H(s, x)$
+
 The concept of a **salted hash** is not just useful to make a coherent security definition, it is also just good practice. Hash functions are commonly used to store passwords. A server may store user records of the form (username, $h=H$ (password)). When a user attempts to login with password $p^{\prime}$, the server computes $H\left(p^{\prime}\right)$ and compares it to $h .$ Storing hashed passwords means that, in the event that the password file is stolen, an attacker would need to find a preimage of $h$ in order to impersonate the user.
 
 Best practice is to use a separate salt for each user. Instead of storing (username, $H$ (password)), choose a random salt $s$ for each user and store (username, $s, H(s,$ password $)$ ). The security properties of a hash function do not require s to be secret, although there is also no good reason to broadcast a user's salt publicly. The salt is only needed by the server, when it verifies a password during a login attempt. 
 
 A user-specific salt means that each user gets their own "personalized" hash function to store their password. Salts offer the following benefits:
 - Without salts, it would be evident when two users have the same password - they would have the same password hashes. The same password hashed with different salts will result in unrelated hash outputs.
-- An attacker can compute a dictionary of $(p, H(p))$ for common passwords. Without salts, this dictionary makes it easy to attack all users at once, since all users are using the same hash function. With salts, each user has a personalized hash function, each of which would require its own dictionary. Salt makes an attacker's effort scale with the number of victims.
-- 
+- An attacker can compute a dictionary of $(p, H(p))$ for common passwords. Without salts, this dictionary makes it easy to attack *all users at once*, since all users are using the same hash function. With salts, each user has a personalized hash function, each of which would require its own dictionary. Salt makes an attacker's effort scale with the number of victims.
+
 ## 11.2 Merkle-Damgård Construction
 Building a hash function, especially one that accepts inputs of arbitrary length, seems like a challenging task. In this section, we'll see one approach for constructing hash functions, called the Merkle-Damgård construction.
 
