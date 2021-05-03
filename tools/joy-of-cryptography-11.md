@@ -158,15 +158,13 @@ A user-specific salt means that each user gets their own "personalized" hash fun
 ## 11.2 Merkle-Damgård Construction
 Building a hash function, especially one that accepts inputs of arbitrary length, seems like a challenging task. In this section, we'll see one approach for constructing hash functions, called the Merkle-Damgård construction.
 
-Instead of a full-fledged hash function, imagine that we had a collision-resistant function whose inputs were of a single fixed length, but longer than its outputs. In other words, $h:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n+t} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n},$ where $t>0 .$ We call such an $h$ a compression function. This is not compression in the usual sense of the word - we are not concerned about recovering
-
-the input from the output. We call it a compression function because it "compresses" its input by $t$ bits (analogous to how a pseudorandom generator "stretches" its input by some amount).
+Instead of a full-fledged hash function, imagine that we had a collision-resistant function whose inputs were of a single fixed length, but longer than its outputs. In other words, $h:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n+t} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n},$ where $t>0 .$ We call such an $h$ a compression function. This is not compression in the usual sense of the word - we are not concerned about recovering the input from the output. We call it a compression function because it "compresses" its input by $t$ bits (analogous to how a pseudorandom generator "stretches" its input by some amount).
 
 The following construction is one way to build a full-fledged hash function (supporting inputs of arbitrary length) out of such a compression function:
 
 **Construction 11.2 (Merkle-Damgård)**
 
-Let $h:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n+t} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n}$ be a compression function. Then the Merkle-Damgärd transformation of $h$ is $M D_{h}:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{*} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n},$ where:
+*Let $h:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n+t} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n}$ be a compression function. Then the **Merkle-Damgärd transformation** of $h$ is $M D_{h}:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{*} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{n},$ where:*
 
 $$
 \def\arraystretch{1.5}
@@ -182,7 +180,7 @@ $$
 \begin{array}{l}
 \underline{\text{MD}_h(x)}\\
 \quad x_1\|\cdots\|x_{k+1}:=\text{MDPAD}_t(x)\\
-\quad//\text{each $x_i$ is $t$ bits}\\
+\quad//\textit{each $x_i$ is $t$ bits}\\
 \quad y_0:=\textcolor{brown}{0}^n\\
 \quad \text{for}\ i=1\ \text{to}\ k+1\\
 \qquad y_i:=h(y_{i-1}\|x_i)\\
@@ -192,20 +190,21 @@ $$
 \end{array}
 $$
 
-The idea of the Merkle-Damgård construction is to split the input $x$ into blocks of size
-$t$. The end of the string is filled out with $\theta$ s if necessary. A final block called the "padding block" is added, which encodes the (original) length of $x$ in binary.
+The idea of the Merkle-Damgård construction is to split the input $x$ into blocks of size $t$. The end of the string is filled out with $\textcolor{Red}0$ s if necessary. A final block called the "padding block" is added, which encodes the (original) length of $x$ in binary.
 
 **Example**
-Suppose we have a compression function $h:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{48} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{32},$ so that $t=16 .$ We build a Merkle-Damgård hash function out of this compression function and wish to compute the hash of the following 5-byte (40-bit) string:
+*Suppose we have a compression function $h:\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{48} \rightarrow\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{32},$ so that $t=16 .$ We build a Merkle-Damgård hash function out of this compression function and wish to compute the hash of the following 5-byte (40-bit) string:*
 $\begin{array}{lllll}x & =\textcolor{brown}{01100011} & \textcolor{brown}{11001101} & \textcolor{brown}{01000011} & \textcolor{brown}{10010111} & \textcolor{brown}{01010000}\end{array}$
-We must first pad $x$ appropriately $(\operatorname{MDPAD}(x)):$
-- Since $x$ is not a multiple of $t=16$ bits, we need to add 8 bits to make it so.
-- Since $|x|=40,$ we need to add an extra 16 - bit block that encodes the number 40 in binary ($\textcolor{brown}{101000}$)
 
-After this padding, and splitting the result into blocks of length $16,$ we have the following:
-$\underbrace{\textcolor{brown}{01100011\ 11001101}}_{x_{1}} \underbrace{\textcolor{brown}{01000011\ 10010111}}_{x_{2}} \underbrace{\textcolor{brown}{01010000\ 00000000}}_{x_{3}} \underbrace{\textcolor{brown}{00000000\ 00101000}}_{x_{4}}$
+*We must first pad $x$ appropriately $\lparen$MDPAD}(x))$\rparen$*
+- *Since $x$ is not a multiple of $t=16$ bits, we need to add 8 bits to make it so.*
+- *Since $|x|=40,$ we need to add an extra 16-bit block that encodes the number 40 in binary ($\textcolor{brown}{101000}$)*
 
-The final hash of $x$ is computed as follows:
+*After this padding, and splitting the result into blocks of length $16,$ we have the following:*
+
+$\underbrace{\textcolor{brown}{01100011\ 11001101}}_{x_{1}} \quad \underbrace{\textcolor{brown}{01000011\ 10010111}}_{x_{2}} \quad \underbrace{\textcolor{brown}{01010000\ 00000000}}_{x_{3}} \quad  \underbrace{\textcolor{brown}{00000000\ 00101000}}_{x_{4}}$
+
+*The final hash of $x$ is computed as follows:*
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
@@ -218,7 +217,7 @@ We are presenting a simplified version, in which $\mathrm{MD}_{h}$ accepts input
 As discussed above, we will not be making provable security claims using the librarystyle definitions. However, we can justify the Merkle-Damgârd construction with the following claim:
 
 **Claim 11.3**
-Suppose $h$ is a compression function and $M D_{h}$ is the Merkle-Damgárd construction applied to $h .$ Given a collision $x, x^{\prime}$ in $M D_{h},$ it is easy to find a collision in $h .$ In other words, if it is hard to find a collision in $h$, then it must also be hard to find a collision in $\mathrm{MD}_{h}$.
+*Suppose $h$ is a compression function and $MD_{h}$ is the Merkle-Damgárd construction applied to $h .$ Given a collision $x, x^{\prime}$ in $MD_{h},$ it is easy to find a collision in $h .$ In other words, if it is hard to find a collision in $h$, then it must also be hard to find a collision in $MD_{h}$.*
 
 **Proof**
 Suppose that $x, x^{\prime}$ are a collision under $\mathrm{MD}_{h} .$ Define the values $x_{1}, \ldots, x_{k+1}$ and $y_{1}, \ldots, y_{k+1}$ as in the computation of $\mathrm{MD}_{h}(x)$. Similarly, define $x_{1}^{\prime}, \ldots, x_{k^{\prime}+1}^{\prime}$ and $y_{1}^{\prime}, \ldots, y_{k^{\prime}+1}^{\prime}$ as in the computation of $\mathrm{MD}_{h}\left(x^{\prime}\right) .$ Note that, in general, $k$ may not equal $k^{\prime} .$
@@ -231,10 +230,9 @@ $$
 $$
 Since we are assuming $M D_{h}(x)=M D_{h}\left(x^{\prime}\right),$ we have $y_{k+1}=y_{k^{\prime}+1}^{\prime} .$ We consider two cases:
 
-Case 1 : If $|x| \neq\left|x^{\prime}\right|$, then the padding blocks $x_{k+1}$ and $x_{k^{\prime}+1}^{\prime}$ which encode $|x|$ and $\left|x^{\prime}\right|$ are not equal. Hence we have $y_{k}\left\|x_{k+1} \neq y_{k^{\prime}}^{\prime}\right\| x_{k^{\prime}+1}^{\prime},$ so $y_{k} \| x_{k+1}$ and $y_{k^{\prime}}^{\prime} \| x_{k^{\prime}+1}^{\prime}$ are a collision
-under $h$ and we are done.
+*Case 1* : If $|x| \neq\left|x^{\prime}\right|$, then the padding blocks $x_{k+1}$ and $x_{k^{\prime}+1}^{\prime}$ which encode $|x|$ and $\left|x^{\prime}\right|$ are not equal. Hence we have $y_{k}\left\|x_{k+1} \neq y_{k^{\prime}}^{\prime}\right\| x_{k^{\prime}+1}^{\prime},$ so $y_{k} \| x_{k+1}$ and $y_{k^{\prime}}^{\prime} \| x_{k^{\prime}+1}^{\prime}$ are a collision under $h$ and we are done.
 
-Case 2 : If $|x|=\left|x^{\prime}\right|$, then $x$ and $x^{\prime}$ are broken into the same number of blocks, so $k=k^{\prime}$. Let us work backwards from the final step in the computations of $\mathrm{MD}_{h}(x)$ and $\mathrm{MD}_{h}\left(x^{\prime}\right)$. We know that:
+*Case 2* : If $|x|=\left|x^{\prime}\right|$, then $x$ and $x^{\prime}$ are broken into the same number of blocks, so $k=k^{\prime}$. Let us work backwards from the final step in the computations of $\mathrm{MD}_{h}(x)$ and $\mathrm{MD}_{h}\left(x^{\prime}\right)$. We know that:
 $$
 \begin{aligned}
 y_{k+1} &=h\left(y_{k} \| x_{k+1}\right) \\
@@ -244,53 +242,56 @@ y_{k+1}^{\prime} &=h\left(y_{k}^{\prime} \| x_{k+1}^{\prime}\right)
 $$
 If $y_{k} \| x_{k+1}$ and $y_{k}^{\prime} \| x_{k+1}^{\prime}$ are not equal, then they are a collision under $h$ and we are done. Otherwise, we can apply the same logic again to $y_{k}$ and $y_{k}^{\prime},$ which are equal by our assumption.
 
-More generally, if $y_{i}=y_{i}^{\prime},$ then either $y_{i-1} \| x_{i}$ and $y_{i-1}^{\prime} \| x_{i}^{\prime}$ are a collision under $h$ (and we say we are "lucky"), or else $y_{i-1}=y_{i-1}^{\prime}($ and we say we are "unlucky"). We start with the
-
-premise that $y_{k}=y_{k}^{\prime} .$ Can we ever get "unlucky" every time, and not encounter a collision when propagating this logic back through the computations of $\mathrm{MD}_{h}(x)$ and $\mathrm{MD}_{h}\left(x^{\prime}\right) ?$ The answer is no, because encountering the unlucky case every time would imply that $x_{i}=x_{i}^{\prime}$ for all $i$. That is, $x=x^{\prime} .$ But this contradicts our original assumption that $x \neq x^{\prime} .$ Hence we must encounter some "lucky" case and therefore a collision in $h$.
+More generally, if $y_{i}=y_{i}^{\prime},$ then either $y_{i-1} \| x_{i}$ and $y_{i-1}^{\prime} \| x_{i}^{\prime}$ are a collision under $h$ (and we say we are "lucky"), or else $y_{i-1}=y_{i-1}^{\prime}($ and we say we are "unlucky"). We start with the premise that $y_{k}=y_{k}^{\prime} .$ Can we ever get "unlucky" every time, and not encounter a collision when propagating this logic back through the computations of $\mathrm{MD}_{h}(x)$ and $\mathrm{MD}_{h}\left(x^{\prime}\right) ?$ The answer is no, because encountering the unlucky case every time would imply that $x_{i}=x_{i}^{\prime}$ for all $i$. That is, $x=x^{\prime} .$ But this contradicts our original assumption that $x \neq x^{\prime} .$ Hence we must encounter some "lucky" case and therefore a collision in $h$.  $\quad \blacksquare$
 
 ## 11.3 Hash Functions vs. MACs: Length-Extension Attacks
 When we discuss hash functions, we generally consider the salt $s$ to be public. A natural question is, **what happens when we make the salt private?** Of all the cryptographic primitives we have discussed so far, a hash function with secret salt most closely resembles a MAC. So, **do we get a secure MAC** by using a hash function with private salt?
 
 Unfortunately, the answer is no in general (although it can be yes in some cases, depending on the hash function). In particular, the method is insecure when $H$ is constructed using the Merkle-Damgârd approach. The key observation is that:
 
->knowing $H(x)$ allows you to predict the hash of any string that begins with $\operatorname{MDPAD}(x)$
+> *knowing $H(x)$ allows you to predict the hash of any string that begins with MDPAD}(x)*
 
 This concept is best illustrated by example.
 
 **Example**
-Let's return to our previous example, with a compression function $h:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{48} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{32}$. Suppose we construct a Merkle-Damgärd hash out of this compression function, and use the construction MAC $(k, m)=H(k \| m)$ as a MAC.
+*Let's return to our previous example, with a compression function $h:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{48} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{32}$. Suppose we construct a Merkle-Damgärd hash out of this compression function, and use the construction MAC $(k, m)=H(k \| m)$ as a MAC.*
 
-Suppose the MACkey is chosen as $k=\textcolor{brown}{01100011\ 11001101},$ and an attacker seestheMAC tag $t$ of the message $m=\textcolor{brown}{01000011\ 10010111\ 01010000} .$ Then $t=H(k \| m)$ corresponds exactly to the example from before:
+*Suppose the MAC key is chosen as $k=\textcolor{brown}{01100011\ 11001101},$ and an attacker sees the MAC tag $t$ of the message $m=\textcolor{brown}{01000011\ 10010111\ 01010000} .$ Then $t=H(k \| m)$ corresponds exactly to the example from before:*
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
 $$
 
-The only difference from before is that the first block contains the MAC key, so its value is not known to the attacker. We have shaded it in gray here. The attacker knows all other inputs as well as the output tag $t$.
+*The only difference from before is that the first block contains the MAC key, so its value is not known to the attacker. We have shaded it in gray here. The attacker knows all other inputs as well as the output tag $t$.*
 
- I claim that the attacker can now exactly predict the tag of:
+ *I claim that the attacker can now exactly predict the tag of:*
  
-$\begin{array}{lllll}m^{\prime}= & \textcolor{brown}{01000011} & \textcolor{brown}{10010111} & \textcolor{brown}{01010000} & \textcolor{brown}{00000000} & \textcolor{brown}{00000000} & \textcolor{brown}{00101000}\end{array}$
+*$\begin{array}{lllll}m^{\prime}= & \textcolor{brown}{01000011} & \textcolor{brown}{10010111} & \textcolor{brown}{01010000} & \textcolor{brown}{00000000} & \textcolor{brown}{00000000} & \textcolor{brown}{00101000}\end{array}$*
 
-The correct MAC tag $t^{\prime}$ of this value would be computed by someone with the key as:
+*The correct MAC tag $t^{\prime}$ of this value would be computed by someone with the key as:*
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
 $$
 
-The attacker can compute the output $t^{\prime}$ in a different way, without knowing the key. In particular, the attacker knows all inputs to the last instance of $h .$ Since the h function itself is public, the attacker can compute this value herself as $t^{\prime}=h(t \| \textcolor{brown}{00000000\ 01000000})$. Since she can predict the tag of $m^{\prime}$, having seen only the tag of $m$, she has broken the MAC scheme.
+*The attacker can compute the output $t^{\prime}$ in a different way, without knowing the key. In particular, the attacker knows all inputs to the last instance of $h .$ Since the h function itself is public, the attacker can compute this value herself as $t^{\prime}=h(t \| \textcolor{brown}{00000000\ 01000000})$. Since she can predict the tag of $m^{\prime}$, having seen only the tag of $m$, she has broken the MAC scheme.*
 
 ## Discussion
- - In our example, the attacker sees the MAC tag for $m$ (computed as $H(k \| m)$ ) and then forges the tag for $m^{\prime}=m \| p,$ where $p$ is the padding you must add when hashing $k \| m$. Note that the padding depends only on the length of $k$, which we assume is public.
+ - In our example, the attacker sees the MAC tag for $m$ (computed as $H(k \| m)$ ) and then forges the tag for $m^{\prime}=m \| p,$ where $p$ is the padding you must add when hashing $k \| m$. Note that the padding depends only on the *length of* $k$, which we assume is public.
 
- - The same attack works to forge the tag of any $m^{\prime}$ that begins with $m \| p$. The attacker would simply have to compute the last several rounds (not just one round) of MerkleDamgârd herself.
- - **This is not an attack on collision resistance!** Length-extension does not result in collisions! We are not saying that $k \| m$ and $k\|m\| p$ have the same hash under $H,$ only that knowing the hash of $k \| m$ allows you to also compute the hash of $k\|m\| p$.
+ - The same attack works to forge the tag of any $m^{\prime}$ that begins with $m \| p$. The attacker would simply have to compute the last several rounds (not just one round) of Merkle-Damgârd herself.
+ - **This is not an attack on collision resistance!** Length-extension does not result in collisions! We are not saying that $k \| m$ and $k\|m\| p$ have the *same* hash under $H,$ only that knowing the hash of $k \| m$ allows you to also compute the hash of $k\|m\| p$.
+
 Knowing how $H(k \| m)$ fails to be a MAC helps us understand better ways to build a secure MAC from a hash function:
- - The Merkle-Damgârd approach suffers from length-extension attacks because it outputs its entire internal state. In the example picture above, the value $t$ is both the output of $H(k \| m)$ as well as the only information about $k \| m$ needed to compute the last call to $h$ in the computation $H(k\|m\| p)$.
-One way to avoid this problem is to only output part of the internal state. In MerkleDamgârd, we compute $y_{i}:=h\left(y_{i-1} \| x_{i}\right)$ until reaching the final output $y_{k+1} .$ Suppose instead that we only output half of $y_{k+1}$ (the $y_{i}$ values may need to be made longer in order for this to make sense). Then just knowing half of $y_{k+1}$ is not enough to predict what the hash output will be in a length-extension scenario.
-The hash function SHA-3 was designed in this way (often called a "wide pipe" construction). One of the explicit design criteria of SHA-3 was that $H(k \| m)$ would be a secure MAC
+ - The Merkle-Damgârd approach suffers from length-extension attacks because it outputs its **entire internal state**. In the example picture above, the value $t$ is both the output of $H(k \| m)$ as well as the only information about $k \| m$ needed to compute the last call to $h$ in the computation $H(k\|m\| p)$.
 
- - Length extension with Merkle-Damgârd is possible because the computation of $H(k \| m)$ exactly appears during the computation of $H(k\|m\| p)$. Similar problems appear in plain CBC-MAC when used with messages of mixed lengths. To avoid this, we can "do something different" to mark the end of the input. In a "wide pipe" construction, we throw away half of the internal state at the end. In ECBC-MAC, we use a different key for the last block of CBC chaining. We can do something similar to the $H(k \| m)$ construction, by doing $H\left(k_{2} \| H\left(k_{1} \| m\right)\right)$, with independent keys. This change is enough to mark the end of the input. This construction is known as $\mathrm{NMAC},$ and it can be proven secure for MerkleDamgârd hash functions, under certain assumptions about their underlying compression function. A closely related (and popular) construction called HMAC allows $k_{1}$ and $k_{2}$ to even be related in some way.
+    One way to avoid this problem is to only output part of the internal state. In Merkle-Damgârd, we compute $y_{i}:=h\left(y_{i-1} \| x_{i}\right)$ until reaching the final output $y_{k+1} .$ Suppose instead that we only output half of $y_{k+1}$ (the $y_{i}$ values may need to be made longer in order for this to make sense). Then just knowing half of $y_{k+1}$ is not enough to predict what the hash output will be in a length-extension scenario.
+
+    The hash function **SHA-3** was designed in this way (often called a "wide pipe" construction). One of the explicit design criteria of SHA-3 was that $H(k \| m)$ would be a secure MAC
+
+ - Length extension with Merkle-Damgârd is possible because the computation of $H(k \| m)$ exactly appears during the computation of $H(k\|m\| p)$. Similar problems appear in plain CBC-MAC when used with messages of mixed lengths. To avoid this, we can "do something different" to mark the end of the input. In a "wide pipe" construction, we throw away half of the internal state at the end. In ECBC-MAC, we use a different key for the last block of CBC chaining. 
+
+    We can do something similar to the $H(k \| m)$ construction, by doing $H\left(k_{2} \| H\left(k_{1} \| m\right)\right)$, with independent keys. This change is enough to mark the end of the input. This construction is known as **NMAC**, and it can be proven secure for Merkle-Damgârd hash functions, under certain assumptions about their underlying compression function. A closely related (and popular) construction called **HMAC** allows $k_{1}$ and $k_{2}$ to even be related in some way.
 
 ### Exercises
 11.1 Sometimes when I verify an MD5 hash visually, I just check the first few and the last few hex digits, and don't really look at the middle of the hash.
