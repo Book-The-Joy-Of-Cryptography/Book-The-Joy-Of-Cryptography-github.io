@@ -1,7 +1,9 @@
-# 12 Authenticated Encryption & AEAD
 
-It can be helpful to think of encryption as providing a secure logical channel between two users who only have access to an insecure physical channel. Below are a few things that an attacker might do to the insecure physical channel:
-- An attacker may **passively eavesdrop**; i.e., simply observe the channel. A CPAsecure encryption scheme provides **confidentiality** and prevents the attacker from learning anything by eavesdropping.
+# 12 Authenticated Encryption & AEAD
+> To do: $\textcolor{Grey}{\textit{Disclaimer: This chapter is in rough draft stage.}}$
+
+It can be helpful to think of encryption as providing a secure *logical* channel between two users who only have access to an insecure *physical* channel. Below are a few things that an attacker might do to the insecure physical channel:
+- An attacker may **passively eavesdrop**; *i.e.*, simply observe the channel. A CPA-secure encryption scheme provides **confidentiality** and prevents the attacker from learning anything by eavesdropping.
 - An attacker may **drop** messages sent along the channel, resulting in a denial of service. If the attacker can do this on the underlying physical channel, then it cannot be overcome through cryptography.
 - An attacker may try to **modify** messages that are sent along the channel, by tampering with their ciphertexts. This sounds like what CCA-secure encryption protects against, right?
 - An attacker may try to **inject** new messages into the channel. If successful, Bob might receive a message and mistake it for something that Alice meant to send. Does CCA security protect against this? If it is indeed possible to inject new messages into the channel, then an attacker can delete Alice's ciphertexts and replace them with their own. This would seem to fall under the category of "modifying" messages on the channel, so message-injection and message-modification are somewhat connected.
@@ -9,26 +11,26 @@ It can be helpful to think of encryption as providing a secure logical channel b
 
 Although it might seem that CCA-secure encryption guarantees protection against many of these kinds of attacks, it does not!
 
-To see why, consider the SPRP-based encryption scheme of Construction 9.3. We proved that this scheme has CCA security. However, it never raises any errors during decryption. *Every* ciphertext is interpreted as a valid encryption of some plaintext. An attacker can choose an arbitrary ciphertext, and when Bob decrypts it he might think Alice was trying to send some (presumably garbled) message. The only thing that CCA security guarantees is that if an attacker is able to make a ciphertext that decrypts without error, then it must decrypt to something that is unrelated to the contents of other ciphertexts.
+To see why, consider the SPRP-based encryption scheme of Construction 9.3. We proved that this scheme has CCA security. However, it never raises any errors during decryption. *Every* ciphertext is interpreted as a valid encryption of *some* plaintext. An attacker can choose an arbitrary ciphertext, and when Bob decrypts it he might think Alice was trying to send some (presumably garbled) message. The only thing that CCA security guarantees is that **if** an attacker is able to make a ciphertext that decrypts without error, then it must decrypt to something that is unrelated to the contents of other ciphertexts.
 
-In order to achieve protection against message-modification and message-injection on the secure channel, we need a stronger/better security denition. **Authenticated encryption (AE)** formalizes the extra property that only someone with the secret key can find ciphertexts that decrypt without error. For example, encrypt-then-MAC (Construction 10.9) already has this property.
+In order to achieve protection against message-modification and message-injection on the secure channel, we need a stronger/better security definition. **Authenticated encryption (AE)** formalizes the extra property that *only* someone with the secret key can find ciphertexts that decrypt without error. For example, encrypt-then-MAC (Construction 10.9) already has this property.
 
 In this chapter we will discuss authenticated encryption and a closely-related concept of encryption with **associated data (AD)**, which is designed to help prevent message replay attacks. These two concepts are the “gold standard” for encryption.
 
 ## 12.1 Definitions
 
 ### Authenticated Encryption
-As with CPA and CCA flavors of security, we can define AE security in both a “left-vsright” style or a “pseudorandom ciphertexts” style. Both are reasonable choices. To make life simpler we will only dene the pseudorandom-ciphertexts-style of AE security in this chapter.
+As with CPA and CCA flavors of security, we can define AE security in both a “left-vs-right” style or a “pseudorandom ciphertexts” style. Both are reasonable choices. To make life simpler we will only define the pseudorandom-ciphertexts-style of AE security in this chapter.
 
-In CCA$\varPhi$ security, the attacker has access to the decryption algorithm (except for ciphertexts generated by the library itself). This captures the idea that the result of decrypting adversarially-generated ciphertexts cannot help distinguish the contents of other ciphertexts. For AE security, we want a stronger condition that $\operatorname{Dec}(k, c)=\textcolor{brown}{\texttt{err}}$for every adversarially-generated ciphertext $c .$ Using the same ideas used to define security for MACs, we express this requirement by saying that the attacker shouldn't be able to distinguish access to the "real" Dec algorithm, or one that always outputs $\textcolor{brown}{\texttt{err}}$:
+In CCA$\Phi$ security, the attacker has access to the decryption algorithm (except for ciphertexts generated by the library itself). This captures the idea that the result of decrypting adversarially-generated ciphertexts cannot help distinguish the contents of other ciphertexts. For AE security, we want a stronger condition that $\operatorname{Dec}(k, c)=\textcolor{brown}{\texttt{err}}$ for every adversarially-generated ciphertext $c .$ Using the same ideas used to define security for MACs, we express this requirement by saying that the attacker shouldn't be able to distinguish access to the "real" Dec algorithm, or one that always outputs $\textcolor{brown}{\texttt{err}}$:
 
 **Definition 12.1 (AE)**
-Let $\Sigma$ be an encryption scheme. We saythat $\Sigma$ has authenticated encryption (AE) security if $\mathcal{L}_{\text {ae}\varPhi-{real }}^{\Sigma} \approx \mathcal{L}_{\text {ae}\varPhi-\text{rand }}^{\Sigma},$ where:
+*Let $\Sigma$ be an encryption scheme. We saythat $\Sigma$ has **authenticated encryption (AE) security** if $\mathcal{L}_{\text {ae}\Phi-{real }}^{\Sigma} \approx \mathcal{L}_{\text {ae}\Phi-\text{rand }}^{\Sigma},$ where:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \quad\mathcal{L}_{\text {ae}\varPhi-{real }}^{\Sigma}\\\hline
+\qquad \quad\mathcal{L}_{\text {ae}\Phi-{real }}^{\Sigma}\\\hline
 k\leftarrow \Sigma.\text{KeyGen}\\
 S:=\emptyset\\
 \underline{\text{CTXT}(m\in\Sigma.\mathcal{M}):}\\
@@ -41,7 +43,7 @@ S:=\emptyset\\
 \end{array} 
 \quad
 \begin{array}{|l|}\hline
-\qquad \quad\mathcal{L}_{\text {ae}\varPhi-{fake}}^{\Sigma}\\\hline
+\qquad \quad\mathcal{L}_{\text {ae}\Phi-{fake}}^{\Sigma}\\\hline
 \underline{\text{CTXT}(m\in\Sigma.\mathcal{M}):}\\
 \quad c\leftarrow \Sigma.C(|m|)\\
 \quad \text{return}\ c\\
@@ -53,24 +55,24 @@ $$
 ### Discussion
 The two libraries are different from each other in two major ways: whether the calling program sees real ciphertexts or random strings (that have nothing to do with the given plaintext), and whether the calling program sees the true result of decryption or an error message. With these two differences, we are demanding that two conditions be true: the calling program can't tell whether it is seeing real or fake ciphertexts, it also cannot generate a ciphertext (other than the ones it has seen) that would cause Dec to output anything except $\textcolor{brown}{\texttt{err}}$.
 
-Whenever the calling program calls DECRYPT( $c$ ) for a ciphertext $c$ that was produced by the library (in crxt), both libraries will return $\textcolor{brown}{\texttt{err}}$ by construction. Importantly, the difference in the libraries is the behavior of DECRYPT on ciphertexts that were not generated by the library (i.e., generated by the attacker).
+Whenever the calling program calls DECRYPT( $c$ ) for a ciphertext $c$ that was produced by the library (in CTXT), both libraries will return $\textcolor{brown}{\texttt{err}}$ by construction. Importantly, the difference in the libraries is the behavior of DECRYPT on ciphertexts that were *not* generated by the library (*i.e.*, generated by the attacker).
 
 ### Associated Data
-AE provides a secure channel between Alice and Bob that is safe from messagemodification and message-injection by the attacker (in addition to providing confidentiality). However, AE still does not protect from **replay** of messages. If Alice sends a ciphertext $c$ to Bob, we know that Bob will decrypt $c$ without error. The guarantee of $\mathrm{AE}$ security is that Bob can be sure that the message originated from Alice in this case. If an attacker re-sends the same $c$ at a later time, Bob will likely interpret that as a sign that Alice wanted to say the same thing again, even though this was not Alice's intent. It is still true that Alice was the originator of the message, but just not at this time.
+AE provides a secure channel between Alice and Bob that is safe from message-modification and message-injection by the attacker (in addition to providing confidentiality). However, AE still does not protect from **replay** of messages. If Alice sends a ciphertext $c$ to Bob, we know that Bob will decrypt $c$ without error. The guarantee of $\mathrm{AE}$ security is that Bob can be sure that the message originated from Alice in this case. If an attacker re-sends the same $c$ at a later time, Bob will likely interpret that as a sign that Alice wanted to say the same thing again, even though this was not Alice's intent. It is still true that Alice was the originator of the message, but just not at this time.
 
-You may wonder how it is possible to prevent this sort of attack. If a ciphertext $c$ is a valid ciphertext when Alice sends it, then it will always be a valid ciphertext, right? A clever way around this problem is for Alice to not only authenticate the ciphertext as coming from her, but to authenticate it also to a *specific* context. For example, suppose that Alice \& Bob are exchanging encrypted messages, and the 5 th ciphertext is $c,$ sent by Alice. The main idea is to let Alice authenticate the fact that "I meant to send $c$ as the 5 th ciphertext in the conversation." If an attacker re-sends $c$ later $(e . g .,$ as the 11 th ciphertext, a different context), Bob will attempt to authenticate the fact that "Alice meant to send $c$ as the 11 th ciphertext." and this authentication will fail.
+You may wonder how it is possible to prevent this sort of attack. If a ciphertext $c$ is a valid ciphertext when Alice sends it, then it will *always* be a valid ciphertext, right? A clever way around this problem is for Alice to not only authenticate the ciphertext as coming from her, but to authenticate it also to a *specific* context. For example, suppose that Alice \& Bob are exchanging encrypted messages, and the 5th ciphertext is $c,$ sent by Alice. The main idea is to let Alice authenticate the fact that "I meant to send $c$ as the 5th ciphertext in the conversation." If an attacker re-sends $c$ later $(e . g .,$ as the 11th ciphertext, a different context), Bob will attempt to authenticate the fact that "Alice meant to send $c$ as the 11th ciphertext." and this authentication will fail.
 
 What I have called "context" is called **associated data** in an encryption scheme. In order to support associated data, we modify the syntax of the encryption and decryption algorithms to take an additional argument $d$. The ciphertext $c=\operatorname{Enc}(k, d, m)$ is an encryption of $m$ with associated data $d$. In application, $d$ could be a sequence number of a conversation, a hash of the entire conversation up to this point, an IP address + port number, etc. - basically, as much information as you can think of regarding this ciphertext's intended context. Decrypting $c$ with the "correct" associated data $d$ via $\operatorname{Dec}(k, d, c)$ should result in the correct plaintext $m$. Decrypting $c$ with any other associated data should result in an error, since that reflects a mismatch between the sender's and receiver's contexts. 
 
 The intuitive security requirement for **authenticated encryption with associated data (AEAD)** is that an attacker who sees many encryptions $c_{i}$ of chosen plaintexts, each authenticated to a particular associated data $d_{i},$ cannot generate a different $\left(c^{*}, d^{*}\right)$ that decrypts successfully. The security definition rules out attempts to modify some $c_{i}$ under the same $d_{i},$ or modify some $d_{i}$ for the same $c_{i},$ or produce a completely new $\left(c^{*}, d^{*}\right) .$
 
 **Definition 12.2 (AEAD)**
-Let $\Sigma$ be an encryption scheme. We write $\Sigma . \mathcal{D}$ to denote the space of supported associated data signifiers ("contexts"). We say that $\Sigma$ has authenticated encryption with associated data (AEAD) security if $\mathcal{L}_{\text {aead}\varPhi-\text{real }}^{\Sigma} \approx \mathcal{L}_{\text {aead}\varPhi-\text{rand, }}^{\Sigma}$ where:
+*Let $\Sigma$ be an encryption scheme. We write $\Sigma . \mathcal{D}$ to denote the space of supported associated data signifiers ("contexts"). We say that $\Sigma$ has **authenticated encryption with associated data (AEAD) security** if $\mathcal{L}_{\text {aead}\Phi-\text{real }}^{\Sigma} \approx \mathcal{L}_{\text {aead}\Phi-\text{rand, }}^{\Sigma}$ where:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \quad\mathcal{L}_{\text {aead}\varPhi-{real }}^{\Sigma}\\\hline
+\qquad \quad\mathcal{L}_{\text {aead}\Phi-\text{real}}^{\Sigma}\\\hline
 k\leftarrow \Sigma.\text{KeyGen}\\
 S:=\emptyset\\
 \underline{\text{CTXT}(d\in \Sigma.\mathcal{D},m\in \Sigma.\mathcal{M}):}\\
@@ -83,7 +85,7 @@ S:=\emptyset\\
 \end{array} 
 \quad
 \begin{array}{|l|}\hline
-\qquad \quad\mathcal{L}_{\text {aead}\varPhi-{fake}}^{\Sigma}\\\hline
+\qquad \quad\mathcal{L}_{\text {aead}\Phi-\text{fake}}^{\Sigma}\\\hline
 \underline{\text{CTXT}(c\in \Sigma.\mathcal{D},m\in \Sigma.\mathcal{M}):}\\
 \quad c\leftarrow \Sigma.C(|m|)\\
 \quad \text{return}\ c\\
@@ -93,7 +95,7 @@ S:=\emptyset\\
 $$
 
 ### Discussion
-One way to "authenticate a message to some context $d$ " is to encrypt $m \| d$ instead of just $m$ (in an AE scheme). This would indeed work! Including $d$ as part of the plaintext would indeed authenticate it, but it would also hide it. The point of differentiating between plaintext and associated data is that we assume the associated data is shared context between both participants. In other words, we assume that the sender and receiver both already know the context $d$. Therefore, *hiding* $d$ is overkill - only authentication is needed. By making a distinction between plaintext and associated data separately in AEAD, the **ciphertext length can depend only on the length of the plaintext**, and not depend on the length of the associated data.
+One way to "authenticate a message to some context $d$ " is to encrypt $m \| d$ instead of just $m$ (in an AE scheme). This would indeed work! Including $d$ as part of the plaintext would indeed authenticate it, but it would also *hide* it. The point of differentiating between plaintext and associated data is that we assume the associated data is *shared context* between both participants. In other words, we assume that the sender and receiver both already know the context $d$. Therefore, *hiding* $d$ is overkill - only authentication is needed. By making a distinction between plaintext and associated data separately in AEAD, the **ciphertext length can depend only on the length of the plaintext**, and not depend on the length of the associated data.
 
 The fact that associated data $d$ is public is reflected in the fact that the calling program chooses it in the security definition.
 
@@ -103,10 +105,12 @@ The fact that associated data $d$ is public is reflected in the fact that the ca
 The Encrypt-then-MAC construction (Construction 10.9 ) has the property that the attacker cannot generate ciphertexts that decrypt correctly. Even though we introduced encrypt-then-MAC to achieve CCA security, it also achieves the stronger requirement of AE
 
 **Claim 12.3**
-If $E$ has CPA security and $M$ is a secure MAC, then EtM (Construction 10.9) has AE security.
+*If $E$ has CPA security and $M$ is a secure MAC, then EtM (Construction 10.9) has AE security.*
 
-**to-do**
->There is a slight mismatch here, sinceI defined AE/AEAD securify as a "pseudorandom ciph texts" style definition. So you actually need CPAS+PRF instead of CPA+MAC. But CPA+MAC is enough for the left-vs-right style of AE/AEAD security.
+>**to-do**
+>There is a slight mismatch here, sinceI defined AE/AEAD security as a "pseudorandom cipher-texts" style definition. So you actually need CPA$\Phi$+PRF instead of CPA+MAC. But CPA+MAC is enough for the left-vs-right style of AE/AEAD security.
+
+There is a slight mismatch here, since I defined AE/AEAD security as a “pseudorandom cipher-texts” style definition. So you actually need CPA$+PRF instead of CPA+MAC. But CPA+MAC is enough for the left-vs-right style of AE/AEAD security.
 
 The security proof is essentially the same as the proof of CCA security (Claim 12.5). In that proof, there is a hybrid in which the pecrypt subroutine always returns an error. Stopping the proof at that point would result in a proof of AE security.
 

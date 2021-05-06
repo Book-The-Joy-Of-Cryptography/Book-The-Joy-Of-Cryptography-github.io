@@ -298,11 +298,11 @@ Knowing how $H(k \| m)$ fails to be a MAC helps us understand better ways to bui
 
 Generate two files with opposite meanings, whose MD5 hashes agree in their first 16 bits (4 hex digits) and in their last 16 bits ( 4 hex digits). It could be two text files that say opposite things. It could be an image of Mario and an image of Bowser. I don't know, be creative.
 
-As an example, the strings "subtitle illusive planes" and "wantings premises forego" actually agree in the first 20 and last 20 bits (first and last 5 hex digits) of their MD5 hashes, but it's not clear that they're very meaningful.
+As an example, the strings "$\mathtt{subtitle\ illusive\ planes}$" and "$\mathtt{wantings\ premises\ forego}$" actually agree in the first 20 and last 20 bits (first and last 5 hex digits) of their MD5 hashes, but it's not clear that they're very meaningful.
 
-$\varPhi$ echo -n "subtitle illusive planes" | md5sum
+$ $\mathtt{echo\ -n\ "subtitle\ illusive\ planes"\ |\ md5sum}$
  $\text{\underline{4188d}4cdcf2be92all2bdb8ce45\underline{00243}}$ -
-  $\varPhi$ echo -n "wantings premises forego" | md5sum 
+$ $\mathtt{echo\ -n\ "wantings\ premises\ forego"\ |\ md5sum}$ 
   $\text{\underline{4188d}209a75ela9b90c6fe3efe3\underline{00243}}$ -
   
   Describe how you generated the files, and how many MD5 evaluations you had to make.
@@ -317,10 +317,9 @@ Basically, it is similar to the Merkle-Damgârd except we lost the IV and we los
 2. Describe an easy way to find two messages that are broken up into different number of pieces, which have the same hash value under $H .$
 >Hint: Pick any string of length $n + 2t$ , then find a shorter string that collides with it.
 
-
 Neither of your collisions above should involve finding a collision in $h$.
 
-11.3. I've designed a hash function $H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{*} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$. One of my ideas is to make $H(x)=x$ if $x$ is an $n$ -bit string (assume the behavior of $H$ is much more complicated on inputs of other lengths). That way, we know with certainty that there are no collisions among $n$ -bit strings. Have I made a good design decision?
+11.3. I've designed a hash function $H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{*} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$. One of my ideas is to make $H(x)=x$ if $x$ is an $n$-bit string (assume the behavior of $H$ is much more complicated on inputs of other lengths). That way, we know with certainty that there are no collisions among $n$-bit strings. Have I made a good design decision?
 
 11.4. Same as above, but now if $x$ is $n$ bits long, then $H(x)=x \oplus m,$ where $m$ is a fixed, public string. Can this be a good hash function?
 
@@ -332,7 +331,7 @@ Show that if you are given a collision under $H^{(t)}$ then you can efficiently 
 
 11.6. In this problem, if $x$ and $y$ are strings of the same length, then we write $x \sqsubseteq y$ if $x=y$ or $x$ comes before $y$ in standard dictionary ordering.
 
-Suppose a function $H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{*} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$ has the following property. For all strings $x$ and $y$ of the same length, if $x \sqsubseteq y$ then $H(x) \sqsubseteq H(y)$. Show that $H$ is not collision resistant (describe how to efficiently find a collision in such a function).
+Suppose a function $H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{*} \rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{n}$ has the following property. For all strings $x$ and $y$ of the same length, if $x \sqsubseteq y$ then $H(x) \sqsubseteq H(y)$. Show that $H$ is **not** collision resistant (describe how to efficiently find a collision in such a function).
 
 > Hint: Binary search, always recursing on a range that is guaranteed to contain a collision
 
@@ -344,38 +343,38 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 \underline{H^*(x_1\|x_2\|x_3\|\cdots\|x_k):}\\
-\quad \text{return} H(1,x_1)\oplus H(2,x_2) \oplus\cdots H(k,x_k)\\\hline
+\quad \text{return}\ H(1,x_1)\oplus H(2,x_2) \oplus\cdots \oplus H(k,x_k)\\\hline
 \end{array}
 $$
 Note that $H^{*}$ can take inputs of any length $(k) .$ Show how to find collisions in $H^{*}$ when $k>n$
 
 11.9. Generalize the Merkle-Damgârd construction so that it works for arbitrary input lengths (and arbitrary values of $t$ in the compression function). Extend the proof of Claim 11.3 to your new construction.
 
-$\star 11.10 .$ Let $F$ be a secure PRF with $n$ -bit inputs, and let $H$ be a collision-resistant (salted) hash function with $n$ -bit outputs. Define the new function $F^{\prime}((k, s), x)=F(k, H(s, x)),$ where we interpret $(k, s)$ to be its key. Prove that $F^{\prime}$ is a secure PRF with arbitrary-length inputs.
+$\star 11.10 .$ Let $F$ be a secure PRF with $n$-bit inputs, and let $H$ be a collision-resistant (salted) hash function with $n$-bit outputs. Define the new function $F^{\prime}((k, s), x)=F(k, H(s, x)),$ where we interpret $(k, s)$ to be its key. Prove that $F^{\prime}$ is a secure PRF with arbitrary-length inputs.
 
-$\star 11.11 .$ Let $M A C$ be a secure $M A C$ algorithm with $n$ -bit inputs, and let $H$ be a collision-resistant (salted) hash function with $n$ -bit outputs. Define the new function $\operatorname{MAC}^{\prime}((k, s), x)=$ $\operatorname{MAC}(k, H(s, x)),$ where we interpret $(k, s)$ to be its key. Prove that $M A C^{\prime}$ is a secure $M A C$ with arbitrary-length inputs.
+$\star 11.11 .$ Let $\operatorname{MAC}$ be a secure $\operatorname{MAC}$ algorithm with $n$-bit inputs, and let $H$ be a collision-resistant (salted) hash function with $n$-bit outputs. Define the new function $\operatorname{MAC}^{\prime}((k, s), x)=$ $\operatorname{MAC}(k, H(s, x)),$ where we interpret $(k, s)$ to be its key. Prove that $\operatorname{MAC}^{\prime}$ is a secure $\operatorname{MAC}$ with arbitrary-length inputs.
 
 11.12. More exotic issues with the Merkle-Damgârd construction:
 
-(a) Let $H$ be a hash function with $n$ -bit output, based on the Merkle-Damgård construction. Show how to compute (with high probability) 4 messages that all hash to the same value under $H,$ using only $\sim 2 \cdot 2^{n / 2}$ calls to $H .$ 
->Hint: The 4 messages that collide will have the form $x\|y,x\|y',x'\|y$ and $x'\|y'$. Use a length extension idea and perform 2 birthday attacks.
+(a) Let $H$ be a hash function with $n$-bit output, based on the Merkle-Damgård construction. Show how to compute (with high probability) 4 messages that all hash to the same value under $H,$ using only $\sim 2 \cdot 2^{n / 2}$ calls to $H .$ 
+>Hint: The 4 messages that collide will have the form $x\|y,x\|y',x'\|y$ and $x'\|y'$. Use a length-extension idea and perform 2 birthday attacks.
 
 (b) Show how to construct $2^{d}$ messages that all hash to the same value under $H,$ using only $O\left(d \cdot 2^{n / 2}\right)$ evaluations of $H$.
 
-(c ) Suppose $H_{1}$ and $H_{2}$ are (different) hash functions, both with $n$ -bit output. Consider the function $H^{*}(x)=H_{1}(x) \| H_{2}(x)$. Since $H^{*}$ has $2 n$ -bit output, it is tempting to think that finding a collision in $H^{*}$ will take $2^{(2 n) / 2}=2^{n}$ effort. 
+(c ) Suppose $H_{1}$ and $H_{2}$ are (different) hash functions, both with $n$-bit output. Consider the function $H^{*}(x)=H_{1}(x) \| H_{2}(x)$. Since $H^{*}$ has $2 n$-bit output, it is tempting to think that finding a collision in $H^{*}$ will take $2^{(2 n) / 2}=2^{n}$ effort. 
+
 However, this intuition is not true when $H_{1}$ is a Merkle-Damgård hash. Show that when $H_{1}$ is Merkle-Damgârd, then it is possible to find collisions in $H^{*}$ with only $O\left(n 2^{n / 2}\right)$ effort. The attack should assume nothing about $H_{2}$ (i.e., $H_{2}$ need not be Merkle-Damgård).
 
 >Hint: Applying part (b), first find a set of $2^{n/2}$ messages that all have the same hash under $H_1$. Among them, find 2 that also collide under$H_2$.
 
-11.13. Let $H$ be a collision-resistant hash function with output length n. Let $H^*$ denote iterating
-$H$ in a manner similar to CBC-MAC:
+11.13. Let $H$ be a collision-resistant hash function with output length $n$. Let $H^*$ denote iterating $H$ in a manner similar to CBC-MAC:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|ll|}\hline
 \begin{array}{l}
-\underline{H^*(x_1\cdots x^\ell:}\\
-\quad//\text{each $x_i$ is n bits}\\
+\underline{H^*(x_1\cdots x^\ell):}\\
+\quad//\textit{each $x_i$ is n bits}\\
 \quad y_0:=\textcolor{brown}{0}^n\\
 \quad \text{for}\ i=1\ \text{to}\ \ell:\\
 \qquad y_i:=H(x_i\oplus y_{i-1})\\
@@ -384,7 +383,7 @@ $$
 \end{array}
 $$
 
-Show that $H^{*}$ is not collision-resistant. Describe a successful attack.
+Show that $H^{*}$ is **not** collision-resistant. Describe a successful attack.
 
 11.14. Show that a bare PRP is not collision resistant. In other words, if $F$ is a secure PRP, then show how to efficiently find collisions in $H(x \| y)=F(x, y)$.
 
@@ -401,14 +400,14 @@ $$
 \end{array} 
 $$
 
-Here we are interpreting k as the salt. This is yet another example of how collisionresistance is different than authenticity (MAC).
+Here we are interpreting $k$ as the salt. This is yet another example of how collision-resistance is different than authenticity (MAC).
 
 11.16. Let $H:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ be any function, and define the following function $H^*:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\underline{H(x\|y):}\\
+\underline{H^*(x\|y):}\\
 \quad z:=H(x)\oplus y\\
 \quad \text{return}\ H(z)\oplus x\\\hline
 \end{array} 
@@ -418,6 +417,6 @@ Show how to succeed in an efficient second-preimage attack on $H^{*}$.
 
 11.17. Adding a plain hash to a plaintext does not result in CCA security. Consider the following approach for encryption, that uses a plain (unsalted) hash function $H .$ To encrypt plaintext $m,$ simply encrypt $m \| H(m)$ under CTR mode. To decrypt, use normal CTR mode decryption but return $\textcolor{brown}{\texttt{err}}$ if the plaintext does not have the form $m \| H(m)$ (i.e., if the last $n$ bits are not a hash of the rest of the CTR-plaintext).
 
-Show that the scheme does not have CCA security.
+Show that the scheme does **not** have CCA security.
 
 11.18. In the discussion of length-extension attacks, we noted that a natural way to stop them is to "do something different" for the last block of Merkle-Damgârd. Suppose after performing the final call to $h$ in Merkle-Damgård, we complement the value $\left(y_{k+1}\right)$. Does this modified scheme still have length-extension properties?
