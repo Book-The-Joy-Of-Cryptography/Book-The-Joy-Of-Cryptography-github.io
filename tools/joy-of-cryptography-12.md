@@ -126,28 +126,28 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|ll|}\hline
 \begin{array}{l}
-\underline{\text{Enc}((k_e,k_m),d,m):}\\
+\underline{\text{Enc}((k_e,k_m),\colorbox{Yellow}{$d$},m):}\\
 \quad c\leftarrow E.\text{Enc}(k_e,m)\\
-\quad t:=M.\text{MAC}(k_m,d\|c)\\
+\quad t:=M.\text{MAC}(k_m,\colorbox{Yellow}{$d \ \|$}c)\\
 \quad\text{return}\ (c,t)
 \end{array}&
 \begin{array}{l}
-\underline{\text{Dec}((k_e,k_m),d,(c,t)):}\\
-\quad\text{if}\ t\neq M.\text{MAC}(k_m,d\|c):\\
+\underline{\text{Dec}((k_e,k_m),\colorbox{Yellow}{$d$},(c,t)):}\\
+\quad\text{if}\ t\neq M.\text{MAC}(k_m,\colorbox{Yellow}{$d \ \|$}c):\\
 \qquad \text{return \textcolor{brown}{\texttt{err}}}\\
-\quad \text{return E.Dec}(k_e,c)
+\quad \text{return $E$.Dec}(k_e,c)
 \end{array}\\\hline
 \end{array} 
 $$
 
 **Claim 12.5**
-If E has CPA security and $M$ is a secure MAC, then Construction 12.4 has AEAD security, when the associated data has fixed length (i,e,$\mathcal{D}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n$ for some fixed $n$).
+*If E has CPA security and $M$ is a secure MAC, then Construction 12.4 has AEAD security, when the associated data has fixed length (i,e,$\mathcal{D}=\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n$ for some fixed $n$).*
 
-**to-do**
-This construction is insecure for variable-length associated data. It is not terribly hard to fix this; see exercises.
+> **to-do**
+> *This construction is insecure for variable-length associated data. It is not terribly hard to fix this; see exercises.*
 
 ## 12.3 Carter-Wegman MACs
-Suppose we construct an AE[AD] scheme using the encrypt-then-MAC paradigm. A good choice for the CPA-secure encryption scheme would be CBC mode; a good choice for the MAC scheme would be ECBC-MAC. Combining these two building blocks would result in an AE[AD] scheme that invokes the block cipher twice for each plaintext block - once for the CBC encryption (applied to the plaintext) and once more for the ECBC-MAC (applied to that ciphertext block).
+Suppose we construct an AE[AD] scheme using the encrypt-then-MAC paradigm. A good choice for the CPA-secure encryption scheme would be CBC mode; a good choice for the MAC scheme would be ECBC-MAC. Combining these two building blocks would result in an AE[AD] scheme that invokes the block cipher *twice* for each plaintext block - once for the CBC encryption (applied to the plaintext) and once more for the ECBC-MAC (applied to that ciphertext block).
 
 Is it possible to achieve AE[AD] with less cost? In this section we will explore a more efficient technique for variable-length MACs, which requires only one multiplication operation per message block along with a single invocation of a block cipher.
 
@@ -158,12 +158,14 @@ Recall that $\left(x, x^{\prime}\right)$ is a **collision** under salt $s$ if $x
 
 $\ldots$ when $x$ and $x^{\prime}$ are chosen without knowledge of the salt,
 
-$\ldots$ and when the attacker has only one attempt at finding a collision for a particular salt value.
+$\ldots$ and when the attacker has *only one attempt at finding a collision* for a particular salt value.
 
-These constraints are equivalent to choosing the salt after $x$ and $x'$ are chosen, and a collision should be negligibly likely under such circumstances. The definition can be stated more formally:
+These constraints are equivalent to choosing the salt after $x$ and $x'$ are chosen, and a collision should be negligibly likely under such circumstances. 
+
+The definition can be stated more formally:
 
 **Definition 12.6 (UHF)**
-A hash function $H$ with set of salts $S$ is called a **universal hash function (UHF)** if $\mathcal{L}_{\text{uhf-real}}^H\approx\mathcal{L}_{\text{uhf-fake}}^H$, where:
+*A hash function $H$ with set of salts $S$ is called a **universal hash function (UHF)** if $\mathcal{L}_{\text{uhf-real}}^H\approx\mathcal{L}_{\text{uhf-fake}}^H$, where:*
 
 $$
 \def\arraystretch{1.5}
@@ -188,7 +190,7 @@ This definition is similar in spirit to the formal definition of collision resis
 In the case of UHFs, there is a different and helpful way of thinking about security. Consider a **“blind collision-resistance”** game, where you try to find a collision under $H$ without access to the salt, and even *without* *seeing the outputs of* $H$! It turns out that if H is a UHF, then it is hard to find collisions in such a game:
 
 **Claim 12.7**
-If H is a UHF, then the following libraries are indistinguishable:
+*If H is a UHF, then the following libraries are indistinguishable:*
 
 $$
 \def\arraystretch{1.5}
@@ -201,32 +203,32 @@ H_{inv}:=\text{empty assoc. array}\\
 \quad \text{if}\ H_{inv}[y]\ \text{define and}\ H_{inv}[y]\neq x:\\
 \qquad \text{return}\ H_{inv}[y]\\
 \quad H_{inv}[y]:=x\\
-\quad \text{return false}\\\hline
+\quad \text{return}\ \mathtt{false}\\\hline
 \end{array} 
 \approx
 \begin{array}{|l|}\hline
 \qquad \quad\mathcal{L}_{\text {bcr-fake}}^{\Sigma}\\\hline
 \underline{\text{TEST}(x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^*):}\\
-\quad \text{return false}\\\hline
+\quad \text{return}\ \mathtt{false}\\\hline
 \end{array} 
 $$
 
 In these libraries, the calling program chooses inputs $x$ to the UHF. The $\mathcal{L}_{\text {bcr-real }}$ library maintains a private record of all of the $x$ values and their hashes, in the form of a reverse lookup table. $H_{\text {inv }}[y]$ will hold the value $x$ that was hashed to result in $y$.
 
-If the calling program calls $\operatorname{TEST}(x)$ on a value that collides with a previous $x^{\prime},$ then $\mathcal{L}_{\text {bcr-real }}$ will respond with this $x^{\prime}$ value (the purpose of this is just to be helpful to security proofs that use these libraries); otherwise it will respond with false, giving no information about $s$ or $H(s, x)$. The other library always responds with false. Hence, the two are indistinguishable only if finding collisions is hard.
+If the calling program calls $\operatorname{TEST}(x)$ on a value that collides with a previous $x^{\prime},$ then $\mathcal{L}_{\text {bcr-real }}$ will respond with this $x^{\prime}$ value (the purpose of this is just to be helpful to security proofs that use these libraries); otherwise it will respond with false, giving no information about $s$ or $H(s, x)$. The other library always responds with $\mathtt{false}$. Hence, the two are indistinguishable only if finding collisions is hard.
 
-**to-do**
+>**to-do**
 >Proof to come. It’s not hard but tedious.
 
 ### Constructing UHFs using Polynomials
 UHFs have much weaker security than other kinds of hashing, and they can in fact be constructed unconditionally. One of the mathematically simplest constructions has to do with polynomials.
 
 **Claim 12.8**
-Let $p$ be a prime and $g$ be a nonzero polynomial with coefficients in $\mathbb{Z}_{p}$ and degree at most $d$. Then $g$ has at most $d$ zeroes from $\mathbb{Z}_{p}$.
+*Let $p$ be a prime and $g$ be a nonzero polynomial with coefficients in $\mathbb{Z}_{p}$ and degree at most $d$. Then $g$ has at most $d$ zeroes from $\mathbb{Z}_{p}$.*
 
 This observation leads to a simple UHF construction, whose idea is to interpret the string $x$ as the coefficients of a polynomial, and evaluate that polynomial at point $s$ (the salt of the UHF). In more detail, let $p$ be a prime with $p>2^{\lambda}$, and let the salt $s$ be a uniformly chosen element of $\mathbb{Z}_{p}$. To compute the hash of $x$, first split $x$ into $\lambda$ -bit blocks, which will be convenient to index as $x_{d-1}\left\|x_{d-2}\right\| \ldots \| x_{0} .$ Interpret each $x_{i}$ as a number mod $p$. Then, the value of the hash $H(s, x)$ is:
 $$
-s^{d}+x_{d-1} s^{d-1}+x_{d-2} s^{d-2}+\cdots+x_{0} \quad(\bmod p)
+s^{d}+x_{d-1} s^{d-1}+x_{d-2} s^{d-2}+\cdots+x_{0} \quad(\bmod\ p)
 $$
 This is the result of evaluating a polynomial with coefficients $\left(1, x_{d-1}, x_{d-2}, \ldots, x_{0}\right)$ at the point $s$. A convenient way to evaluate this polynomial is by using **Horner's rule**:
 $$
@@ -250,10 +252,10 @@ S=\mathbb{Z}_p
 \end{array}&
 \begin{array}{l}
 \underline{H(s,x):}\\
-\quad\text{write}\ x=x_{d-1}\|x_{d-2}\|\cdots x_0,\\
+\quad\text{write}\ x=x_{d-1}\|x_{d-2}\|\cdots \|x_0,\\
 \qquad \text{where each}\ |x_i|=\lambda\\
 \quad y:=1\\
-\quad \text{for}\ i=d-11\ \text{down to}\ 0:\\
+\quad \text{for}\ i=d-1\ \text{downto}\ 0:\\
 \qquad y_i:=s\cdot y+x_i\% p\\
 \quad \text{return}\ y\\
 \end{array}\\\hline
@@ -261,7 +263,7 @@ S=\mathbb{Z}_p
 $$
 
 **Claim 12.10**
-The Poly-UHF construction is a secure UHF.
+*The Poly-UHF construction is a secure UHF.*
 
 **Proof**
 It suffices to show that, for any $x \neq x^{\prime},$ the probability that $H(s, x)=H\left(s, x^{\prime}\right)$ (taken over random choice of $s$ ) is negligible. Note that $H(s, x)=g(s)$, where $g$ is a polynomial whose coefficients are $\left(1, x_{d-1}, \ldots, x_{0}\right),$ and $H\left(s, x^{\prime}\right)=g^{\prime}(s),$ where $g^{\prime}$ is a similar polynomial derived from $x^{\prime} .$ Note that $x$ and $x^{\prime}$ may be split into a different number of blocks, leading to different degrees $\left(d\right.$ and $\left.d^{\prime}\right)$ for the two polynomials.
@@ -279,8 +281,8 @@ d^{*} / p \leqslant d^{*} / 2^{\lambda}.
 $$
 This probability is negligible since $d^{*}$ is polynomial in $\lambda$ (it is the number of blocks in a string that was written down by the attacker, who runs in polynomial time in $\lambda$ ).
 
-**to-do**
->Fine print: this works but modular multiplication is not fast. If you want this to be fast, you would use a binary finite field. It is not so bad to describe what finite fields are, but doing so involves more polynomials. Then when you make polynomials whose coecients are finite field elements, it runs the risk of feeling like polynomials over polynomials (because at some level it is). Not sure how I will eventually deal with this.
+>**to-do**
+>*Fine print: this works but modular multiplication is not fast. If you want this to be fast, you would use a binary finite field. It is not so bad to describe what finite fields are, but doing so involves more polynomials. Then when you make polynomials whose coefficients are finite field elements, it runs the risk of feeling like polynomials over polynomials (because at some level it is). Not sure how I will eventually deal with this.*
 
 ### Carter-Wegman UHF-based MAC
 A UHF by itself is not a good MAC, even when its salt $s$ is kept secret. This is because the security of a MAC must hold even when the attacker sees the function's outputs, but a UHF provides security (blind collision-resistance) only when the attacker does not see the UHF outputs.
@@ -289,7 +291,7 @@ The Carter-Wegman MAC technique augments a UHF by sending its output through a P
 
 **Construction 12.11 (Carter-Wegman)**
 
-Let $H$ be a UHF with $n$ bits of output, and let $F$ be a secure PRF with in $=n$. The CarterWegman construction combines them as follows:
+*Let $H$ be a UHF with $n$ bits of output, and let $F$ be a secure PRF with in $=n$. The Carter-Wegman construction combines them as follows:*
 
 $$
 \def\arraystretch{1.5}
@@ -310,10 +312,10 @@ $$
 
 We will show that the Carter-Wegman construction is a secure PRF. Recall that this implies that the construction is also a secure MAC (Claim 10.4). Note that the Carter-Wegman construction also *uses* a PRF as a building block. However, it uses a PRF for short messages, to construct a PRF for arbitrary-length messages. Furthermore, it only calls the underlying PRF once, and all other computations involving the UHF are comparatively “cheap.”
 
-To understand the security of Carter-Wegman, we work backwards. The output $F(k, H(s, x))$ comes directly from a PRF. These outputs will look random as long as the inputs to the PRF are distinct. In this construction, the only way for PRF inputs to repeat is for there to be a collision in the UHF $H .$ However, we have to be careful. We can only reason about the collision-resistance of $H$ when its salt is secret and its outputs are hidden from the attacker. The salt is indeed hidden in this case (kept as part of the Carter-Wegman key), but its outputs are being used as PRF inputs. Fortunately, the guarantee of a PRF is that its outputs appear unrelated to its inputs. In other words, the PRF outputs leak no information about the PRF inputs (H-outputs). Indeed, this appears to be a situation where the UHF outputs are hidden from the attacker, so we can argue that collisions in $H$ are negligibly likely.
+To understand the security of Carter-Wegman, we work backwards. The output $F(k, H(s, x))$ comes directly from a PRF. These outputs will look random as long as the inputs to the PRF are *distinct*. In this construction, the only way for PRF inputs to repeat is for there to be a collision in the UHF $H .$ However, we have to be careful. We can only reason about the collision-resistance of $H$ when its salt is secret and its outputs are hidden from the attacker. The salt is indeed hidden in this case (kept as part of the Carter-Wegman key), but its outputs are being used as PRF inputs. Fortunately, the guarantee of a PRF is that its outputs appear *unrelated* to its inputs. In other words, the PRF outputs leak no information about the PRF inputs (*H*-outputs). Indeed, this appears to be a situation where the UHF outputs are hidden from the attacker, so we can argue that collisions in $H$ are negligibly likely.
 
 **Claim 12.12**
-If $H$ is a secure UHF and $F$ is a secure PRF, then the Carter-Wegman construction (Construction 12.11) is a secure PRF, and hence a secure MAC as well.
+*If $H$ is a secure UHF and $F$ is a secure PRF, then the Carter-Wegman construction (Construction 12.11) is a secure PRF, and hence a secure MAC as well.*
 
 **Proof**
 We will show that $\mathcal{L}_{\text {prf-real }}^{\mathrm{CW}} \approx \mathcal{L}_{\text {prf-rand }}^{\mathrm{CW}}$ using a standard hybrid technique.
@@ -326,7 +328,7 @@ k\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\\
 s\leftarrow S\\
 \underline{\text{LOOKUP}(x):}\\
 \quad y:=H(s,x)\\
-\quad \text{return}\ (k,s)\\\hline
+\quad \text{return}\ F(k,s)\\\hline
 \end{array}
 \quad
 \begin{array}{l}
@@ -337,13 +339,13 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-T:=\text{empty assoc. array}\\
+\colorbox{Yellow}{$T$ := empty assoc. array}\\
 s\leftarrow S\\
 \underline{\text{LOOKUP}(x):}\\
 \quad y:=H(s,x)\\
-\quad \text{if}\ T[y]\ \text{undefined:}\\
-\qquad T[y]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
-\quad \text{return}\ T[y]\\\hline
+\quad \colorbox{Yellow}{\text{if}\ $T$[$y$]\ \text{undefined:}}\\
+\qquad \colorbox{Yellow}{$T$[$y$]$\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}$}\\
+\quad \text{return}\ \colorbox{Yellow}{$T$[$y$]}\\\hline
 \end{array}
 \quad
 \begin{array}{l}
