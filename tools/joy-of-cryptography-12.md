@@ -279,7 +279,7 @@ A collision happens if and only if $s$ is chosen to be one of the roots of $g-g^
 $$
 d^{*} / p \leqslant d^{*} / 2^{\lambda}.
 $$
-This probability is negligible since $d^{*}$ is polynomial in $\lambda$ (it is the number of blocks in a string that was written down by the attacker, who runs in polynomial time in $\lambda$ ).
+This probability is negligible since $d^{*}$ is polynomial in $\lambda$ (it is the number of blocks in a string that was written down by the attacker, who runs in polynomial time in $\lambda$ ). $\qquad\blacksquare$
 
 >**to-do**
 >*Fine print: this works but modular multiplication is not fast. If you want this to be fast, you would use a binary finite field. It is not so bad to describe what finite fields are, but doing so involves more polynomials. Then when you make polynomials whose coefficients are finite field elements, it runs the risk of feeling like polynomials over polynomials (because at some level it is). Not sure how I will eventually deal with this.*
@@ -358,21 +358,66 @@ $$
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
+\colorbox{Yellow}{cache := \text{empty assoc. array}}\\
+T:=\text{empty assoc. array}\\
+s\leftarrow S\\
+\underline{\text{LOOKUP}(x):}\\
+\quad \colorbox{Yellow}{\text{if}\ cache [x]\ \text{undefined:}}\\
+\qquad y:=H(s,x)\\
+\qquad \text{if}\ T[y]\ \text{undefined:}\\
+\qquad \quad T[y]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
+\qquad \colorbox{Yellow}{cache[x]:=T[y]}\\
+\quad  \colorbox{Yellow}{\text{return}\ cache[x]}\\\hline
+\end{array}
+\quad
+\begin{array}{l}
+\text{The lookup subroutine has the property that if it is called}\\
+\text{on the same $x$ twice, it will return the same result. It}\\
+\text{therefore does no harm to cache the answer every time.}\\
+\text{The second time lookup is called on the same value $x$,}\\
+\text{the previous value is loaded from cache rather than re-}\\
+\text{computed. This change has no effect on the calling pro-}\\
+\text{gram.}\\
+\end{array}
+$$
+
+    
+
+$$
+\def\arraystretch{1.5}
+\begin{array}{|l|}\hline
 cache := \text{empty assoc. array}\\
+\colorbox{Yellow}{$H_{inv}$:= \text{empty assoc. array}}\\
 T:=\text{empty assoc. array}\\
 s\leftarrow S\\
 \underline{\text{LOOKUP}(x):}\\
 \quad \text{if}\ cache [x]\ \text{undefined:}\\
 \qquad y:=H(s,x)\\
+\qquad \colorbox{Yellow}{\text{if}\ $H_{inv}$[$y$]\ \text{defined:}}\\
+\qquad \quad \colorbox{Yellow}{$x'$:=$H_{inv}$[$y$]}\\
+\qquad \quad \colorbox{Yellow}{\text{return}\ $cache$ [$x'$]}\\
 \qquad \text{if}\ T[y]\ \text{undefined:}\\
 \qquad \quad T[y]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
-\quad cache[x]:=T[y]\\
+\qquad \colorbox{Yellow}{$H_{inv}$[$y$] := $x$}\\
+\qquad cache[x]:=T[y]\\
 \quad  \text{return}\ cache[x]\\\hline
+\end{array}
+\quad
+\begin{array}{l}
+\text{Note that if LOOKUP is first called on $x^{\prime}$ and then later on}\\
+\text{ $x,$ where $H(s, x)=H\left(s, x^{\prime}\right),$ LOOKUP will return the same}\\
+\text{result. We therefore modify the library to keep track of}\\
+\text{$H$-outputs and inputs. Whenever the library computes}\\
+\text{$y=H(s, x),$ it stores $H_{\text {inv }}[y]=x .$ However, if $H_{\text {inv }}[y]$}\\
+\text{already exists, it means that this $x$ and $x^{\prime}=H_{\text {inv }}[y]$ are}\\
+\text{a collision under $H .$ In that case, the library directly re-}\\
+\text{turns whatever it previously returned on input $x^{\prime}$. This}\\
+\text{change has no effect on the calling program.
+}\\
 \end{array}
 $$
 
-The lookup subroutine has the property that if it is called on the same $x$ twice, it will return the same result. It therefore does no harm to cache the answer every time. The second time lookup is called on the same value $x$, the previous value is loaded from cache rather than recomputed. This change has no effect on the calling program.
-
+     
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
@@ -386,22 +431,27 @@ s\leftarrow S\\
 \qquad \text{if}\ H_{inv}[y]\ \text{defined:}\\
 \qquad \quad x':=H_{inv}[y]\\
 \qquad \quad \text{return}\ cache [x']\\
-\qquad \text{if}\ T[y]\ \text{undefined:}\\
+\qquad \colorbox{Yellow}{\text{if}\ $H_{inv}$[$y$]}\ \text{undefined:}\\
 \qquad \quad T[y]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
 \qquad H_{inv}[y]:=x\\
 \qquad cache[x]:=T[y]\\
 \quad  \text{return}\ cache[x]\\\hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{In the previous hybrid, $T[y]$ is set at the same time $H_{inv}[y]$}\\
+\text{is set — on the first call LOOKUP ($x$) such that $H(s, x) =$}\\
+\text{$y$. Therefore, it has no effect on the calling program to}\\
+\text{check whether $T[y]$ is defined or check whether $H_{inv}[y]$}\\
+\text{is defined.}\\
+\end{array}
 $$
-
-Note that if LOOKUP is first called on $x^{\prime}$ and then later on $x,$ where $H(s, x)=H\left(s, x^{\prime}\right),$ LOOKUP will return the same result. We therefore modify the library to keep track of $H$ -outputs and inputs. Whenever the library computes $y=H(s, x),$ it stores $H_{\text {inv }}[y]=x .$ However, if $H_{\text {inv }}[y]$ already exists, it means that this $x$ and $x^{\prime}=H_{\text {inv }}[y]$ are a collision under $H .$ In that case, the library directly returns whatever it previously returned on input $x^{\prime}$. This change has no effect on the calling program.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
 cache := \text{empty assoc. array}\\
 H_{inv}:=\text{empty assoc. array}\\
-T:=\text{empty assoc. array}\\
 s\leftarrow S\\
 \underline{\text{LOOKUP}(x):}\\
 \quad \text{if}\ cache [x]\ \text{undefined:}\\
@@ -410,35 +460,23 @@ s\leftarrow S\\
 \qquad \quad x':=H_{inv}[y]\\
 \qquad \quad \text{return}\ cache [x']\\
 \qquad \text{if}\ H_{inv}[y]\ \text{undefined:}\\
-\qquad \quad T[y]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
-\qquad H_{inv}[y]:=x\\
-\qquad cache[x]:=T[y]\\
-\quad  \text{return}\ cache[x]\\\hline
-\end{array}
-$$
-
-In the previous hybrid, $T[y]$ is set at the same time $H_{inv}[y]$ is set — on the first call lOOKUP ($x$) such that $H(s, x) = y$. Therefore, it has no effect on the calling program to check whether $T[y]$ is defined or check whether $H_{inv}[y]$ is defined.
-
-$$
-\def\arraystretch{1.5}
-\begin{array}{|l|}\hline
-cache := \text{empty assoc. array}\\
-H_{inv}:=\text{empty assoc. array}\\
-s\leftarrow S\\
-\underline{\text{LOOKUP}(x):}\\
-\quad \text{if}\ cache [x]\ \text{undefined:}\\
-\qquad y:=H(s,x)\\
-\qquad \text{if}\ H_{inv}[y]\ \text{defined:}\\
-\qquad \quad x':=H_{inv}[y]\\
-\qquad \quad \text{return}\ cache [x']\\
-\qquad \text{if}\ H_{inv}[y]\ \text{undefined:}\\
-\qquad \quad cache[x]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
+\qquad \quad \colorbox{Yellow}{$cache$[$x$]}\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
 \qquad H_{inv}[y]:=x\\
 \quad  \text{return}\ cache[x]\\\hline
 \end{array}
+\begin{array}{l}
+\text{Note that if $H_{\text {inv }}[y]$ is defined, then Lookup returns}\\
+\text{within that if-statement. The line $cache$ $[x]:=T[y]$ is}\\
+\text{therefore only executed in the case that $H_{\text {inv }}[y]$ was not}\\
+\text{initially defined. Instead of choosing $T[y]$ only to imme-}\\
+\text{diately assign it to cache $[x]$, we just assign directly to}\\
+\text{cache $[x]$. This change has no effect on the calling pro-}\\
+\text{gram, and it does away with the $T$ associative array en-}\\
+\text{tirely.}\\
+\end{array}
 $$
 
-Note that if $H_{\text {inv }}[y]$ is defined, then Lookup returns within that if-statement. The line cache $[x]:=T[y]$ is therefore only executed in the case that $H_{\text {inv }}[y]$ was not initially defined. Instead of choosing $T[y]$ only to immediately assign it to cache $[x]$, we just assign directly to cache $[x]$. This change has no effect on the calling program, and it does away with the $T$ associative array entirely.
+    
 
 The if-statements involving $H_{\text {inv }}$ in this hybrid are checking whether $x$ has collided with any previous $x^{\prime}$ under $H$. All of this logic, including the evaluation of $H,$ can be factored out in terms of $\mathcal{L}_{\text {bcr-real }}^{H}$. At this point in the sequence of hybrids, the output of $H$ is not needed, except to check whether a collision has been encountered (and if so, what the offending inputs are). Again, this change has no effect on the calling program. The result is:
 
@@ -448,7 +486,7 @@ $$
 cache := \text{empty assoc. array}\\
 \underline{\text{LOOKUP}(x):}\\
 \quad \text{if}\ cache [x]\ \text{undefined:}\\
-\qquad \text{if TEST}(x)+x'\neq \text{false}\\
+\qquad \colorbox{Yellow}{$\text{if TEST}(x) = x'\neq \mathtt{false}$}\\
 \qquad \quad \text{return} \ cache[x']\\
 \qquad\text{else}\\
 \qquad \quad cache[x]\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{out}\\
@@ -460,15 +498,15 @@ cache := \text{empty assoc. array}\\
 s\leftarrow S\\
 H_{inv}:=\text{empty assoc. array}\\
 \underline{\text{TEST}(x):}\\
-\qquad y:=H(s,x)\\
-\qquad \text{if}\ H_{inv}[y]\ \text{defined:}\\
-\qquad \quad \text{return}\ H_{inv}[y]\\
-\qquad H_{inv}[y]:=x\\
-\quad  \text{return false}\\\hline
+\quad y:=H(s,x)\\
+\quad \text{if}\ H_{inv}[y]\ \text{defined:}\\
+\quad \quad \text{return}\ H_{inv}[y]\\
+\quad H_{inv}[y]:=x\\
+\quad  \text{return}\ \mathtt{false}\\\hline
 \end{array}
 $$
 
-The security of $H$ is that we can swap $\mathcal{L}_{\text {bcr-real }}^{H}$ for $\mathcal{L}_{\text {bcr-fake }}^{H},$ with negligible effect on the calling program. Note that TEST algorithm in $\mathcal{L}_{\text {bcr-fake }}$ always returns false. This leads us to simply remove the "if $\operatorname{TEST}(x) \neq$ false" clause, resulting in the following:
+The security of $H$ is that we can swap $\mathcal{L}_{\text {bcr-real }}^{H}$ for $\mathcal{L}_{\text {bcr-fake }}^{H},$ with negligible effect on the calling program. Note that TEST algorithm in $\mathcal{L}_{\text {bcr-fake }}$ always returns false. This leads us to simply remove the "if $\operatorname{TEST}(x) \neq$ $\mathtt{false}$" clause, resulting in the following:
 
 $$
 \def\arraystretch{1.5}
@@ -482,7 +520,7 @@ cache := \text{empty assoc. array}\\
 \end{array}
 $$
 
-Since this is exactly $\mathcal{L}_{\text {prf-rand }}^{\mathrm{CW}},$ we are done. We have shown that $\mathcal{L}_{\text {prf-rand }}^{\mathrm{CW}} \approx \mathcal{L}_{\text {prf-rand }}^{\mathrm{CW}}$
+Since this is exactly $\mathcal{L}_{\text {prf-rand }}^{\mathrm{CW}},$ we are done. We have shown that $\mathcal{L}_{\text {prf-rand }}^{\mathrm{CW}} \approx \mathcal{L}_{\text {prf-rand }}^{\mathrm{CW}}$$\qquad\blacksquare$
 
 ## 12.4 Galois Counter Mode for AEAD
 The most common block cipher mode for AEAD is called Galois Counter Mode (GCM). GCM is essentially an instance of encrypt-then-MAC, combining CTR mode for encryption and the polynomial-based Carter-Wegman MAC for authentication. GCM is relatively inexpensive since it requires only one call to the block cipher per plaintext block, plus one multiplication for each block of ciphertext + associated data.
@@ -490,7 +528,7 @@ The most common block cipher mode for AEAD is called Galois Counter Mode (GCM). 
 Rather than using polynomials over $\mathbb{Z}_{p},$ GCM mode uses polynomials defined over a finite field with $2^{\lambda}$ elements. Such fields are often called "Galois fields," which leads to the name Galois counter mode.
 
 **to-do**
->More information about GCM will go here. Again, be nice to have a crash co finite fields.
+> *More information about GCM will go here. Again, be nice to have a crash co finite fields.*
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
@@ -498,11 +536,11 @@ $$
 
 ### Exercises
 **to-do**
->.. more on the way ...
+> *.. more on the way ...*
 
-12.1. Suppose Enc-then-MAC+AD is instantiated with CBC mode and any secure MAC, as described in Construction 12.4. The scheme is secure for fixed-length associated data. Show that if variable-length associated data is allowed, then the scheme does not provide AEAD security.
+12.1. Suppose Enc-then-MAC+AD is instantiated with CBC mode and any secure MAC, as described in Construction 12.4. The scheme is secure for fixed-length associated data. Show that if variable-length associated data is allowed, then the scheme does **not** provide AEAD security.
 
-Note: you are not attacking the MAC! Take advantage of the fact that $d\|c$ is ambiguous when the length of d is not fixed and publicly known.
+*Note:* you are not attacking the MAC! Take advantage of the fact that $d\|c$ is ambiguous when the length of d is not fixed and publicly known.
 
 12.2. Suggest a way to make Construction 12.4 secure for variable-length associated data. Prove that your construction is secure.
 
