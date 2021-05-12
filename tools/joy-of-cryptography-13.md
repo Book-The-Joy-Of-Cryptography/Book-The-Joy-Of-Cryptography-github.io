@@ -1,18 +1,18 @@
 # 13 RSA & Digital Signatures
 
-RSA was among the first public-key cryptography developed. It was first described in $1978,$ and is named after its creators, Ron Rivest, Adi Shamir, and Len Adleman. ${ }^{1}$ RSA can be used as a building block for public-key encryption and digital signatures. In this chapter we discuss only the application of RSA for digital signatures.
-
+RSA was among the first public-key cryptography developed. It was first described in $1978,$ and is named after its creators, Ron Rivest, Adi Shamir, and Len Adleman. [^1] RSA can be used as a building block for public-key encryption and digital signatures. In this chapter we discuss only the application of RSA for digital signatures.
+[^1]: Clifford Cocks developed an equivalent scheme in 1973, but it was classified since he was working for British intelligence.
 ## 13.1 "Dividing" Mod $n$
 
 **to-do**
->I'm considering moving some of this material to Chapter 3 (secret sharing) - enough to understand that every nonzero element has a multiplicative inverses modulo a prime (totients, etc can stay here). That way, I don't have to say "trust me, this can be made to work" when describing Lagrange interpolation over a prime field, and students can play around with secret sharing using Sage. Also, students will see that there is "serious math" in the course already in chapter 3 so they don't get blindsided as we transition into public-keycrypto. (Not to mention, this chapter is too long.)
+>*I'm considering moving some of this material to Chapter 3 (secret sharing) - enough to understand that every nonzero element has a multiplicative inverses modulo a prime (totients, etc can stay here). That way, I don't have to say "trust me, this can be made to work" when describing Lagrange interpolation over a prime field, and students can play around with secret sharing using Sage. Also, students will see that there is "serious math" in the course already in chapter 3 so they don't get blindsided as we transition into public-keycrypto. (Not to mention, this chapter is too long.)*
 
-Please review the material from Section $0.2,$ to make sure your understanding of basic modular arithmetic is fresh. You should be comfortable with the definitions of $\mathbb{Z}_{n}$, congruence $\left(\equiv_{n}\right),$ the modulus operator $(\%),$ and how to do addition, multiplication, and subtraction $\bmod n$
+Please review the material from Section $0.2,$ to make sure your understanding of basic modular arithmetic is fresh. You should be comfortable with the definitions of $\mathbb{Z}_{n}$, congruence $\left(\equiv_{n}\right),$ the modulus operator $(\%),$ and how to do addition, multiplication, and subtraction $\bmod\ n$
 
 Note that we haven't mentioned division $\bmod n$. Does it even make sense to talk about division mod $n ?$
 
 **Example**
-Consider the following facts which hold mod 15:
+*Consider the following facts which hold mod 15:*
 $$
 \begin{array}{ll}
 2 \cdot 8 \equiv_{15} 1 & 10 \cdot 8 \equiv_{15} 5 \\
@@ -22,23 +22,23 @@ $$
 \end{array}
 $$
 
-Now imagine replacing " $\cdot 8$ "with $" \div 2$ " in each of these examples:
+*Now imagine replacing " $\cdot\ 8$ "with $" \div 2$ " in each of these examples:*
 $$
 \begin{array}{ll}
-2 \div 2 \equiv_{15} 1 & 10 \div 2 \equiv_{15} 5 \\
-4 \div 2 \equiv_{15} 2 & 12 \div 2 \equiv_{15} 6 \\
-6 \div 2 \equiv_{15} 3 & 14 \div 2 \equiv_{15} 7 \\
-8 \div 2 \equiv_{15} 4 &
+2 \colorbox{Yellow}{$\div$ 2} \equiv_{15} 1 & 10 \colorbox{Yellow}{$\div$ 2} \equiv_{15} 5 \\
+4 \colorbox{Yellow}{$\div$ 2} \equiv_{15} 2 & 12 \colorbox{Yellow}{$\div$ 2} \equiv_{15} 6 \\
+6 \colorbox{Yellow}{$\div$ 2} \equiv_{15} 3 & 14 \colorbox{Yellow}{$\div$ 2} \equiv_{15} 7 \\
+8 \colorbox{Yellow}{$\div$ 2} \equiv_{15} 4 &
 \end{array}
 $$
 
-Everything still makes sense! Somehow, multiplying by 8 mod 15 seems to be the same thing as "dividing by $2 " \bmod 15 .$
+*Everything still makes sense! Somehow, multiplying by 8 mod 15 seems to be the same thing as "dividing by $2 " \bmod 15 .$*
 
-The previous examples all used $x \cdot 8(x \div 2)$ where $x$ was an even number. What happens when $x$ is an odd number?
+*The previous examples all used $x \cdot 8(x \div 2)$ where $x$ was an even number. What happens when $x$ is an odd number?*
 $$
-3 \cdot 8 \equiv_{15} 9 \Longleftrightarrow " 3 \div 2 \equiv_{15} 9 " ? ?
+3 \cdot 8 \equiv_{15} 9 \Longleftrightarrow " 3 \div 2 \equiv_{15} 9 " \textit{? ?}
 $$
-This might seem non-sensical, but if we make the substitutions $3 \equiv_{15}-12$ and $9 \equiv_{15}-6,$ then we do indeed get something that makes sense:
+*This might seem non-sensical, but if we make the substitutions $3 \equiv_{15}-12$ and $9 \equiv_{15}-6,$ then we do indeed get something that makes sense:*
 $$
 -12 \cdot 8 \equiv_{15}-6 \Longleftrightarrow-12 \div 2 \equiv_{15}-6
 $$
@@ -53,25 +53,27 @@ We usually don't directly use the terminology of "division" with modular arithme
 
 **Definition 13.1 ($x^{-1}$ mod $n$)**
 
-The **multiplicative inverse** of $x$ mod $n$ is the integer $y$ that satisfies $x \cdot y \equiv_{n} 1$ (if such a number exists). We usually refer to the multiplicative inverse of $x$ as $x^{-1}$."
+*The **multiplicative inverse** of $x$ mod $n$ is the integer $y$ that satisfies $x \cdot y \equiv_{n} 1$ (if such a number exists). We usually refer to the multiplicative inverse of $x$ as "$x^{-1}$."*
 
 **Example**
-Contuining to work mod $15,$ we have:
+*Continuing to work mod $15,$ we have:*
 
- - $4^{-1} \equiv_{15} 4$ since $4 \cdot 4=16 \equiv_{15}$ 1. Hence 4 is its own multiplicative inverse! You can also understand this as:
+ - $4^{-1} \equiv_{15} 4$ since $4 \cdot 4=16 \equiv_{15}$ 1. *Hence 4 is its own multiplicative inverse! You can also understand this as:*
 $$
 \begin{array}{l}
 4^{-1}=\left(2^{2}\right)^{-1}=\left(2^{-1}\right)^{2} \equiv _{15}8^{2}=64 \equiv_{15} 4 \\
 \end{array}
 $$
- - $7^{-1} \equiv_{15} 13 \text { since } 7 \cdot 13=91 \equiv_{15} 1$.
+ - $7^{-1} \equiv_{15} 13 \textit{ since } 7 \cdot 13=91 \equiv_{15} 1$.
 
 We are interested in which numbers have a multiplicative inverse mod $n$.
 
 **Definition 13.2 $(\mathbb{Z}_n^*)$**
-The **multiplicative group modulo** $n$ is defined as:
+*The **multiplicative group** [^2]**modulo** $n$ is defined as:*
+[^2]: “Group” is a technical term from abstract algebra.
+
 $$
-\mathbb{Z}_{n}^{*}=\left\{x \in \mathbb{Z}_{n} \mid x \text { has a multiplicative inverse mod } n\right\}
+\mathbb{Z}_{n}^{*}=\left\{x \in \mathbb{Z}_{n} \mid x \textit{ has a multiplicative inverse mod } n\right\}
 $$
 
 For example, we have seen that $\mathbb{Z}_{n}^{*}$ contains the numbers $2,4,$ and 7 (and perhaps others), but it doesn't contain the number 3 since 3 does not have a multiplicative inverse. 
@@ -79,65 +81,67 @@ For example, we have seen that $\mathbb{Z}_{n}^{*}$ contains the numbers $2,4,$ 
 So which numbers have a multiplicative inverse mod $n$, in general? (Which numbers belong to $\mathbb{Z} *_{n} ?$ ) The answer is quite simple:
 
 **Theorem 13.3**
-$x$ has a multiplicative inverse mod $n$ **if and only if** $\operatorname{gcd}(x, n)=1 .$ In other words, $\mathbb{Z}_{n}^{*}=\{x \in$ $\left.\mathbb{Z}_{n} \mid \operatorname{gcd}(x, n)=1\right\}$
+*$x$ has a multiplicative inverse mod $n$ **if and only if** $\operatorname{gcd}(x, n)=1 .$ In other words, $\mathbb{Z}_{n}^{*}=\{x \in$ $\left.\mathbb{Z}_{n} \mid \operatorname{gcd}(x, n)=1\right\}$*
 
 We prove the theorem using another fact from abstract algebra which is often useful:
 
 **Theorem 13.4 (Bezout’s Theorem)**
-For all integers $x$ and $y,$ there exist integers $a$ and $b$ such that $a x+b y=\operatorname{gcd}(x, y) .$ In fact, $\operatorname{gcd}(x, y)$ is the smallest positive integer that can be written as an integral linear combination of $x$ and $y$
+*For all integers $x$ and $y,$ there exist integers $a$ and $b$ such that $a x+b y=\operatorname{gcd}(x, y) .$ In fact, $\operatorname{gcd}(x, y)$ is the smallest positive integer that can be written as an integral linear combination of $x$ and $y$*
 
 We won't prove Bezout's theorem, but we will show how it is used to prove Theorem 13.3:
 
 **Proof (of Theorem 13.3)**
-$(\Leftarrow)$ Suppose $\operatorname{gcd}(x, n)=1 .$ We will show that $x$ has a multiplicative inverse $\bmod n .$ From Bezout's theorem, there exist integers $a, b$ satisfying $a x+b n=1 .$ By reducing both sides of this equation modulo $n$, we have
+$(\Leftarrow)$ Suppose $\operatorname{gcd}(x, n)=1 .$ We will show that $x$ has a multiplicative inverse $\bmod\ n .$ From Bezout's theorem, there exist integers $a, b$ satisfying $a x+b n=1 .$ By reducing both sides of this equation modulo $n$, we have
 $$
 1=a x+b n \equiv_{n} a x+b \cdot 0=a x
 $$
 Thus the integer $a$ that falls out of Bezout's theorem is the multiplicative inverse of $x$ modulo $n$ 
 
-$(\Rightarrow)$ Suppose $x$ has a multiplicative inverse $\bmod n,$ so $x x^{-1} \equiv_{n}$. $1 .$ We need to show that $\operatorname{gcd}(x, n)=1$. From the definition of $\equiv_{n}$, we know that $n$ divides $x x^{-1}-1$, so we can write $x x^{-1}-1=k n$ (as an expression over the integers) for some integer $k$. Rearranging, we have $x x^{-1}-k n=1$. Since we can write 1 as an integral linear combination of $x$ and $n$ Bezout's theorem says that we must have $\operatorname{gcd}(x, n)=1$.
+$(\Rightarrow)$ Suppose $x$ has a multiplicative inverse $\bmod\ n,$ so $x x^{-1} \equiv_{n}$. $1 .$ We need to show that $\operatorname{gcd}(x, n)=1$. From the definition of $\equiv_{n}$, we know that $n$ divides $x x^{-1}-1$, so we can write $x x^{-1}-1=k n$ (as an expression over the integers) for some integer $k$. Rearranging, we have $x x^{-1}-k n=1$. Since we can write 1 as an integral linear combination of $x$ and $n$ Bezout's theorem says that we must have $\operatorname{gcd}(x, n)=1$.   $\qquad \blacksquare$
 
 **Example**
-$\mathbb{Z}_{15}=\{0,1, \ldots, 14\},$ and to obtain $\mathbb{Z}_{15}^{*}$ we exclude any of the numbers that share a common factor with $15 .$ In other words, we exclude the multiples of 3 and multiples of $5 .$ The remaining numbers are $\mathbb{Z}_{15}^{*}=\{1,2,4,7,8,11,13,14\}$
+$\mathbb{Z}_{15}=\{0,1, \ldots, 14\},$ *and to obtain* $\mathbb{Z}_{15}^{*}$ *we exclude any of the numbers that share a common factor with $15 .$ In other words, we exclude the multiples of 3 and multiples of $5 .$ The remaining numbers are* $\mathbb{Z}_{15}^{*}=\{1,2,4,7,8,11,13,14\}$
 
-Since 11 is a prime, 0 is the only number in $\mathbb{Z}_{11}$ that shares a common factor with $11 .$ All the rest satisfy $\operatorname{gcd}(x, 11)=1 .$ Hence, $\mathbb{Z}_{11}^{*}=\{1,2, \cdots, 10\} .$
+*Since 11 is a prime, 0 is the only number in $\mathbb{Z}_{11}$ that shares a common factor with 11 . All the rest satisfy $\operatorname{gcd}(x, 11)=1 .$ Hence, $\mathbb{Z}_{11}^{*}=\{1,2, \cdots, 10\} .$*
 
 **Example**
-We can use **Sage** to play around with these concepts. Sage supports the \% operator for modulus:
+We can use **Sage**[^3] to play around with these concepts. Sage supports the \% operator for modulus:
 
-sage: $2 \times 8$ \& 15 
+[^3]: https://www.sagemath.org
+
+>$\mathtt{sage}$: $2 \times 8$ %  15 
 1
 
-It also supports a convenient way to generate "Z $_{n}$ -objects," or Mod-objects as they are called. An object like Mod (2,15) represents the value $2 \in \mathbb{Z}_{15},$ and all of its operations are overloaded to be the mod-15 operations:
+*It also supports a convenient way to generate "Z$_{n}$-objects," or Mod-objects as they are called. An object like Mod (2,15) represents the value $2 \in \mathbb{Z}_{15},$ and all of its operations are overloaded to be the mod-15 operations:*
 
-sage: $\operatorname{Mod}(2,15) \times 8$
+>$\mathtt{sage}$: $\mathtt{Mod}(2,15) * 8$
 1
-sage: $\operatorname{Mod}(2,15)+31415926$
+$\mathtt{sage}$: $\mathtt{Mod}(2,15)+31415926$
 3
-sage: $\operatorname{Mod}(-1,15)$
+$\mathtt{sage}$: $\mathtt{Mod}(-1,15)$
 14
 
-In Sage, you can compute multiplicative inverses in a few different ways:
+*In Sage, you can compute multiplicative inverses in a few different ways:*
 
-sage: $\operatorname{Mod}(2,15)^{\wedge}-1$
+>$\mathtt{sage}$: $\mathtt{Mod}(2,15)^{\wedge}-1$
 8
-sage: $1 / \operatorname{Mod}(2,15)$
+$\mathtt{sage}$: $1 / \mathtt{Mod}(2,15)$
 8
-sage: 2 . inverse_mod(15) 
+$\mathtt{sage}$: $2 . \mathtt{inverse\_mod}(15)$ 
 8
-sage: $(1 / 2) \% 15$ 
+$\mathtt{sage}$: $(1 / 2)$ % $15$ 
 8
 
-Sage is smart enough to know when a multiplicative inverse doesn't exist:
+*Sage is smart enough to know when a multiplicative inverse doesn't exist:*
 
-sage: $\operatorname{Mod}(3,15)^{\wedge}-1$
+>sage: $\mathtt{Mod}(3,15)^{\wedge}-1$
 ZeroDivisionError: inverse of Mod (3,15) does not exist
 
-Sage supports huge integers, with no problem:
+*Sage supports huge integers, with no problem:*
 
-sage: $\mathrm{n}=3141592653589793238462643383279502884197169399375105820974944$
-sage: $x=1234567890123456789012345678901234567890123456789012345678901$
-sage: $1 / \operatorname{Mod}(x, n)$
+>$\mathtt{sage}$: $\mathrm{n}=3141592653589793238462643383279502884197169399375105820974944$
+$\mathtt{sage}$: $x=1234567890123456789012345678901234567890123456789012345678901$
+$\mathtt{sage}$:  $1 / \mathtt{Mod}(x, n)$
 2234412539909122491686747985730075304931040310346724620855837
 
 The relationship between multiplicative inverses and GCD goes even farther than Theorem 13.3. Recall that we can compute $\operatorname{gcd}(x, n)$ efficiently using Euclid's algorithm. There is a relatively simple modification to Euclid's algorithm that also computes the corresopnding Bezout coefficients with little extra work. In other words, given $x$ and $n$, it is possible to efficiently compute integers $a, b,$ and $d$ such that
@@ -154,22 +158,22 @@ $$
 \quad \text{if}\ y=0\\
 \qquad \text{return}\ (x,1,0)\\
 \quad \text{else:}\\
-\qquad (d,a,b):=\text{EXTGCD}(y,x\%y)\\
+\qquad (d,a,b):=\text{EXTGCD}(y,x\ \%\ y)\\
 \qquad \text{return} (d,b,a-b[x/y])\\\hline
 \end{array}
 $$
 
 **Example**
-Sage implements the extended Euclidean algorithm as "xgcd":
+*Sage implements the extended Euclidean algorithm as "xgcd":*
 
-sage: $x \operatorname{gcd}(427,529)$
+> $\mathtt{sage}$: $\mathtt{xgcd}$(427,529)
 (1, 223, -180)
-sage: $223 * 427+(-18 \theta) * 529$
+$\mathtt{sage}$: 223 $*$ 427 + (-180) $*$ 529
 1
 
-You can then see that 223 and 427 are multiplicative inverses mod 529:
+*You can then see that 223 and 427 are multiplicative inverses mod 529:*
 
-sage: $427 * 223$ \& 529 
+$\mathtt{sage}$: 427 $*$ 223  % 529 
 1
 
 ### The Totient Function
@@ -190,22 +194,22 @@ General formulas for $\phi(n)$ exist, but they typically rely on knowing the pri
 The reason we consider $\phi(n)$ at all is this fundamental theorem from abstract algebra:
 
 **Theorem 13.5 (Euler’s Theorem)**
-If $x \in \mathbb{Z}_{n}^{*}$ then $x^{\phi(n)} \equiv_{n} 1$
+*If $x \in \mathbb{Z}_{n}^{*}$ then $x^{\phi(n)} \equiv_{n} 1$*
 
 **Example**
-Using the formula for $\phi(n),$ we can see that $\phi(15)=\phi(3 \cdot 5)=(3-1)(5-1)=8 .$ Euler's theorem says that raising any element of $\mathbb{Z}_{15}^{*}$ to the 8 power results in 1: We can use Sage to verify this:
+*Using the formula for $\phi(n),$ we can see that $\phi(15)=\phi(3 \cdot 5)=(3-1)(5-1)=8 .$ Euler's theorem says that raising any element of $\mathbb{Z}_{15}^{*}$ to the 8 power results in 1: We can use Sage to verify this:*
 
-sage: for $i$ in range(15):
-$\ldots .: \quad$ if $\operatorname{gcd}(i, 15)=1:$
-$\ldots \qquad\quad$ print ("%d^8 mod 15 = %d" % (i, i ^8 % 15))
-$1^{\wedge} 8$ mod $15=1$
-$2^{\wedge} 8$ mod $15=1$
-$4^{\wedge} 8$ mod $15=1$
-$7^{\wedge} 8$ mod $15=1$
-$8^{\wedge} 8$ mod $15=1$
-$11^{\wedge} 8$ mod $15=1$
-$13^{\wedge} 8$ mod $15=1$
-$14^{\wedge} 8$ mod $15=1$
+>sage: for i in range(15):
+$\ldots.:\quad$if gcd(i, 15) == 1:
+$\ldots.: \qquad\quad$ print ("%d^8 mod 15 = %d" % (i, i ^8 % 15))
+1^ 8 mod 15 = 1
+2^ 8 mod 15 = 1
+4^ 8 mod 15 = 1
+7^ 8 mod 15 = 1
+8^ 8 mod 15 = 1 
+11^ 8 mod 15 = 1 
+13^ 8 mod 15 = 1
+14^ 8 mod 15 = 1
 
 ## 13.2 The RSA Function
 The RSA function is defined as follows:
