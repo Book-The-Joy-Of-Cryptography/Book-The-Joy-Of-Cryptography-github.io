@@ -1,3 +1,4 @@
+
 # 13 RSA & Digital Signatures
 
 RSA was among the first public-key cryptography developed. It was first described in $1978,$ and is named after its creators, Ron Rivest, Adi Shamir, and Len Adleman. [^1] RSA can be used as a building block for public-key encryption and digital signatures. In this chapter we discuss only the application of RSA for digital signatures.
@@ -215,13 +216,13 @@ $\ldots.: \qquad\quad$ print ("%d^8 mod 15 = %d" % (i, i ^8 % 15))
 The RSA function is defined as follows:
 - Let $p$ and $q$ be distinct primes (later we will say more about how they are chosen), and let $N=p q . N$ is called the **RSA modulus**.
 
-- Let $e$ and $d$ be integers such that $e d \equiv \phi(N)$. That is, $e$ and $d$ are multiplicative inverses mod $\phi(N)-$ not $\bmod N !$
+- Let $e$ and $d$ be integers such that $e d \equiv _{\phi(N)}$. That is, $e$ and $d$ are multiplicative inverses mod $\phi(N)-$ not $\bmod\ N !$
 
 - The RSA function is: $x \mapsto x^{e} \% N,$ where $x \in \mathbb{Z}_{N}$.
 
 - The inverse RSA function is: $y \mapsto y^{d} \% N,$ where $x \in \mathbb{Z}_{N}$.
 
-Essentially, the RSA function (and its inverse) is a simple modular exponentiation. The most confusing thing to remember about RSA is that $e$ and $d$ "live" in $\mathbb{Z}_{\phi(N)}^{*},$ while $x$ and $y^{\text {" }}$ live" in $\mathbb{Z}_{N}$.
+Essentially, the RSA function (and its inverse) is a simple modular exponentiation. The most confusing thing to remember about RSA is that $e$ and $d$ "live" in $\mathbb{Z}_{\phi(N)}^{*},$ while $x$ and $y$ "live" in $\mathbb{Z}_{N}$.
 
 $$
 \textcolor{red}{{\text{Image screenshot here}}}
@@ -230,17 +231,17 @@ $$
 Let's make sure the function we called the "inverse RSA function" is actually an inverse of the RSA function. Let's start with an example:
 
 **Example**
-In Sage, we can sample a random prime between 1 and $k$ by using random_prime $(k) .$ We use it to sample the prime factors $p$ and $q$ :
+*In Sage, we can sample a random prime between 1 and $k$ by using random_prime $(k) .$ We use it to sample the prime factors $p$ and $q$ :*
 
-sage: $\mathrm{p}=$ random prime $\left(10^{\wedge} 5\right)$ 
+> sage: $\mathrm{p}=$ random prime $\left(10^{\wedge} 5\right)$ 
 sage: $q=$ random prime $\left(10^{\wedge} 5\right)$ 
 sage: $\mathrm{N}=\mathrm{p} * \mathrm{q}$
 sage: $\mathrm{N}$ 
 36486589
 
-Then we can compute the exponentse and d. Recall that they must be multiplicative inverses $\bmod \phi(N)$, so they cannot share any common factors with $\phi(N) .$ An easy way to ensure this is to choose e to be a prime:
+*Then we can compute the exponentse and d. Recall that they must be multiplicative inverses $mod\ \phi(N)$, so they cannot share any common factors with $\phi(N) .$ An easy way to ensure this is to choose e to be a prime:*
 
-sage:  $\mathrm{phi}=(\mathrm{p}-1) *(\mathrm{q}-1)$
+>sage:  $\mathrm{phi}=(\mathrm{p}-1) *(\mathrm{q}-1)$
 sage: $\mathrm{e}=$ random. prime( $\mathrm{phi}$ )
 sage: $\mathrm{e}$
 $28931431$
@@ -248,23 +249,24 @@ sage: $\mathrm{d}=1 / \operatorname{Mod}(\mathrm{e}, \mathrm{phi})$
 sage: $\mathrm{d}$ 
 $31549271$
 
-We can now raise something to the e power and again to the d power:
+*We can now raise something to the e power and again to the d power:*
 
-sage:  x=$31415926$
-sage:  y=x^e %N}
+> sage:  x=$31415926$
+sage:  y = x^e % N
 sage: y
 $1798996$
-sage:  y^d & N
+sage:  y^d % N
 $31415926$
 
-As you can see, raising to the e power and then d power $(\bmod N)$ seems to bring us back to where we started $(x) .$
+*As you can see, raising to the e power and then d power $(mod\ N)$ seems to bring us back to where we started $(x) .$*
 
-We can argue that raising-to-the- $e$ -power and raising-to-the- $d$ -power are inverses in general: Since $e d \equiv_{\phi(N)} 1,$ we can write $e d=t \phi(N)+1$ for some integer $t .$ Then:
+We can argue that raising-to-the-$e$-power and raising-to-the-$d$-power are inverses in general: Since $ed \equiv_{\phi(N)} 1,$ we can write $ed = t\phi(N)+1$ for some integer $t .$ Then:
 $$
 \left(x^{e}\right)^{d}=x^{e d}=x^{t \phi(N)+1}=\left(x^{\phi(N)}\right)^{t} x \equiv_{N} 1^{t} x=x
 $$
 
-Note that we have used the fact that $x^{\phi(N)} \equiv_{N} 1$ from Euler's theorem.
+Note that we have used the fact that $x^{\phi(N)} \equiv_{N} 1$ from Euler's theorem.[^4]
+[^4]: However, see Exercise 13.15.
 
 ### How [Not] to Exponentiate Huge Numbers
 
@@ -281,7 +283,7 @@ $$\begin{array}{|l|}\hline
 While this algorithm would indeed give the correct answer, it is a really bad way of doing it. In practice, we use RSA with numbers that are thousands of bits long. Suppose we run the NAIVEEXPONENTIATE algorithm with arguments $x, e,$ and $N$ which are around a thousand bits each (so the magnitude of these numbers is close to $2^{1000}$ ):
 
 1. The algorithm will spend approximately $2^{1000}$ iterations in the for-loop!
-2. The algorithm computes $x^{e}$ as an integer first, and then reduces that integer mod $N$. Observe that $x^{2}$ is roughly 2000 bits long, $x^{3}$ is roughly 3000 bits long, etc. So it would take about $2^{1000} \cdot 1000$ bits just to write down the integer $x^{e}$.
+2. The algorithm computes $x^{e}$ as an *integer* first, and then reduces that integer mod $N$. Observe that $x^{2}$ is roughly 2000 bits long, $x^{3}$ is roughly 3000 bits long, etc. So it would take about $2^{1000} \cdot 1000$ bits just to write down the integer $x^{e}$.
 
 As you can see, there is neither enough time nor storage capacity in the universe to use this algorithm. So how can we actually compute values like $x^{e} \% N$ on huge numbers?
 1. Suppose you were given an integer $x$ and were asked to compute $x^{17}$. You can compute it as:
@@ -294,9 +296,9 @@ x^{17}=x^{16} \cdot x=\left(\left(\left(x^{2}\right)^{2}\right)^{2}\right)^{2} \
 $$
 This expression can be evaluated with only 5 multiplications (squaring is just muliplying a number by itself).
 
-More generally, you can compute an expression like $x^{e}$ by following the recurrence below. The method is called **exponentiation by repeated squaring,** for reasons that are hopefully clear:
+    More generally, you can compute an expression like $x^{e}$ by following the recurrence below. The method is called **exponentiation by repeated squaring,** for reasons that are hopefully clear:
 
-$$x^e=\left\{\begin{array}{ll}
+    $$x^e=\left\{\begin{array}{ll}
 1 & \text{if}\ e=0\\
 (x^{e/2})^2 & \text{if}\ e\ \text{even}\\
 (x^{\frac{e-1}{2}})^2\cdot x & \text{if}\ e\ \text{odd}
@@ -309,10 +311,11 @@ $$x^e=\left\{\begin{array}{ll}
 \qquad \text{return BETTEREXP}(x,\frac{e-1}{2})^2\cdot x\\\hline
 \end{array}$$
 
-BETTEREXP divides the $e$ argument by two (more or less) each time it recurses, until reaching the base case. Hence, the number of recursive calls is $O(\log e) .$ In each recursive call there are only a constant number of multiplications (including squarings). So overall this algorithm requires only $O(\log e)$ multiplications (compared to $e-1$ multiplications by just multiplying $m$ by itself $e$ times). In the case where $e \sim 2^{1000},$ this means only a few thousand multiplications.
+    BETTEREXP divides the $e$ argument by two (more or less) each time it recurses, until reaching the base case. Hence, the number of recursive calls is $O(\log e) .$ In each recursive call there are only a constant number of multiplications (including squarings). So overall this algorithm requires only $O(\log e)$ multiplications (compared to $e-1$ multiplications by just multiplying $m$ by itself $e$ times). In the case where $e \sim 2^{1000},$ this means only a few thousand multiplications.
 
- 2. We care about only $x^{e} \% N,$ not the intermediate integer value $x^{e} .$ One of the most fundamental features of modular arithmetic is that you can reduce any intermediate values mod $N$ if you care about the final result only $\bmod N$.
-Revisiting our previous example:
+ 2. We care about only $x^{e} \% N,$ not the intermediate *integer* value $x^{e} .$ One of the most fundamental features of modular arithmetic is that you can **reduce any intermediate values mod** $N$ if you care about the final result only $\bmod\ N$.
+ 
+    Revisiting our previous example:
 $$
 x^{17} \% N=x^{16} \cdot x \% N=\left(\left(\left(x^{2} \% N\right)^{2} \% N\right)^{2} \% N\right)^{2} \cdot x \% N
 $$
@@ -322,32 +325,32 @@ $$\begin{array}{|l|}\hline
 \underline{\text{MODEXP} (x, e, N):} // compute x^e\% N\\
 \quad\text{if $e = 0$: return 1}\\
 \quad \text{if $e$ even:} \\
-\qquad \text{return MODEXP}(x,\frac{e}{2},N)^2 \% N\\
+\qquad \text{return MODEXP}(x,\frac{e}{2},N)^2 \colorbox{Yellow}{\% $N$}\\
 \quad \text{if $e$ odd:}\\
-\qquad \text{return MODEXP}(x,\frac{e-1}{2},N)^2\cdot x \% N\\\hline
+\qquad \text{return MODEXP}(x,\frac{e-1}{2},N)^2\cdot x \colorbox{Yellow}{\% $N$}\\\hline
 \end{array}$$
 
 This algorithm avoids the problem of computing the astronomically huge integer $x^{e} .$ It never needs to store any value (much) larger than $N$.
 
-**Warning:** Even this MopExp algorithm isn't an ideal way to implement exponentiation for cryptographic purposes. Exercise 13.10 explores some unfortunate properties of this exponentiation algorithm.
+**Warning:** *Even this MopExp algorithm isn't an ideal way to implement exponentiation for cryptographic purposes. Exercise 13.10 explores some unfortunate properties of this exponentiation algorithm.*
 
 **Example**
-Most math libraries implement exponentiation using repeated squaring. For example, you can use Sage to easily calculate numbers with huge exponents:
+*Most math libraries implement exponentiation using repeated squaring. For example, you can use Sage to easily calculate numbers with huge exponents:*
 
-sage: $427^{\wedge} 31415926$ % 100
+> sage: $427^{\wedge} 31415926$ % 100
 89
 
-However, this expression still tells Sage to compute $427^{31415926}$ **as an integer**, before reducing it mod $100 .$ As such, it takes some time to perform this computation.
+*However, this expression still tells Sage to compute $427^{31415926}$ **as an integer**, before reducing it mod $100 .$ As such, it takes some time to perform this computation.*
 
-If you try an expression like $\mathrm{x}^{\wedge} \mathrm{e}$ \& $\mathrm{N}$ with a larger exponent, Sage will give a memory error. How can we tell Sage to perform modular reduction at every intermediate step during repeated squaring? The answer is to use Sage's Mod objects, for example:
+*If you try an expression like $\mathtt{x}^{\wedge} \mathtt{e}$ %  $\mathtt{N}$ with a larger exponent, Sage will give a memory error. How can we tell Sage to perform modular reduction at every intermediate step during repeated squaring? The answer is to use Sage's Mod objects, for example:*
 
-sage: $\operatorname{Mod}(427,100)^{\wedge} 314159265358979$
+> sage: $\operatorname{Mod}(427,100)^{\wedge} 314159265358979$
 63
 
-This expression performs repeated squaring on the object Mod $(427,100) .$ Since a Mod-object's operations are all overloaded (to give the answer only mod $n$ ), this has the result of doing a modular reduction after every squaring and multiplication. This expression runs instantaneously, even with very large numbers.
+*This expression performs repeated squaring on the object Mod $(427,100) .$ Since a Mod-object's operations are all overloaded (to give the answer only mod $n$ ), this has the result of doing a modular reduction after every squaring and multiplication. This expression runs instantaneously, even with very large numbers.*
 
 ### Security Properties \& Discussion
-RSA is what is called a trapdoor function.
+RSA is what is called a **trapdoor function**.
 
 - One user generates the RSA parameters (primarily $N, e,$ and $d$ ) and makes $N$ and $e$ public, while keeping $d$ private.
 
@@ -356,31 +359,32 @@ RSA is what is called a trapdoor function.
 **Security property**: Given only the public information, it should be hard to compute the RSA inverse $\left(y \mapsto y^{d} \% N\right)$ on randomly chosen values. In other words, the only person who is able to compute the RSA inverse function is the person who generated the RSA parameters.
 
 **to-do**
->The security property is not natural to express in our language of security definitions (libraries).
+>*The security property is not natural to express in our language of security definitions (libraries).*
 
-Currently the best known attacks against RSA (i.e., ways to compute the inverse RSA function given only the public information) involve factoring the modulus. If we want to ensure that RSA is secure as a trapdoor function, we must understand the state of the art for factoring large numbers.
+Currently the best known attacks against RSA (*i.e.*, ways to compute the inverse RSA function given only the public information) involve factoring the modulus. If we want to ensure that RSA is secure as a trapdoor function, we must understand the state of the art for factoring large numbers.
 
-Before discussing the performance of factoring algorithms, remember that we measure performance as a function of the **length** of the input - how many bits it takes to write the input. In a factoring algorithm, the input is a large number $N,$ and it takes roughly $n=\log _{2} N$ bits to write down that number. We will discuss the running time of algorithms as a function of $n,$ not $N$. Just keep in mind the difference in cost between writing down a 1000 -bit number $(n=1000)$ vs counting up to a 1000 -bit number $\left(N=2^{1000}\right)$
+Before discussing the performance of factoring algorithms, remember that we measure performance as a function of the **length** of the input - how many bits it takes to write the input. In a factoring algorithm, the input is a large number $N,$ and it takes roughly $n=\log _{2} N$ bits to write down that number. We will discuss the running time of algorithms as a function of $n,$ not $N$. Just keep in mind the difference in cost between *writing down* a 1000-bit number $(n=1000)$ vs counting up to a 1000-bit number $\left(N=2^{1000}\right)$
 
 Everyone knows the "trial division" method of factoring: given a number $N,$ check whether $i$ divides $N,$ for every $i \in\{2, \ldots \sqrt{N}\} .$ This algorithm requires $\sqrt{N}=2^{n / 2}$ divisions in the worst case. It is an exponential-time algorithm since we measure performance in terms of the bit-length $n$.
 
 If this were the best-known factoring algorithm, then we would need to make $N$ only as large as $2^{256}$ to make factoring require $2^{128}$ effort. But there are much better factoring algorithms than trial division. The fastest factoring algorithm today is called the Generalized Number Field Sieve (GNFS), and its complexity is something like $O\left(n^{\left(\frac{n}{\log n}\right)^{\frac{1}{3}}}\right) .$ This is not a polynomial-time algorithm, but it's much faster than trial division.
 
 **Example**
-Sage can easily factor reasonably large numbers. Factoring the following 200-bit RSA modulus on my modest computer takes about 10 seconds:
+*Sage can easily factor reasonably large numbers. Factoring the following 200-bit RSA modulus on my modest computer takes about 10 seconds:*
 
-sage: $\mathrm{p}=$ random-prime $\left(2^{\wedge} 1 \theta \theta\right)$
-sage: $q=$ random prime $\left(2^{\wedge} 1 \theta \theta\right)$
+> sage: $\mathrm{p}=$ random_prime $\left(2^{\wedge} 100 \right)$
+sage: $q=$ random_prime $\left(2^{\wedge} 100 \right)$
 sage: $\mathrm{N}=\mathrm{p} * \mathrm{q}$
-sage: $f$ actor $(N)$ 
+sage: factor (N) 
 $206533721079613722225064934611 * 517582080563726621130111418123$
 
-As of January 2020, the largest RSA modulus that has been (publically) factored is a 795-bit modulus. Factoring this number required the equivalent of 900 CPU-core-years, or roughly $2^{66}$ total clock cycles.
+As of January 2020, the largest RSA modulus that has been (publically) factored is a 795-bit modulus.[^5] Factoring this number required the equivalent of 900 CPU-core-years, or roughly $2^{66}$ total clock cycles.
+[^5]: https://en.wikipedia.org/wiki/RSA_numbers#RSA-240
 
-All of this is to say, the numbers involved in RSA need to be quite large to resist factoring attacks (i.e., require $2^{128}$ effort for state-of-the-art factoring algorithms). Current best practices suggest to use 2048- or 4096-bit RSA moduli, meaning that $p$ and $q$ are each 1024 or 2048 bits.
+All of this is to say, the numbers involved in RSA need to be quite large to resist factoring attacks (*i.e*., require $2^{128}$ effort for state-of-the-art factoring algorithms). Current best practices suggest to use 2048- or 4096-bit RSA moduli, meaning that $p$ and $q$ are each 1024 or 2048 bits.
 
 **to-do**
-“What about quantum computers?” is a common FAQ that I should address here.
+> *“What about quantum computers?” is a common FAQ that I should address here.*
 
 ## 13.3 Digital Signatures
 MACs are a cryptographic primitive that provide authenticity. A valid MAC tag on $m$ is "proof" that someone who knows the key has vouched for $m .$ MACs are a symmetric-key primitive, in the sense that generating a MAC tag and verifying a MAC tag both require the same key (in fact, a tag is verified by re-computing it).
@@ -389,20 +393,19 @@ MACs are a cryptographic primitive that provide authenticity. A valid MAC tag on
 
 - KeyGen: outputs a **pair** of keys $(s k, v k)$, where $s k$ is the **signing key** and $v k$ is the **verification key**.
 
-- Sign: takes the signing key $s k$ and a message $m$ as input, and outputs a signature
-$\sigma$
+- Sign: takes the signing key $s k$ and a message $m$ as input, and outputs a signature $\sigma$.
 
 
 - Ver: takes the verification key $v k$, message $m$, and a potential signature $\sigma$ as input; outputs a boolean.
 
-If indeed $\sigma$ is an output of $\operatorname{Sign}(s k, m)$, then $\operatorname{Ver}(v k, m, \sigma)$ should output true. Intuitively, it should be hard for an attacker to find any other $(m, \sigma)$ pairs that cause Ver to output true.
+If indeed $\sigma$ is an output of $\operatorname{Sign}(s k, m)$, then $\operatorname{Ver}(v k, m, \sigma)$ should output $\mathtt{true}$. Intuitively, it should be hard for an attacker to find any other $(m, \sigma)$ pairs that cause Ver to output $\mathtt{true}$.
 
-The idea behind digital signatures is to make $v k$ public. In other words, anyone (even the attacker) should be able to verify signatures. But only the holder of $s k$ (the person who generated $v k$ and $s k$ ) should be able to generate valid signatures. Furthermore, this guarantee should hold even against an attacker who sees many examples of valid signatures. The attacker should not be able to generate new valid signatures.
+The idea behind digital signatures is to make $v k$ public. In other words, anyone (even the attacker) should be able to verify signatures. But only the holder of $s k$ (the person who generated $v k$ and $s k$ ) should be able to generate valid signatures. Furthermore, this guarantee should hold even against an attacker who sees many examples of valid signatures. The attacker should not be able to generate *new* valid signatures.
 
 We formalize this security property in a similar way that we formalized the security of MACs: "only the secret-key holder can generate valid tags, even after seeing chosen examples of valid tags."
 
 **Definition 13.6**
-Let $\Sigma$ be a signature scheme. We say that $\Sigma$ **is a secure signature** if $\mathcal{L}_{\text{sig-real}}^\Sigma\approx \mathcal{L}_{\text{sig-fake}}^\Sigma$, where:
+*Let $\Sigma$ be a signature scheme. We say that $\Sigma$ **is a secure signature** if $\mathcal{L}_{\text{sig-real}}^\Sigma\approx \mathcal{L}_{\text{sig-fake}}^\Sigma$, where:*
 
 $$\begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{sig-real}}^\Sigma\\\hline
@@ -429,7 +432,7 @@ S:=\emptyset\\
 \quad \text{return $(m,\sigma)\stackrel{?}{\in}S$}\\\hline
 \end{array}$$
 
-Similar to the security definition for MACs, the libraries differ only in how they verify signatures provided by the attacker (versig). If the attacker can generate a messagesignature pair $(m, \sigma)$ that (1) verifies correctly, but (2) was not generated previously by the library itself, then versia from the $\mathcal{L}_{\text {sig-real }}$ library will return true, while the $\mathcal{L}_{\text {sig-fake }}$ library would return false. By asking for the libraries to be indistinguishable, we are really asking that the attacker cannot find any such message-signature pair (forgery).
+Similar to the security definition for MACs, the libraries differ only in how they verify signatures provided by the attacker (VERSIG). If the attacker can generate a message-signature pair $(m, \sigma)$ that (1) verifies correctly, but (2) was not generated previously by the library itself, then VERSIG from the $\mathcal{L}_{\text {sig-real }}$ library will return $\mathtt{true}$, while the $\mathcal{L}_{\text {sig-fake }}$ library would return $\mathtt{false}$. By asking for the libraries to be indistinguishable, we are really asking that the attacker cannot find any such message-signature pair (forgery).
 
 The main difference to the MAC definition is that, unlike for the MAC setting, we intend to make a verification key public. The library can run $(v k, s k) \leftarrow$ KeyGen, but these values remain private by default. To make $v k$ public, we explicitly provide an accessor GETVK to the attacker.
 
@@ -443,8 +446,10 @@ This similarity suggests that we can use RSA for signatures in the following way
 $$\sigma^{e} \equiv_{N}\left(m^{d}\right)^{e} \equiv_{N} m$$
 The second equality is from the standard RSA property. Now this check can be done given only the public information $N$ and $e$.
 
+    A formal description of this scheme is given below:
+
 **Construction 13.7 (Textbook RSA)**
-The key generation algorithm is not listed here, but $N,e,d$ are generated in the usual way for RSA. The signing key is $sk = (N,d)$ and the verification key is $vk = (N, e)$.
+*The key generation algorithm is not listed here, but $N,e,d$ are generated in the usual way for RSA. The signing key is $sk = (N,d)$ and the verification key is $vk = (N, e)$.*
 
 $$
 \begin{array}{|l|}\hline
@@ -461,16 +466,16 @@ $$
 \end{array}
 $$
 
-Unfortunately, textbook RSA signatures are useful only as a first intuition. They are not secure! A simple attack is the following:
+Unfortunately, textbook RSA signatures are useful only as a first intuition. They are **not secure**! A simple attack is the following:
 
 Suppose an attacker knows the verification key $(N, e)$ and sees a valid signature $\sigma \equiv_N
-m^d$ for some messagem. Then $\sigma^2$ is also a valid signature for the message $m^2$, since:
+m^d$ for some message $m$. Then $\sigma^2$ is also a valid signature for the message $m^2$, since:
 $$\sigma^2\equiv_n(m^d)^2=(m^2)^d$$
 
 The attacker can easily generate a forged signature on a new message $m^2$, making the scheme insecure.
 
 ### Hashed RSA Signatures
-The problem with textbook RSA signatures is that the signatures and plaintexts had a very strong algebraic relationship. Squaring the signature had the effect of squaring the underlying message. One way to fix the problem is to “break” this algebraic relationship. Hashed RSA signatures break the algebraic structure by applying the RSA function not to m directly, but to $H(m)$, where $H$ is a suitable hash function (with outputs interpreted as elements of $\mathbb{Z}_N$ ).
+The problem with textbook RSA signatures is that the signatures and plaintexts had a very strong algebraic relationship. Squaring the signature had the effect of squaring the underlying message. One way to fix the problem is to “break” this algebraic relationship. Hashed RSA signatures break the algebraic structure by applying the RSA function not to $m$ directly, but to $H(m)$, where $H$ is a suitable hash function (with outputs interpreted as elements of $\mathbb{Z}_N$ ).
 
 **Construction 13.8 (Textbook RSA)**
 $$
@@ -493,15 +498,17 @@ Let's see how this change thwarts the attack on textbook signatures. If $\sigma$
 Of course, this is not a formal proof. It is possible to formally prove the security of hashed RSA signatures. The precise statement of security is: "if RSA is a secure trapdoor function and $H$ is modeled as a random oracle, then hashed RSA signatures are a secure signature scheme." Since we have not given formal definitions for either trapdoor functions or random oracles, we won't see the proof in this book.
 
 **to-do**
-Write a chapter on random oracle and other idealized models.
+> *Write a chapter on random oracle and other idealized models.*
 
 ## 13.4 Chinese Remainder Theorem
 
-When doing arithmetic $\bmod N,$ we can sometimes use knowledge of the factors $N=p q$ to speed things up. This section discusses the math behind these speedups.
+When doing arithmetic $\bmod\ N,$ we can sometimes use knowledge of the factors $N=p q$ to speed things up. This section discusses the math behind these speedups.
 
 **History.** In the *Sunzi Suanjing*, written some time around the 4 th century $\mathrm{CE}$, Chinese mathematician Sunzi posed an interesting puzzle involving remainders:
 
->"We have a number of things, but we do not know exactly how many. If we count them by threes we have two left over. If we count them by fives we have three left over. If we count them by sevens we have two left over. How many things are there? 
+>*"We have a number of things, but we do not know exactly how many. If we count them by threes we have two left over. If we count them by fives we have three left over. If we count them by sevens we have two left over. How many things are there?* [^6]
+
+[^6]: Chinese text is from an old manuscript of Sunzi Suanjing, but my inability to speak the language prevents me from identifying the manuscript more precisely. English translation is from Joseph Needham, Science and Civilisation in China, vol. 3: Mathematics and Sciences of the Heavens and Earth, 1959.
 
 Sunzi's puzzle is the first known instance of a system of simultaneous equations involving modular arithmetic: In our notation, he is asking us to solve for $x$ in the following system of congruences:
 $$
@@ -532,7 +539,7 @@ x=v a r+u b s \equiv_{r}(v a) 0+u\left(s^{-1} s\right)=u
 $$
 So $x \equiv_{r} u,$ as desired. Using similar reasoning $\bmod s,$ we can see that $x \equiv_{s} v,$ so $x$ is a solution to both equations.
 
-Now we argue that this solution is unique modulo $r s .$ Suppose $x$ and $x^{\prime}$ are two solutions to the system of equations, so we have:
+Now we argue that this solution is *unique* modulo $r s .$ Suppose $x$ and $x^{\prime}$ are two solutions to the system of equations, so we have:
 $$
 x \equiv_{r} x^{\prime} \equiv_{r} u
 $$
@@ -540,24 +547,24 @@ $$
 $$
 x \equiv_{s} x^{\prime} \equiv_{s} v
 $$
-Since $x \equiv_{r} x^{\prime}$ and $x \equiv_{s} x^{\prime},$ it must be that $x-x^{\prime}$ is a multiple of $r$ and a multiple of $s$. Since $r$ and $s$ are relatively prime, their least common multiple is $r s,$ so $x-x^{\prime}$ must be a multiple of $r s .$ Hence, $x \equiv_{r s} x^{\prime} .$ So any two solutions to this system of equations are congruent $\bmod r s$
+Since $x \equiv_{r} x^{\prime}$ and $x \equiv_{s} x^{\prime},$ it must be that $x-x^{\prime}$ is a multiple of $r$ and a multiple of $s$. Since $r$ and $s$ are relatively prime, their least common multiple is $r s,$ so $x-x^{\prime}$ must be a multiple of $r s .$ Hence, $x \equiv_{r s} x^{\prime} .$ So any two solutions to this system of equations are congruent $\bmod\ rs$. $\qquad \blacksquare$
 
 **Example**
-Sage implements the crt function to solve for $x$ in these kinds of systems of equations. Suppose we want to solve for $x$ :
+*Sage implements the crt function to solve for $x$ in these kinds of systems of equations. Suppose we want to solve for $x$ :*
 $$
 \begin{array}{l}
 x \equiv_{427} 42 \\
 x \equiv _{529}123
 \end{array}
 $$
-In Sage, the solution can be found as follows:
+*In Sage, the solution can be found as follows:*
 
-sage: crt $(42, 123, 427, 529)$
+> sage: crt $(42, 123, 427, 529)$
 $32921$
 
-We can check the solution:
+*We can check the solution:*
 
-sage: $32921\ \%\ 427$
+> sage: $32921\ \%\ 427$
 42
 sage: $32921\ \%\ 529$
 $123$
@@ -573,10 +580,10 @@ We can convert any $x \in \mathbb{Z}_{r s}$ into its CRT encoding quite easily, 
 The amazing thing about these CRT encodings is that they preserve all sorts of arithmetic structure.
 
 **Claim 13.10**
-If $(u, v)$ is the CRT encoding of $x,$ and $\left(u^{\prime}, v^{\prime}\right)$ is the CRTencoding of $x^{\prime},$ then $\left(u+u^{\prime} \% r, v+v^{\prime} \% s\right)$ is the CRT encoding of $x+x^{\prime} \% r s .$
+*If $(u, v)$ is the CRT encoding of $x,$ and $\left(u^{\prime}, v^{\prime}\right)$ is the CRT encoding of $x^{\prime},$ then $\left(u+u^{\prime} \% r, v+v^{\prime} \% s\right)$ is the CRT encoding of $x+x^{\prime} \% r s .$*
 
 **Example**
-Taking $r=3$ and $s=5,$ let's write down the CRT encodings of every element in $\mathbb{Z}_{15} .$ In this table, every column contains $x$ and its CRT encoding $(u, v)$ :
+*Taking $r=3$ and $s=5,$ let's write down the CRT encodings of every element in $\mathbb{Z}_{15} .$ In this table, every column contains $x$ and its CRT encoding $(u, v)$ :*
 
 $$\begin{array}{c|ccccccccccccccc}
 x & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 \\
@@ -584,7 +591,7 @@ x & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 \\
 v & 0 & 1 & 2 & 3 & 4 & 0 & 1 & 2 & 3 & 4 & 0 & 1 & 2 & 3 & 4
 \end{array}$$
 
-Highlight the columns for $x=3$ and $x^{\prime}=7$ and their sum $x+x^{\prime}=10 .$
+*Highlight the columns for $x=3$ and $x^{\prime}=7$ and their sum $x+x^{\prime}=10 .$*
 
 $$\begin{array}{c|ccccccccccccccc}
 x & 0 & 1 & 2 & \colorbox{yellow}{3} & 4 & 5 & 6 & \colorbox{yellow}{7} & 8 & 9 & \colorbox{yellow}{10} & 11 & 12 & 13 & 14 \\
@@ -592,17 +599,17 @@ x & 0 & 1 & 2 & \colorbox{yellow}{3} & 4 & 5 & 6 & \colorbox{yellow}{7} & 8 & 9 
 v & 0 & 1 & 2 & \colorbox{yellow}{3} & 4 & 0 & 1 & \colorbox{yellow}{2} & 3 & 4 & \colorbox{yellow}{0} & 1 & 2 & 3 & 4
 \end{array}$$
 
-Focusing on only the highlighted cells, the top row shows a true addition expression $3+7 \equiv_{15}$ 10; the second row shows a true addition expression $0+1 \equiv_{3}$ 1; the third row shows a true addition expression $3+2 \equiv_{5} 0$. 
+*Focusing on only the highlighted cells, the top row shows a true addition expression $3+7 \equiv_{15}$ 10; the second row shows a true addition expression $0+1 \equiv_{3}$ 1; the third row shows a true addition expression $3+2 \equiv_{5} 0$.* 
 
 This pattern holds for any $x$ and $x^{\prime},$ and I encourage you to **try it**!
 
 As if that weren't amazing enough, the same thing holds for multiplication:
 
 **Claim 13.11**
-If $(u, v)$ is the CRTencoding of $x,$ and $\left(u^{\prime}, v^{\prime}\right)$ is the CRTencoding of $x^{\prime},$ then $\left(u \cdot u^{\prime} \% r, v \cdot v^{\prime} \% s\right)$ is the CRT encoding of $x \cdot x^{\prime} \% r s .$
+*If $(u, v)$ is the CRT encoding of $x,$ and $\left(u^{\prime}, v^{\prime}\right)$ is the CRT encoding of $x^{\prime},$ then $\left(u \cdot u^{\prime} \% r, v \cdot v^{\prime} \% s\right)$ is the CRT encoding of $x \cdot x^{\prime} \% r s .$*
 
 **Example**
-Let's return to the $r=3, s=5$ setting for CRT and highlight $x=6, x^{\prime}=7,$ and their product $x \cdot x^{\prime} \equiv_{15} 12$
+*Let's return to the $r=3, s=5$ setting for CRT and highlight $x=6, x^{\prime}=7,$ and their product $x \cdot x^{\prime} \equiv_{15} 12$*
 
 
 $$\begin{array}{c|ccccccccccccccc}
@@ -611,79 +618,81 @@ x & 0 & 1 & 2 & 3 & 4 & 5 & \colorbox{yellow}{6} & \colorbox{yellow}{7} & 8 & 9 
 v & 0 & 1 & 2 & 3 & 4 & 0 & \colorbox{yellow}{1} & \colorbox{yellow}{2} & 3 & 4 & 0 & 1 & \colorbox{yellow}{2} & 3 & 4
 \end{array}$$
 
-The top row shows a true multiplication expression $6 \cdot 7 \equiv_{15} 12 ;$ the second row shows a true multiplication expression $0 \cdot 1 \equiv_{3} 0 ;$ the third row shows a true multiplication expression $1 \cdot 2 \equiv_{5} 2$
+*The top row shows a true multiplication expression $6 \cdot 7 \equiv_{15} 12 ;$ the second row shows a true multiplication expression $0 \cdot 1 \equiv_{3} 0 ;$ the third row shows a true multiplication expression $1 \cdot 2 \equiv_{5} 2$*
 
-This pattern holds for any $x$ and $x^{\prime},$ and I encourage you to try it!
+*This pattern holds for any $x$ and $x^{\prime},$ and I encourage you to* **try it!**
 
-The CRT suggests a different, perhaps more indirect, way to do things $\bmod r$ s. Suppose $x$ has CRT encoding $(u, v)$ and $x^{\prime}$ has CRT encoding $\left(u^{\prime}, v^{\prime}\right),$ and we want to compute $x+y$ $\bmod r s .$ One wild idea is to first directly compute the CRT encoding of this answer, and then convert that encoding to the normal integer representation in $\mathbb{Z}_{r s}$
+The CRT suggests a different, perhaps more indirect, way to do things mod $rs$. Suppose $x$ has CRT encoding $(u, v)$ and $x^{\prime}$ has CRT encoding $\left(u^{\prime}, v^{\prime}\right),$ and we want to compute $x+y$ mod $rs$. One wild idea is to first *directly compute the CRT encoding of this answer*, and then convert that encoding to the normal integer representation in $\mathbb{Z}_{rs}$.
 
 In this case, we know that the answer $x+x^{\prime}$ has the CRT encoding $\left(u+u^{\prime} \% r, v+v^{\prime} \% s\right)$. But this is the same as $\left(x+x^{\prime} \% r, x+x^{\prime} \% s\right)-$ do you see why? So, to add $x+x^{\prime} \bmod r s$, we just need to add $x+x^{\prime} \bmod r$, and then add $x+x^{\prime}$ mod $s$. This gives us the CRT encoding of the answer we want, and we can convert that CRT encoding back into a normal $\mathbb{Z}_{r s}-$ integer. 
 
 The same idea works for multiplication as well, giving us the following:
 
 **CRT method for doing some operation[s] mod $r s$**
-1. Do the operation[s] you want, but mod $r$ instead of mod $r$ s.
-2. Do the operation[s] you want, but mod s instead of mod $r$ s.
-3. Those two results are the CRT encoding of the final answer, so convert them back to the normal representation.
+1. *Do the operation[s] you want, but mod $r$ instead of mod $rs$.*
+2. *Do the operation[s] you want, but mod s instead of mod $rs$.*
+3. *Those two results are the CRT encoding of the final answer, so convert them back to the normal representation.*
 
 **Example**
-Let's take the example r $=3359$ and $s=2953,$ which are relatively prime (so the CRT applies). Suppose we want to compute $3141592+6535897\ \%\ r s .$ Doing it the usual way in Sage looks like this:
+*Let's take the example r $=3359$ and $s=2953,$ which are relatively prime (so the CRT applies). Suppose we want to compute $3141592+6535897\ \%\ r s .$ Doing it the usual way in Sage looks like this:*
 
-sage: $r=3359$ 
+> sage: $r=3359$ 
 sage: $s=2953$
-sage: $(3141592+6535897)$ % ($r * s$)
+sage: $(3141592+6535897)$ % (r * s)
 $9677489$
 
 
-Doing it in the CRT way looks like this.
+*Doing it in the CRT way looks like this.*
 
 
- sage:  $u = (3141592+6535897)$  %  $r$
+>sage:  $u = (3141592+6535897)$  %  $r$
 sage:  $v = (3141592+6535897)$ % $s$
 sage: crt ($u, v, r, s$)
 $9677489$
 
-Both methods give the same answer!
+*Both methods give the same answer!*
 
 ### Application to RSA
-You might be wondering what the point of all of this is. The CRT method seems like a very indirect and wasteful way to compute anything. This impression might be true for simple operations like addition and single multiplications. However, the CRT method is *faster* for exponentiation $\bmod N,$ which is the main operation in RSA!
+You might be wondering what the point of all of this is.[^7] The CRT method seems like a very indirect and wasteful way to compute anything. This impression might be true for simple operations like addition and single multiplications. However, the CRT method is *faster* for exponentiation $\bmod\ N,$ which is the main operation in RSA!
+[^7]: 0.  I’m talking about the CRT method for arithmetic mod $rs$, not life in general.
 
 **Example**
-In Sage, we can do basic exponentiation mod $n$as follows:
+*In Sage, we can do basic exponentiation mod $n$as follows:*
 
-sage:   def modexp $(x, e, n): \# x^{\wedge} e$ mod $n$
- $\ldots .:$ return Mod $(x, n)^{\wedge} e$
+> sage:   def modexp (x, e, n):  # x$^{\wedge}$e mod n
+ $\ldots .:$ return Mod (x, n)$^{\wedge}$e
 
-If we are working over an RSA modulus and know its factorization $p \times q,$ then we use the CRT method for exponentiation mod pq as follows. We simply do the exponentiation mod $p$ and (separately) mod $q$, then use the crt function to convert back to $\mathbb{Z}_{p q}$.
+*If we are working over an RSA modulus and know its factorization $p \times q,$ then we use the CRT method for exponentiation mod pq as follows. We simply do the exponentiation mod $p$ and (separately) mod $q$, then use the crt function to convert back to $\mathbb{Z}_{p q}$.*
 
-sage: def $\operatorname{crtmodexp}(x, e, p, q): \# x^{\wedge} e$ mod pq, using CRT speedup
-$\ldots:$ $u=\text{Mod} (x,p)^{\wedge}e$
-$\ldots:$ $u=\text{Mod} (x,q)^{\wedge}e$
-$\ldots:$ $\text{return crt(u.lift(),v.lift()},p,q)$
-We need to use $\text{u. lift ()}$ and $\text{v. lift ()}$ to convert u and $v$ from Mod-objects into integers, because that is what crt expects.
+> sage: def crtmodexp(x, e, p, q): # x$^{\wedge}$e mod pq, using CRT speedup
+$\ldots:$ u = Mod(x,p)$^{\wedge}$e
+$\ldots:$ v = Mod(x,q)$^{\wedge}$e
+$\ldots:$ return crt(u.lift(), v.lift(),p,q)
 
-We can use both methods to perform an exponentiation, and measure how long it takes with the timeit function. In this example, $N$ is about 2000 bits long, and the difference in speed is noticeable:
+*We need to use u. lift() and v. lift() to convert u and $v$ from Mod-objects into integers, because that is what crt expects.*
 
-sage: $\mathrm{p}=$ random_prime $\left(2^{\wedge} 1000\right)$
-sage: $q=$ random prime $\left(2^{\wedge} 1000\right)$
-sage: $\mathrm{N}=\mathrm{p} * \mathrm{q}$
-sage: $x=12345678901234567$
-sage: $\mathrm{e}=$ randint $(0, \mathrm{N}) \#$ random integer between $0 \& \mathrm{~N}-1$
- sage: timeit $\left('\right.$ modexp $\left.(x, e, N)^{\prime}\right)$
-  125 loops, best of $3: 5.34 \mathrm{~ms}$ per loop
-   sage: timeit $\left({ }^{\prime} \operatorname{crtmodexp}(x, e, p, q)^{\prime}\right)$
+*We can use both methods to perform an exponentiation, and measure how long it takes with the timeit function. In this example, $N$ is about 2000 bits long, and the difference in speed is noticeable:*
+
+> sage: p = random_prime $\left(2^{\wedge} 1000\right)$
+sage: q = random_prime $\left(2^{\wedge} 1000\right)$
+sage: N = p * q
+sage: x = 12345678901234567
+sage: e = randint (0, N) \#  random integer between 0 \& N-1
+sage: timeit ($^\prime$modexp(x, e, N)$^\prime$)
+125 loops, best of 3: 5.34 ms per loop
+sage: timeit ($^\prime$crtmodexp(x, e, p, q)$^\prime$)
 125 loops, best of $3: 2.86 \mathrm{~ms}$ per loop
 
-And just for good measure, we can check that both approaches give the same answer:
+*And just for good measure, we can check that both approaches give the same answer:*
 
-sage: $\operatorname{modexp}(x, e, N)==\operatorname{crtmodexp}(x, e, p, q)$
+> sage: modexp(x, e, N) == crtmodexp(x, e, p, q)
 True
 
 To understand why the CRT method is faster, it's important to know that the cost of standard modular exponentiation over a $k$ -bit modulus is $O\left(k^{3}\right)$. For simplicity, let's pretend that exponentiation takes exactly $k^{3}$ steps. Suppose $p$ and $q$ are each $k$ bits long. so that the RSA modulus $N$ is $2 k$ bits long. Hence, a standard exponentiation $\bmod N$ takes $(2 k)^{3}=8 k^{3}$ steps.
 
-With the CRT method, we do an exponentiation mod $p$ and an exponentiation $\bmod q$ Each of these exponentiations takes $k^{3}$ steps, since $p$ and $q$ are only $k$ bits long. Overall, we are only doing $2 k^{3}$ steps in this approach, which is $4 \times$ faster than the standard exponentiation $\bmod N$. In this simple analysis, we are not counting the cost of converting the CRT encoding back to the typical mod- $N$ representation. But this cost is much smaller than the cost of an exponentiation (both in practice and asymptotically).
+With the CRT method, we do an exponentiation mod $p$ and an exponentiation mod $q$. Each of these exponentiations takes $k^{3}$ steps, since $p$ and $q$ are only $k$ bits long. Overall, we are only doing $2 k^{3}$ steps in this approach, which is $4 \times$ faster than the standard exponentiation mod $N$. In this simple analysis, we are not counting the cost of converting the CRT encoding back to the typical mod-$N$ representation. But this cost is much smaller than the cost of an exponentiation (both in practice and asymptotically).
 
-It's worth pointing out that this speedup can only be done for RSA signing, and not verification. In order to take advantage of the CRT method to speed up exponentiation $\bmod N,$ it's necessary to know the prime factors $p$ and $q .$ Only the person who knows the signing key knows these factors.
+It's worth pointing out that this speedup can only be done for RSA *signing*, and not *verification*. In order to take advantage of the CRT method to speed up exponentiation mod $N$, it's necessary to know the prime factors $p$ and $q .$ Only the person who knows the signing key knows these factors.
 
 
 ## 13.5 The Hardness of Factoring $N$
