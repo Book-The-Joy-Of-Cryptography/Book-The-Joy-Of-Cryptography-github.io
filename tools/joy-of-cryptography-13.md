@@ -697,37 +697,37 @@ It's worth pointing out that this speedup can only be done for RSA *signing*, an
 
 ## 13.5 The Hardness of Factoring $N$
 
-As previously mentioned, the best known way to break the security of RSA as a trapdoor function (i.e., to compute the inverse RSA function given only the public information $N$ and $e$ ) involves factoring the RSA modulus.
+As previously mentioned, the best known way to break the security of RSA as a trapdoor function (*i.e*., to compute the inverse RSA function given only the public information $N$ and $e$ ) involves factoring the RSA modulus.
 
 Factoring integers (or, more specifically, factoring RSA moduli) is believed to be a hard problem for classical computers. In this section we show that some other problems related to RSA are "as hard as factoring." What does it mean for a computational problem to be "as hard as factoring?" More formally, in this section we will show the following:
 
 **Theorem 13.12**
-Either all of the following problems can be solved in polynomial-time, or none of them can:
-1. Given an RSA modulus $N=p q,$ compute its factors $p$ and $q$.
-2. Given an RSA modulus $N=p q$ compute $\phi(N)=(p-1)(q-1)$.
-3. Given an RSA modulus $N=$ pq and value $e$, compute the corresponding $d$ (satisfying $\left.e d \equiv_{\phi(N)} 1\right)$
-4. Given an RSA modulus $N=p q,$ find any $x \not \equiv_{N} \pm 1$ such that $x^{2} \equiv_{N} 1$.
+*Either **all** of the following problems can be solved in polynomial-time, or **none** of them can:*
+1. *Given an RSA modulus $N=p q,$ compute its factors $p$ and $q$.*
+2. *Given an RSA modulus $N=p q$ compute $\phi(N)=(p-1)(q-1)$.*
+3. *Given an RSA modulus $N=$ pq and value $e$, compute the corresponding $d$ (satisfying $\left.e d \equiv_{\phi(N)} 1\right)$*
+4. *Given an RSA modulus $N=p q,$ find any $x \not \equiv_{N} \pm 1$ such that $x^{2} \equiv_{N} 1$.*
 
 To prove the theorem, we will show:
 - if there is an efficient algorithm for (1), then we can use it as a subroutine to construct an efficient algorithm for (2). This is straight-forward: if you have a subroutine factoring $N$ into $p$ and $q,$ then you can call the subroutine and then compute $(p-1)(q-1)$
 
 - if there is an efficient algorithm for (2), then we can use it as a subroutine to construct an efficient algorithm for (3). This is also straight-forward: if you have a subroutine computing $\phi(N)$ given $N,$ then you can compute $d$ exactly how it is computed in the key generation algorithm.
-- if there is an efficient algorithm for (3), then we can use it as a subroutine to construct an efficient algorithm for (4).
-- if there is an efficient algorithm for (4), then we can use it as a subroutine to construct an efficient algorithm for (1).
+- *if there is an efficient algorithm for (3), then we can use it as a subroutine to construct an efficient algorithm for (4).*
+- *if there is an efficient algorithm for (4), then we can use it as a subroutine to construct an efficient algorithm for (1).*
 
 Below we focus on the final two implications.
 
-### Using square roots of unity to factor N
+### Using square roots of unity to factor $N$
 
 Problem (4) of Theorem 13.12 concerns a new concept known as square roots of unity:
 
 **Definition 13.13 (Sqrt of unity)**
-$x$ is a **square root of unity modulo** $N$ if $x^{2} \equiv_{N}$ 1. If $x \neq_{N} 1$ and $x \not \equiv_{N}-1$, then we say that $x$ is a **non-trivial** square root of unity.
+*$x$ is a **square root of unity modulo** $N$ if $x^{2} \equiv_{N}$ 1. If $x \neq_{N} 1$ and $x \not \equiv_{N}-1$, then we say that $x$ is a **non-trivial** square root of unity.*
 
 Since $(\pm 1)^{2}=1$ over the integers, it is also true that $(\pm 1)^{2} \equiv_{N} 1 .$ In other words, ±1 are always square roots of unity modulo $N,$ for any $N$. But some values of $N$ have even more square roots of unity. If $N$ is the product of distinct odd primes, then $N$ has 4 square roots of unity: two trivial and two non-trivial ones (and you are asked to prove this fact in an exercise).
 
 **Claim 13.14**
-Suppose there is an efficient algorithm for computing nontrivial square roots of unity modulo $N .$ Then there is an efficient algorithm for factoring $N .$ (This is the (4)$\Rightarrow(1)$ step in Theorem 13.12.)
+*Suppose there is an efficient algorithm for computing nontrivial square roots of unity modulo $N .$ Then there is an efficient algorithm for factoring $N .$ (This is the (4)$\Rightarrow(1)$ step in Theorem 13.12.)*
 
 **Proof**
 The reduction is rather simple. Suppose NTSRU is an algorithm that on input $N$ returns a non-trivial square root of unity modulo $N$. Then we can factor $N$ with the following algorithm:
@@ -748,12 +748,12 @@ x \not \neq_{p q} 1  \qquad \qquad& & \Rightarrow p q \nmid(x-1); \\
 x \neq_{p q}-1  \qquad \qquad& & \Rightarrow p q \nmid(x+1).
 \end{aligned}
 $$
-The prime factorization of $(x+1)(x-1)$ contains a factor of $p$ and a factor of $q .$ But neither $x+1$ nor $x-1$ contain factors of both $p$ and $q .$ Hence $x+1$ and $x-1$ must each contain factors of exactly one of $\{p, q\} .$ In other words, $\{\operatorname{gcd}(p q, x-1), \operatorname{gcd}(p q, x+1)\}=\{p, q\} .$
+The prime factorization of $(x+1)(x-1)$ contains a factor of $p$ and a factor of $q .$ But neither $x+1$ nor $x-1$ contain factors of both $p$ and $q .$ Hence $x+1$ and $x-1$ must each contain factors of exactly one of $\{p, q\} .$ In other words, $\{\operatorname{gcd}(p q, x-1), \operatorname{gcd}(p q, x+1)\}=\{p, q\} .$   $\qquad \blacksquare$
 
 ### Finding square roots of unity
 
 **Claim 13.15**
-If there is an efficient algorithm for computing $d \equiv_{\phi(N)} e^{-1}$ given $N$ and $e,$ then there is an efficient algorithm for computing nontrivial square roots of unity modulo $N$. (This is the (3) $\Rightarrow(4)$ step in Theorem 13.12.)
+*If there is an efficient algorithm for computing $d \equiv_{\phi(N)} e^{-1}$ given $N$ and $e,$ then there is an efficient algorithm for computing nontrivial square roots of unity modulo $N$. (This is the (3) $\Rightarrow$(4) step in Theorem 13.12.)*
 
 **Proof**
 Suppose we have an algorithm FIND_D that on input $(N, e)$ returns the corresponding exponent $d$. Then consider the following algorithm which uses FIND_D as a subroutine:
@@ -768,7 +768,7 @@ $$
  \quad w\leftarrow \mathbb{Z}_{N}\\
 \quad\text{if $\operatorname{gcd}(w, N) \neq 1: / / w \notin \mathbb{Z}_{N}^{*}$}\\
 \qquad\text{use $\operatorname{gcd}(w, N)$ to factor $N=p q$}\\
-\qquad\text{compute a nontrivial square root of unity using $p \& q$}\\
+\qquad\text{compute a nontrivial square root of unity using $p\ \&\ q$}\\
 \quad\text{$x:=w^{r} \% N$}\\
 \quad\text{if $x \equiv_{N} 1$ then return 1}\\
 \quad\text{for $i=0$ to $s$ :}\\
@@ -785,7 +785,7 @@ and the final value of that sequence satisfies
 $$
 w^{2^{s} r}=w^{e d-1} \equiv_{N} w^{(e d-1) \% \phi(N)}=w^{1-1}=1
 $$
-Although we don't prove it here, it is possible to show that the algorithm returns a square root of unity *chosen uniformly at random* from among the four possible square roots of unity. So with probability $1 / 2$ the output is a nontrivial square root. We can repeat this basic process $n$ times, and eventually encounter a nontrivial square root of unity with probability $1-2^{-n}$.
+Although we don't prove it here, it is possible to show that the algorithm returns a square root of unity *chosen uniformly at random* from among the four possible square roots of unity. So with probability $1 / 2$ the output is a nontrivial square root. We can repeat this basic process $n$ times, and eventually encounter a nontrivial square root of unity with probability $1-2^{-n}$. $\qquad\blacksquare$
 
 ### Exercises
 13.1. Prove by induction the correctness of the EXTGCD algorithm. That is, whenever $\operatorname{EXTGCD}(x, y)$ outputs $(d, a, b),$ we have $\operatorname{gcd}(x, y)=d=a x+b y .$ You may use the fact that the original Euclidean algorithm correctly computes the GCD.
@@ -794,7 +794,7 @@ Although we don't prove it here, it is possible to show that the algorithm retur
 
 13.3. Prove that $\operatorname{gcd}\left(2^{a}-1,2^{b}-1\right)=2^{\operatorname{gcd}(a, b)}-1$.
 
-13.4. Prove that $x^{a} \% n=x^{a \pi \phi(n)} \% n$ for any $x \in \mathbb{Z}_{n}^{*}$. In other words, when working modulo $n$, you can reduce exponents modulo $\phi(n)$.
+13.4. Prove that $x^{a} \% n=x^{a \% \phi(n)}\ \%\  n$ for any $x \in \mathbb{Z}_{n}^{*}$. In other words, when working modulo $n$, you can reduce exponents modulo $\phi(n)$.
 
 13.5. How many fractions $a / b$ in **lowest terms** are there, where $0<a / b<1$ and $b \leqslant n ?$ For $n=5$ the answer is 9 since the relevant fractions are:
 
@@ -805,11 +805,12 @@ Write a formula in terms of $n$. What is the answer for $n=100 ?$
 
 >Hint: How many are there with denominator exactly equal to $n$ (in terms of $n$)?
 
-13.6. In this problem we determine the efficiency of Euclid's GCD algorithm. Since its input is a pair of numbers $(x, y)$, let's call $x+y$ the size of the input. Let $F_{k}$ denote the $k$ th Fibonacci number, using the indexing convention $F_{0}=1 ; F_{1}=2$. Prove that $\left(F_{k}, F_{k-1}\right)$ is the smallest-size input on which Euclid's algorithm makes $k$ recursive calls.
+13.6. In this problem we determine the efficiency of Euclid's GCD algorithm. Since its input is a pair of numbers $(x, y)$, let's call $x+y$ the size of the input. Let $F_{k}$ denote the $k$th Fibonacci number, using the indexing convention $F_{0}=1 ; F_{1}=2$. Prove that $\left(F_{k}, F_{k-1}\right)$ is the smallest-size input on which Euclid's algorithm makes $k$ recursive calls.
 
 >Hint: Use induction on $k$.
 
-Note that the size of input $\left(F_{k}, F_{k-1}\right)$ is $F_{k+1},$ and recall that $F_{k+1} \approx \phi^{k+1},$ where $\phi \approx$ $1.618 \ldots$ is the golden ratio. Thus, for any inputs of size $N \in\left[F_{k}, F_{k+1}\right),$ Euclid's algorithm will make less than $k \leqslant \log _{\phi} N$ recursive calls. In other words, the worst-case number of recursive calls made by Euclid's algorithm on an input of size $N$ is $O(\log N),$ which is linear in the number of bits needed to write such an input.
+Note that the *size* of input $\left(F_{k}, F_{k-1}\right)$ is $F_{k+1},$ and recall that $F_{k+1} \approx \phi^{k+1},$ where $\phi \approx$ $1.618 \ldots$ is the golden ratio. Thus, for any inputs of *size* $N \in\left[F_{k}, F_{k+1}\right),$ Euclid's algorithm will make less than $k \leqslant \log _{\phi} N$ recursive calls. In other words, the worst-case number of recursive calls made by Euclid's algorithm on an input of size $N$ is $O(\log N),$ which is linear in the number of bits needed to write such an input.[^8]
+[^8]: A more involved calculation that incorporates the cost of each division (modulus) operation shows the worst-case overall efficiency of the algorithm to be $O$(log2 $N$) — quadratic in the number of bits needed to write the input.
 
 13.7. Consider the following **symmetric-key** encryption scheme with plaintext space $\mathcal{M}=$ $\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda} .$ To encrypt a message $m$, we "pad" $m$ into a prime number by appending a zero and then random non-zero bytes. We then mulitply by the secret key. To decrypt, we divide off the key and then strip away the "padding"
 
@@ -819,16 +820,21 @@ $$
 \begin{array}{|lll|}\hline
 \begin{array}{l}
 \underline{\text{KeyGen:}}\\
-\text{choose random $\lambda$ -bit prime $k$}\\
-\text{return $k$}
+\text{choose random $\lambda$-bit prime $k$}\\
+\text{return $k$}\\ \\
+\underline{\text{Dec}(k, c):}\\
+\quad m' := c/k \\
+\quad \text{while}\ m' \text{not a multiple of 10}: \\
+\qquad m' := [m'/10] \\
+\quad \text{return}\ m'/10
 \end{array}
 &
 \begin{array}{l}
 \underline{\text{Enc$(k, m \in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^{\lambda})$:}}\\
 \text{$m^{\prime}:=10 \cdot m$}\\
 \text{while $m^{\prime}$ not prime:}\\
-\text{d $\leftarrow\{1, \ldots, 9\}$}\\
-m':=10\cdot m'+d\\
+\quad\text{d $\leftarrow\{1, \ldots, 9\}$}\\
+\quad m':=10\cdot m'+d\\
 \text { return } k \cdot m^{\prime}
 \end{array}
 &
@@ -848,20 +854,20 @@ Show an attack breaking CPA-security of the scheme. That is, describe a distingu
 
 13.8. Explain why the RSA exponents $e$ and $d$ must always be odd numbers.
 
-13.9. Why must $p$ and $q$ be distinct primes? Why is it a bad idea to choose $p=q$ ?
+13.9. Why must $p$ and $q$ be *distinct* primes? Why is it a bad idea to choose $p=q$ ?
 
 13.10. **A simple power analysis (SPA)** attack is a physical attack on a computer, where the attacker monitors precisely how much electrical current the processor consumes while performing a cryptographic algorithm. In this exercise, we will consider an SPA attack against the MopExp algorithm shown in Section $13.2 .$
 
-The MopExp algorithm consists mainly of squarings and multiplications. Suppose that by monitoring a computer it is easy to tell when the processor is running a squaring vs. a multiplication step (this is a very realistic assumption). This assumption is analogous to having access to the printed output of this modified algorithm:
+The MODEXP algorithm consists mainly of squarings and multiplications. Suppose that by monitoring a computer it is easy to tell when the processor is running a squaring vs. a multiplication step (this is a very realistic assumption). This assumption is analogous to having access to the printed output of this modified algorithm:
 $$
 \begin{array}{|l|}\hline
-\text{$\underline{\operatorname{MopExP}(m, e, N):} / /$ compute $m^{e} \% N$}\\
+\text{$\underline{\operatorname{MODEXP}(m, e, N):} / /$ compute $m^{e} \% N$}\\
 \quad\text{if $e=0:$ return 1}\\
 \quad\text{if $e$ even:}\\
-\qquad\text {res }:=\operatorname{MoDExP}\left(m, \frac{e}{2}, N\right)^{2} \% N\\
+\qquad\text {res }:=\operatorname{MODEXP}\left(m, \frac{e}{2}, N\right)^{2} \% N\\
 \qquad\text{print "square"}\\
 \quad\text{if $e$ odd:}\\
-\qquad\text {res : }=\operatorname{MoDExP}\left(m, \frac{e-1}{2}, N\right)^{2} \cdot m \% N\\
+\qquad\text {res : }=\operatorname{MODEXP}\left(m, \frac{e-1}{2}, N\right)^{2} \cdot m \% N\\
 \qquad\text{print "square"}\\
 \qquad\text{print "mult"}\\
 \quad\text{return res}\\\hline
@@ -869,6 +875,7 @@ $$
 $$
 
 Describe how the printed output of this algorithm lets the attacker *completely* learn the value $e$. Remember that in RSA it is indeed the exponent that is secret, so this attack leads to key recovery for RSA.
+>Hint: Think about what “$e$/2,” “($e$ − 1)/2,” and “$e$ is odd” mean, in terms of the bits of $e$.
 
 13.11. The Chinese Remainder Theorem states that there is always a solution for x in the following
 system of equations, when gcd$(r,s)=1$:
@@ -884,23 +891,25 @@ Give an example $u, v, r, s,$ with $\operatorname{gcd}(r, s) \neq 1$ for which t
 
 Show that if $\operatorname{gcd}(w, h)=1$ then you will eventually visit every point in the grid.
 
+>Hint: Derive a formula for the coordinates of the point you reach after $n$ steps.
+
 13.14. Suppose $(u, v) \in \mathbb{Z}_{r} \times \mathbb{Z}_{s}$ is a CRT encoding of $x \in \mathbb{Z}_{r s} .$ Prove that $x \in \mathbb{Z}_{r s}^{*}$ if and only if $u \in \mathbb{Z}_{r}^{*}$ and $v \in \mathbb{Z}_{s}^{*}$.
 
 Note: this problem implies that $\phi(r s)=\phi(r) \phi(s)$ when $\operatorname{gcd}(r, s)=1$. A special case of this identity is the familiar expression $\phi(p q)=(p-1)(q-1)$ when $p$ and $q$ are distinct primes.
 
 13.15. There is a bug (or at least an oversight) in the proof that $x \mapsto x^{e} \% N$ and $y \mapsto y^{d} \% N$ are inverses. We used the fact that $x^{\phi(N)} \equiv_{N} 1,$ but this is only necessarily true for $x \in \mathbb{Z}_{N}^{*}$. Using the Chinese Remainder Theorem, show that the RSA function and its inverse are truly inverses, even when applied to $x \notin \mathbb{Z}_{N}^{*}$.
 
-13.16. We are supposed to choose RSA exponents $e$ and $d$ such that $e d \equiv_{\phi(N)}$. . Let $N=p q$ and define the value $L=\operatorname{lcm}(p-1, q-1)$. Suppose we choose $e$ and $d$ such that $e d \equiv_{L} 1$. Show that RSA still works for this choice of $e$ and $d-$ in other words, $x \mapsto x^{e} \% N$ and $y \mapsto y^{d} \% N$ are inverses.
+13.16. We are supposed to choose RSA exponents $e$ and $d$ such that $e d \equiv_{\phi(N)}$ 1. Let $N=p q$ and define the value $L=\operatorname{lcm}(p-1, q-1)$. Suppose we choose $e$ and $d$ such that $e d \equiv_{L}$ 1. Show that RSA still works for this choice of $e$ and $d-$ in other words, $x \mapsto x^{e} \% N$ and $y \mapsto y^{d} \% N$ are inverses.
 
 >Hint: You’ll have to use the Chinese Remainder Theorem.
 
-$\star$ 13.17. If $y^{e} \equiv_{N} x$ then we call $y$ an " $e$ -th root" of $x$. One way to think about RSA is that raising something to the $d$ power is equivalent to computing an $e$ -th root. Our assumption about RSA is that it's hard to compute $e$ -th roots given only public $e$ and $N$.
+$\star$ 13.17. If $y^{e} \equiv_{N} x$ then we call $y$ an " $e$-th root" of $x$. One way to think about RSA is that raising something to the $d$ power is equivalent to computing an $e$-th root. Our assumption about RSA is that it's hard to compute $e$-th roots given only public $e$ and $N$.
 
-In this problem, show that if you are given an $a$ -th root of $x$ and $b$ -th root of the same $x$, and $\operatorname{gcd}(a, b)=1$, then you can easily compute an $a b$ -th root of $x$. 
+In this problem, show that if you are given an $a$-th root of $x$ and $b$ -th root of the same $x$, and $\operatorname{gcd}(a, b)=1$, then you can easily compute an $a b$-th root of $x$. 
 
 More formally, given $x, y, z$ and $N$ where $y^{a} \equiv_{N} x$ and $z^{b} \equiv_{N} x,$ show how to efficiently compute a value $w$ such that $w^{a b} \equiv_{N} x$.
 
-Compute $w$ for the following values (after verifying that $y$ is an $a$ -th root and $z$ is a $b$ -th root of $x \bmod N$ ):
+Compute $w$ for the following values (after verifying that $y$ is an $a$-th root and $z$ is a $b$-th root of $x \bmod N$ ):
 
 N =  318753895014839414391833197387495582828703628009180678460009
 X = 183418622076108277295248802695684859123490073011079896375192
@@ -911,13 +920,17 @@ z=20697550065842164169278024507041536884260713996371572807344
 
 >Hint: It is important that gcd$(a,b) = 1$. Use Bezout’s theorem
 
-13.18. Suppose Alice uses the CRT method to sign some message $m$ in textbook RSA. In other words, she computes $m^{d} \% p,$ then $m^{d} \% q,$ and finally converts this CRT encoding back to $\mathbb{Z}_{N}$. But suppose Alice is using faulty hardware (or Eve is bombarding her hardware with electromagnetic pulses), so that she computes the wrong value $\bmod q .$ The rest of the computation happens correctly, and Alice publishes $m$ and the (incorrect) signature $\sigma$.
+13.18. Suppose Alice uses the CRT method to sign some message $m$ in textbook RSA. In other words, she computes $m^{d} \% p,$ then $m^{d} \% q,$ and finally converts this CRT encoding back to $\mathbb{Z}_{N}$. But suppose Alice is using faulty hardware (or Eve is bombarding her hardware with electromagnetic pulses), so that she computes the **wrong value** $\bmod\ q .$ The rest of the computation happens correctly, and Alice publishes $m$ and the (incorrect) signature $\sigma$.
 
 Show that, no matter what $m$ is, and no matter what Alice's computational error was, Eve can factor $N$ (upon seeing $m, \sigma,$ and the public RSA information $N$ and $e$ ).
 
+> Hint: $m$ ≡$_p\ σ^e$ but$\ m\neq_q σ^e$.
+
 13.19. (a) Show that given an RSA modulus $N$ and $\phi(N)$, it is possible to factor $N$ easily.
 
-(b) Write a Sage function that takes as input an RSA modulus $N$ and $\phi(N)$ and outputs the prime factors of $N$. Use it to factor the following 2048 -bit RSA modulus. Note: take care that there are no precision issues in how you solve the problem; double-check your factorization!
+> Hint: You have two equations (involving $\phi$($N$ ) and $N$ ) and two unknowns ($p$ and $q$).
+
+(b) Write a Sage function that takes as input an RSA modulus $N$ and $\phi(N)$ and outputs the prime factors of $N$. Use it to factor the following 2048-bit RSA modulus. *Note*: take care that there are no precision issues in how you solve the problem; double-check your factorization!
 
 $\begin{array}{ll}
 \text{N}= & 133140272889335192922108409260662174476303831652383671688547009484 \\
@@ -946,7 +959,7 @@ $\begin{array}{ll}
 
 13.21. Discuss the computational difficulty of the following problem:
 
-Given an integer $N$, find a nonzero element of $\mathbb{Z}_{N} \backslash \mathbb{Z}_{N}^{*}$.
+> *Given an integer $N$, find a nonzero element of $\mathbb{Z}_{N} \backslash \mathbb{Z}_{N}^{*}$.*
 
 If you can, relate its difficulty to that of other problems we've discussed (factoring $N$ or inverting RSA).
 
@@ -962,11 +975,11 @@ $\star 13.23 .$ Show that, conditioned on $w \in \mathbb{Z}_{N}^{*},$ the SqrtUn
 
 >Hint: Use the Chinese Remainder Theorem.
 
-13.24. Suppose $N$ is an RSA modulus, and $x^{2} \equiv_{N} y^{2},$ but $x \not \equiv_{N} \pm y .$ Show that $N$ can be efficiently factored if such a pair $x$ and $y$ are known.
+13.24. Suppose $N$ is an RSA modulus, and $x^{2} \equiv_{N} y^{2},$ but $x \neq_{N} \pm y .$ Show that $N$ can be efficiently factored if such a pair $x$ and $y$ are known.
 
 13.25. Why are ±1 the only square roots of unity modulo $p$, when $p$ is an odd prime?
 
-13.26. When $N$ is an RSA modulus, why is squaring modulo $N$ a 4 -to-1 function, but raising to the $e^{\text {th }}$ power modulo $N$ is 1 -to-1?
+13.26. When $N$ is an RSA modulus, why is squaring modulo $N$ a 4-to-1 function, but raising to the $e^{\text {th }}$ power modulo $N$ is 1-to-1?
 
 13.27. Implement a Sage function that efficiently factors an RSA modulus $N,$ given only $N, e$, and $d$. Use your function to factor the following 2048 -bit RSA modulus.
 
@@ -1005,7 +1018,7 @@ d=&138476999734263775498100443567132759182144573474474014195021091272\\
 
 13.28. In this problem we'll see that it's bad to choose RSA prime factors $p$ and $q$ too close together.
 
-(a) Let $N=p q$ be an RSA modulus. Show that if you know $N$ and $\delta=|p-q|$ then you can efficiently factor $N$
+(a) Let $N=p q$ be an RSA modulus. Show that if you know $N$ and $\delta=|p-q|$ then you can efficiently factor $N$.
 (b) Alice generated the following RSA modulus $N=p q$ and lets you know that $|p-q|<$
 10000. Factor $N$ :
 
@@ -1033,8 +1046,7 @@ $\begin{array}{ll}
 
 (b) Write a Sage function that factors RSA moduli whose prime factors are close. Use it to factor the following 2048 -bit number. How close were the factors (how large was $|p-q|) ?$
 
-Hint: Sage has an is_square method. Also, be sure to do exact square roots over the integers, not
-the reals.
+> Hint: Sage has an $\mathtt{is\_square}$ method. Also, be sure to do exact square roots over the integers, not the reals.
 
 
 $\begin{array}{ll}
