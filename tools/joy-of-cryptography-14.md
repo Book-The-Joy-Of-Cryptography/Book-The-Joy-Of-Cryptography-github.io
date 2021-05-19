@@ -120,46 +120,46 @@ $$
 We have renamed the libraries to $\mathcal{L}_{\text{dh-real}}$ and $\mathcal{L}_{\text{dh-rand}}$. In  $\mathcal{L}_{\text{dh-real}}$  the response to QUERY corresponds to a DHKA transcript $(g^a,g^b)$ along with the corresponding “correct” key $g^{a b} .$ The response in $\mathcal{L}_{\text {dh-rand }}$ corresponds to a DHKA transcript along with a completely independent random key $g^{c}$.
 
 **Definition 14.5 (DDH)**
-The **decisional Diffie-Hellman (DDH) assumption** in a cyclic group $\mathbb{G}$ is that $\mathcal{L}_{\mathrm{dh}-\mathrm{real}}^{\mathrm{G}} \approx$ $\mathcal{L}_{\mathrm{dh}-\mathrm{rand}}^{\mathrm{G}}$ (libraries defined above).
+*The **decisional Diffie-Hellman (DDH) assumption** in a cyclic group $\mathbb{G}$ is that $\mathcal{L}_{\mathrm{dh}-\mathrm{real}}^{\mathrm{G}} \approx$ $\mathcal{L}_{\mathrm{dh}-\mathrm{rand}}^{\mathrm{G}}$ (libraries defined above).*
 
 Since we have defined the DDH assumption by simply renaming the security definition for DHKA, we immediately have:
 
 **Claim 14.6**
-The DHKA protocol is a secure KA protocol **if and only if** the DDH assumption is true for the choice of $\mathbb{G}$ used in the protocol.
+*The DHKA protocol is a secure KA protocol **if and only if** the DDH assumption is true for the choice of $\mathbb{G}$ used in the protocol.*
 
 ### For Which Groups does the DDH Assumption Hold?
-So far our only example of a cyclic group is $\mathbb{Z}_{p}^{*},$ where $p$ is a prime. Although many textbooks describe DHKA in terms of this cyclic group, it is not a good choice because the DDH assumption is demonstrably false in $\mathbb{Z}_{p}^{*}$. To see why, we introduce a new concept:
+So far our only example of a cyclic group is $\mathbb{Z}_{p}^{*},$ where $p$ is a prime. Although *many* textbooks describe DHKA in terms of this cyclic group, it is not a good choice because the DDH assumption is *demonstrably* *false* in $\mathbb{Z}_{p}^{*}$. To see why, we introduce a new concept:
 
 **Claim 14.7 (Euler criterion)**
-If $p$ is a prime and $X=g^{x} \in \mathbb{Z}_{p}^{*},$ then $X^{\frac{p-1}{2}} \equiv_{p}(-1)^{x}$.
+*If $p$ is a prime and $X=g^{x} \in \mathbb{Z}_{p}^{*},$ then $X^{\frac{p-1}{2}} \equiv_{p}(-1)^{x}$.*
 
-Note that $(-1)^{x}$ is 1 if $x$ is even and -1 if $x$ is odd. So, while in general it is hard to determine $x$ given $g^{x}$, Euler's criterion says that it is possible to determine the parity of $x$ (i.e., whether $x$ is even or odd) given $g^{x}$.
+Note that $(-1)^{x}$ is 1 if $x$ is even and -1 if $x$ is odd. So, while in general it is hard to determine $x$ given $g^{x}$, Euler's criterion says that it is possible to determine the *parity of $x$* (*i.e.*, whether $x$ is even or odd) given $g^{x}$.
 
 To see how these observations lead to an attack against the Diffie-Hellman protocol, consider the following attack:
 
 $$
 \begin{array}{|l|}\hline
 \qquad \quad \ \ \mathcal{A:}\\\hline
-(A,B,C){\text{QUERY():}}\\
+(A,B,C)\leftarrow{\text{QUERY():}}\\
 \quad \text{return}\ \stackrel{?}{\equiv}_pC^{\frac{p-1}{2}}\\\hline
 \end{array}
 $$
 
-Roughly speaking, the adversary returns true whenever $C$ can be written as $g$ raised to an even exponent. When linked to $\mathcal{L}_{\text {dh-real }}, C=g^{a b}$ where $a$ and $b$ are chosen uniformly. Hence $a b$ will be even with probability $3 / 4$. When linked to $\mathcal{L}_{\text {dh-rand }}, C=g^{c}$ for an independent random $c$. So $c$ is even only with probability $1 / 2 .$ Hence the adversary distinguishes the libraries with advantage $1 / 4$.
+Roughly speaking, the adversary returns true whenever $C$ can be written as $g$ raised to an *even* exponent. When linked to $\mathcal{L}_{\text {dh-real }}, C=g^{a b}$ where $a$ and $b$ are chosen uniformly. Hence $a b$ will be even with probability $3 / 4$. When linked to $\mathcal{L}_{\text {dh-rand }}, C=g^{c}$ for an independent random $c$. So $c$ is even only with probability $1 / 2 .$ Hence the adversary distinguishes the libraries with advantage $1 / 4$.
 
 Concretely, with this choice of group, the key $g^{a b}$ will never be uniformly distributed. See the exercises for a slightly better attack which correlates the key to the transcript.
 
 **Quadratic Residue**s. Several better choices of cyclic groups have been proposed in the literature. Arguably the simplest one is based on the following definition:
 
 **Definition 14.8**
-A number $X \in \mathbb{Z}_{n}^{*}$ is a **quadratic residue modulo** $n$ if there exists some integer $Y$ such that $Y^{2} \equiv_{n} X .$ That is, if $X$ can be obtained by squaring a number mod $n .$ Let $\mathbb{Q R}_{n}^{*} \subseteq \mathbb{Z}_{n}^{*}$ denote the set of quadratic residues mod $n$.
+*A number $X \in \mathbb{Z}_{n}^{*}$ is a **quadratic residue modulo** $n$ if there exists some integer $Y$ such that $Y^{2} \equiv_{n} X .$ That is, if $X$ can be obtained by squaring a number mod $n .$ Let $\mathbb{Q R}_{n}^{*} \subseteq \mathbb{Z}_{n}^{*}$ denote the set of quadratic residues mod $n$.*
 
-For our purposes it is enough to know that, when $p$ is prime, $\mathbb{Q R}_{p}^{*}$ is a cyclic group with $(p-1) / 2$ elements (see the exercises). When both $p$ and $(p-1) / 2$ are prime, we call $p$ a safe prime (and call $(p-1) / 2$ a *Sophie Germain prime*). To the best of our knowledge the DDH assumption is true in $\mathbb{Q} R_{p}^{*}$ when $p$ is a safe prime.
+For our purposes it is enough to know that, when $p$ is prime, $\mathbb{Q R}_{p}^{*}$ is a cyclic group with $(p-1) / 2$ elements (see the exercises). When both $p$ and $(p-1) / 2$ are prime, we call $p$ a **safe prime** (and call $(p-1) / 2$ a *Sophie Germain prime*). To the best of our knowledge the DDH assumption is true in $\mathbb{Q} R_{p}^{*}$ when $p$ is a safe prime.
 
 ### Exercises
 14.1. Let $p$ be an odd prime, as usual. Recall that $\mathbb{Q R}_{p}^{*}$ is the set of quadratic residues $\bmod p$- that is, $\mathbb{Q R}_{p}^{*}=\left\{x \in \mathbb{Z}_{p}^{*} \mid \exists y: x \equiv_{p} y^{2}\right\} .$ Show that if $g$ is a primitive root of $\mathbb{Z}_{p}^{*}$ then $\left\langle g^{2}\right\rangle=\mathbb{Q} \mathbb{R}_{p}^{*}$
 
-Note: This means that $g^{a} \in \mathbb{Q R}_{p}^{*}$ if and only if $a$ is even $-$ and in particular, the choice of generator $g$ doesn't matter.
+*Note*: This means that $g^{a} \in \mathbb{Q R}_{p}^{*}$ if and only if $a$ is even $-$ and in particular, the choice of generator $g$ doesn't matter.
 
 14.2. Suppose $N=p q$ where $p$ and $q$ are distinct primes. Show that $\left|Q \mathbb{R}_{N}^{*}\right|=\left|\mathbb{Q R}_{p}^{*}\right| \cdot\left|\mathbb{Q R}_{q}^{*}\right|$.
 
@@ -169,11 +169,11 @@ Note: This means that $g^{a} \in \mathbb{Q R}_{p}^{*}$ if and only if $a$ is eve
 
 14.4. Let $\langle g\rangle$ be a cyclic group with $n$ elements and generator $g$. Show that for all integers $a$, it is true that $g^{a}=g^{a \% n}$.
 
-Note: As a result, $\langle g\rangle$ is isomorphic to the additive group $\mathbb{Z}_{n}$.
+*Note*: As a result, $\langle g\rangle$ is isomorphic to the additive group $\mathbb{Z}_{n}$.
 
 14.5. Let $g$ be a primitive root of $\mathbb{Z}_{n}^{*}$. Recall that $\mathbb{Z}_{n}^{*}$ has $\phi(n)$ elements. Show that $g^{a}$ is a primitive root of $\mathbb{Z}_{n}^{*}$ if and only if $\operatorname{gcd}(a, \phi(n))=1$.
 
-Note: It follows that, for every $n$, there are either 0 or $\phi(\phi(n))$ primitive roots $\bmod n$.
+*Note*: It follows that, for every $n$, there are either 0 or $\phi(\phi(n))$ primitive roots $\bmod n$.
 
 14.6. Let $\langle g\rangle$ be a cyclic group with $n$ elements. Show that for all $x, y \in\langle g\rangle,$ it is true that $x^{n}=y^{n}$
 
@@ -196,7 +196,7 @@ What will be Alice \& Bob's shared key?
 
 14.9. Explain what is wrong in the following argument:
 
-In Diffie-Hellman key agreement, Alice sends $A=g^{a}$ and $B o b$ sends $B=g^{b}$. Their shared key is $g^{a b}$. To break the scheme, the eavesdropper can simply compute $A \cdot B=\left(g^{a}\right)\left(g^{b}\right)=g^{a b}$
+> *In Diffie-Hellman key agreement, Alice sends $A=g^{a}$ and $B o b$ sends $B=g^{b}$. Their shared key is $g^{a b}$. To break the scheme, the eavesdropper can simply compute $A \cdot B=\left(g^{a}\right)\left(g^{b}\right)=g^{a b}$*
 
 14.10. Let $\mathbb{G}$ be a cyclic group with $n$ elements and generator $g$. Consider the following algorithm:
 
@@ -222,11 +222,11 @@ $\star(\mathrm{c})$ Consider the problem of determining whether a given triple $
 $\operatorname{Pr}[\mathcal{A}(A, B, C)=1]>0.51$ when $(A, B, C)$ chosen uniformly in $D H$
 $\operatorname{Pr}[\mathcal{A}(A, B, C)=0]>0.51$ when $(A, B, C)$ chosen uniformly in $\mathbb{G}^{3}$
 
-The algorithm $\mathcal{A}$ does not seem very useful if you have a particular triple $(A, B, C)$ and you really want to know whether it is in $D H .$ You might have one of the triples for which $\mathcal{A}$ gives the wrong answer, and there's no real way to know. 
+The algorithm $\mathcal{A}$ does not seem very useful if you have a *particular* triple $(A, B, C)$ and you really want to know whether it is in $D H .$ You might have one of the triples for which $\mathcal{A}$ gives the wrong answer, and there's no real way to know. 
 
 Show how to construct a randomized algorithm $\mathcal{A}^{\prime}$ such that: for every $(A, B, C) \in \mathbb{G}^{3}$ :
 $$
-\operatorname{Pr}\Big[\mathcal{A}^{\prime}(A, B, C)=[(A, B, C) \in D H]\Big]>0.99
+\operatorname{Pr}\Big[\mathcal{A}^{\prime}(A, B, C)=[(A, B, C) \stackrel{?}{\in} D H]\Big]>0.99
 $$
 Here the input $A, B, C$ is fixed and the probability is over the internal randomness in $\mathcal{A}^{\prime} .$ So on every possible input, $\mathcal{A}^{\prime}$ gives a very reliable answer.
 
