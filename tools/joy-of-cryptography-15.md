@@ -1,3 +1,4 @@
+
 # 15. Public-Key Encryption
 
 So far, the encryption schemes that we’ve seen are **symmetric-key** schemes. The same key is used to encrypt and decrypt. In this chapter we introduce **public-key** (sometimes called *asymmetric*) encryption schemes, which use different keys for encryption and decryption. The idea is that the encryption key can be made *public*, so that anyone can send an encryption to the owner of that key, even if the two users have never spoken before and have no shared secrets. The decryption key is private, so that only the designated owner can decrypt.
@@ -10,14 +11,14 @@ Enc: Takes the public key *pk* and a plaintext $m$ as input, and outputs a ciphe
 
 Dec: Takes the secret key *sk* and a ciphertext $c$ as input, and outputs a plaintext $m$.
 
-We modify the correctness condition similarly. A public-key encryption scheme satisfies *correctness* if, for all $m \in \mathcal{M}$ and all (pk, sk) $\leftarrow$ KeyGen, we have Dec($sk$, Enc$(pk,m)) = m$ (with probability 1 over the randomness of Enc).
+We modify the correctness condition similarly. A public-key encryption scheme satisfies *correctness* if, for all $m \in \mathcal{M}$ and all ($pk, sk$) $\leftarrow$ KeyGen, we have Dec($sk$, Enc$(pk,m)) = m$ (with probability 1 over the randomness of Enc).
 
 
 ## 15.1 Security Definitions
 
 We now modify the definition of CPA security to fit the setting of public-key encryption. As before, the adversary calls a CHALLENGE subroutine with two plaintexts — the difference between the two libraries is which plaintext is actually encrypted. Of course, the encryption operation now takes the public key.
 
-Then the biggest change is that we would like to make the *public* key public. In other words, the calling program should have a way to learn the public key (otherwise the library cannot model a situation where the public key is known to the adversary). To do this, we simply add another subroutine that returns the public key.
+Then the biggest change is that we would like to make the public key *public*. In other words, the calling program should have a way to learn the public key (otherwise the library cannot model a situation where the public key is known to the adversary). To do this, we simply add another subroutine that returns the public key.
 
 **Definition 15.1** 
 *Let $\Sigma$ be a public-key encryption scheme. Then $\Sigma$ is **secure against chosen-plaintext at tacks (CPA secure)** if $\mathcal{L}^{\Sigma}_{\text{pk-cpa-L}} \approx \mathcal{L}^{\Sigma}_{\text{pk-cpa-R}}$, where:*
@@ -43,19 +44,20 @@ $$
 \end{array}
 $$
 
-to-do *Re-iterate how deterministic encryption still can’t be CPA-secure in the public-key setting.*
+**to-do** 
+>*Re-iterate how deterministic encryption still can’t be CPA-secure in the public-key setting.*
 
 ### Pseudorandom Ciphertexts
 
 We can modify/adapt the definition of pseudorandom ciphertexts to public-key encryption in a similar way:
 
 **Definition 15.2** 
-*Let $\Sigma$ be a public-key encryption scheme. Then $\Sigma$ has **pseudorandom ciphertexts in the presence of chosen-plaintext attacks (CPA$\varPhi$ security)** if $\mathcal{L}^{\Sigma}_{\text{pk-cpa}\varPhi\text{-real}} \approx \mathcal{L}^{\Sigma}_{\text{pk-cpa}\varPhi\text{-rand}}$, where:*
+*Let $\Sigma$ be a public-key encryption scheme. Then $\Sigma$ has **pseudorandom ciphertexts in the presence of chosen-plaintext attacks (CPA$\varPhi$ security)** if $\mathcal{L}^{\Sigma}_{\text{pk-cpa}\Phi\text{-real}} \approx \mathcal{L}^{\Sigma}_{\text{pk-cpa}\Phi\text{-rand}}$, where:*
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\varPhi\text{-real}} \\ \hline
+\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\Phi\text{-real}} \\ \hline
 (pk, sk)  \leftarrow \Sigma.\text{KeyGen} \\
 \underline{\text{GETPK}():} \\
 \quad \text{return } pk \\
@@ -64,7 +66,7 @@ $$
 \end{array}
 \qquad
 \begin{array}{|l|} \hline
-\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\varPhi\text{-rand}} \\ \hline
+\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\Phi\text{-rand}} \\ \hline
 (pk, sk)  \leftarrow \Sigma.\text{KeyGen} \\
 \underline{\text{GETPK}():} \\
 \quad \text{return } pk \\
@@ -74,7 +76,7 @@ $$
 \end{array}
 $$
 
-As in the symmetric-key setting, CPA$\varPhi$ security (for public-key encryption) implies CPA security:
+As in the symmetric-key setting, CPA$\Phi$ security (for public-key encryption) implies CPA security:
 
 **Claim 15.3** 
 *Let $\Sigma$ be a public-key encryption scheme. If $\Sigma$ has CPA$\varPhi$ security, then $\Sigma$ has CPA security.*
@@ -92,7 +94,7 @@ Surprisingly, if a *public-key* encryption scheme is secure when the adversary s
 
 To show this property formally, we first adapt the definition of one-time secrecy (Definition 2.6) to the public-key setting. There is one small but important technical subtlety: in Definition 2.6 the encryption key is chosen at the last possible moment in the body of CHALLENGE. This ensures that the key is local to this scope, and therefore each value of the key is only used to encrypt one plaintext.
 
-In the public-key setting, however, it turns out to be important to allow the adversary to see the public key before deciding which plaintexts to encrypt. (This concern is not present in the symmetric-key setting precisely because there is nothing public upon which the adversary’s choice of plaintexts can depend.) For that reason, in the public-key setting we must sample the keys at initialization time so that the adversary can obtain the public key via GETPK. To ensure that the key is used to encrypt only one plaintext, we add a counter and a guard condition to challenge, so that it only responds once with a ciphertext.
+In the public-key setting, however, it turns out to be important to allow the adversary to see the public key before deciding which plaintexts to encrypt. (This concern is not present in the symmetric-key setting precisely because there is nothing public upon which the adversary’s choice of plaintexts can depend.) For that reason, in the public-key setting we must sample the keys at initialization time so that the adversary can obtain the public key via GETPK. To ensure that the key is used to encrypt only one plaintext, we add a counter and a guard condition to CHALLENGE, so that it only responds once with a ciphertext.
 
 **Definition 15.4** 
 *Let $\Sigma$ be a public-key encryption scheme. Then $\Sigma$ has **one-time secrecy** if $\mathcal{L}^{\Sigma}_{\text{pk-ots-L}} \approx \mathcal{L}^{\Sigma}_{\text{pk-ots-R}}$, where:*
@@ -102,24 +104,24 @@ $$
 \begin{array}{|l|} \hline
 \qquad\qquad\quad\mathcal{L}^{\Sigma}_{\text{pk-ots-L}} \\ \hline
 (pk, sk)  \leftarrow \Sigma.\text{KeyGen} \\
-count := 0 \\
+\colorbox{Yellow}{count := 0} \\
 \underline{\text{GETPK}():} \\
 \quad \text{return } pk \\
 \underline{\text{CHALLENGE}(m_L, m_R \in \Sigma. \mathcal{M}):} \\
-\quad count := count + 1 \\
-\quad \text{if } count > 1: \text{return null}\\
+\quad \colorbox{Yellow}{count := count + 1} \\
+\quad \colorbox{Yellow}{\text{if } count > 1: \text{return null}}\\
 \quad \text{return } \Sigma. \text{Enc} (pk, m_L) \\ \hline
 \end{array}
 \qquad
 \begin{array}{|l|} \hline
 \qquad\qquad\quad\mathcal{L}^{\Sigma}_{\text{pk-ots-R}} \\ \hline
 (pk, sk)  \leftarrow \Sigma.\text{KeyGen} \\
-count := 0 \\
+\colorbox{Yellow}{count := 0} \\
 \underline{\text{GETPK}():} \\
 \quad \text{return } pk \\
 \underline{\text{CHALLENGE}(m_L, m_R \in \Sigma. \mathcal{M}):} \\
-\quad count := count + 1 \\
-\quad \text{if } count > 1: \text{return null} \\
+\quad \colorbox{Yellow}{count := count + 1} \\
+\quad \colorbox{Yellow}{\text{if } count > 1: \text{return null}} \\
 \quad \text{return } \Sigma. \text{Enc} (pk, m_R) \\ \hline
 \end{array}
 $$
@@ -128,7 +130,7 @@ $$
 *Let $\Sigma$ be a public-key encryption scheme. If $\Sigma$ has one-time secrecy, then $\Sigma$ is CPA-secure.*
 
 **Proof** 
-Suppose $\mathcal{L}^{\Sigma}_{\text{pk-ots-L}} \approx \mathcal{L}^{\Sigma}_{\text{pk-ots-R}}$. Our goal is to show that $\mathcal{L}^{\Sigma}_{\text{pk-ots-L}} \approx \mathcal{L}^{\Sigma}_{\text{pk-ots-R}}$. The proof centers around the following hybrid library $\mathcal{L}_{\text{hyb-h}}$, which is designed to be linked to either $\mathcal{L}_{\text{pk-ots-L}}$ or $\mathcal{L}_{\text{pk-ots-R}}$:
+Suppose $\mathcal{L}^{\Sigma}_{\text{pk-ots-L}} \approx \mathcal{L}^{\Sigma}_{\text{pk-ots-R}}$. Our goal is to show that $\mathcal{L}^{\Sigma}_{\text{pk-cpa-L}} \approx \mathcal{L}^{\Sigma}_{\text{pk-cpa-R}}$. The proof centers around the following hybrid library $\mathcal{L}_{\text{hyb-h}}$, which is designed to be linked to either $\mathcal{L}_{\text{pk-ots-L}}$ or $\mathcal{L}_{\text{pk-ots-R}}$:
 
 $$
 \def\arraystretch{1.5}
@@ -138,34 +140,34 @@ count := 0 \\
 pk := \text{GETPK}() \\
 \underline{\text{CHALLENGE}(m_L, m_R \in \Sigma. \mathcal{M}):} \\
 \quad count := count + 1 \\
-\quad \text{if } count < h: \\
+\quad \text{if } count < \colorbox{lightgray}{$h$}: \\
 \qquad \text{return } \Sigma. \text{Enc} (pk, m_R) \\
-\quad \text{else } count = h: \\
+\quad \text{else } count = \colorbox{lightgray}{$h$}: \\
 \qquad \text{return CHALLENGE}' (m_L, m_R) \\
 \quad \text{else } : \\
 \qquad \text{return } \Sigma. \text{Enc} (pk, m_L) \\ \hline
 \end{array}
 $$
 
-Here the value $h$ is an unspecified value that will be a hard-coded constant, and CHALLENGE' (called by the “elsif” branch) and GETPK refer to the subroutine in $\mathcal{L}_{\text{pk-ots-}\star}$. Note that $\mathcal{L}_{\text{hyb-}h}$ is designed so that it only makes one call to CHALLENGE' — in particular, only when its own challenge subroutine is called for the $h$ th time.
+Here the value $\colorbox{lightgray}{\textit{h}}$ is an unspecified value that will be a hard-coded constant, and CHALLENGE' (called by the “elsif” branch) and GETPK refer to the subroutine in $\mathcal{L}_{\text{pk-ots-}\star}$. Note that $\mathcal{L}_{\text{hyb-}h}$ is designed so that it only makes one call to CHALLENGE' — in particular, only when its own CHALLENGE subroutine is called for the $h^{th}$  time.
 
 We now make a few observations:
 
 $\mathcal{L}_{\mathrm{hyb}-1} \diamond \mathcal{L}_{\mathrm{pk}-\mathrm{ots}-\mathrm{L}} \equiv \mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{L}}:$ 
 
-In both libraries, every call to CHALLENGE encrypts the left plaintext. In particular, the first call to CHALLENGE in $\mathcal{L}_{\text{hyb-1}}$ triggers the “elsif” branch, so the challenge is routed to $\mathcal{L}_{\text{pk-ots-L}}$, which encrypts the left plaintext. In all other calls to challenge, the “else” branch is triggered and the left plaintext is encrypted explicitly.
+>In both libraries, every call to CHALLENGE encrypts the left plaintext. In particular, the first call to CHALLENGE in $\mathcal{L}_{\text{hyb-1}}$ triggers the “elsif” branch, so the challenge is routed to $\mathcal{L}_{\text{pk-ots-L}}$, which encrypts the left plaintext. In all other calls to CHALLENGE, the “else” branch is triggered and the left plaintext is encrypted explicitly.
 
 $\mathcal{L}_{\mathrm{hyb}-h} \diamond \mathcal{L}_{\mathrm{pk}-\mathrm{ots}-\mathrm{R}} \equiv \mathcal{L}_{\mathrm{hyb}-(h+1)} \diamond \mathcal{L}_{\mathrm{pk}-\mathrm{ots}-\mathrm{L}},$
 
-for all $h$ . In both of these libraries, the first $h$ calls to CHALLENGE encrypt the right plaintext, and all subsequent calls encrypt the left plaintext.
+> for all $\colorbox{lightgray}{\textit{h}}$ . In both of these libraries, the first $h$ calls to CHALLENGE encrypt the right plaintext, and all subsequent calls encrypt the left plaintext.
 
 $\mathcal{L}_{\text {hyb- } h} \diamond \mathcal{L}_{\text {pk-ots-L }} \approx \mathcal{L}_{\text {hyb- } h} \diamond \mathcal{L}_{\text {pk-ots-R }},$
 
-for all $h$. This simply follows from the fact that $\mathcal{L}_{\text{pk-ots-L}} \approx \mathcal{L}_{\text{pk-ots-R}}$.
+> for all $\colorbox{lightgray}{\textit{h}}$. This simply follows from the fact that $\mathcal{L}_{\text{pk-ots-L}} \approx \mathcal{L}_{\text{pk-ots-R}}$.
 
 $\mathcal{L}_{\text {hyb- } q} \diamond \mathcal{L}_{\text {pk-ots-R }} \equiv \mathcal{L}_{\text {pk-cpa-R }},$
 
-where $q$ is the number of times the calling program calls challenge. In particular, every call to challenge encrypts the right plaintext.
+where $q$ is the number of times the calling program calls CHALLENGE. In particular, every call to CHALLENGE encrypts the right plaintext.
 
 Putting everything together, we have that:
 
@@ -181,7 +183,7 @@ and so $\mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{L}} \approx \mathcal{L}_{\
 
 The reason this proof goes through for public-key encryption but not symmetric-key encryption is that *anyone can encrypt* in a public-key scheme. In a symmetric-key scheme, it is not possible to generate encryptions without the key. But in a public-key scheme, the encryption key is public.
 
-In more detail, the $\mathcal{L}_{\text {hyb- } h}$ library can indeed obtain $p k$ from $\mathcal{L}_{\text {pk-ots }-\star .}$. It therefore has enough information to perform the encryptions for all calls to CHALLENGE. Indeed, you can think of $\mathcal{L}_{\text {hyb- } 0}$ as doing everything that $\mathcal{L}_{\text {pk-cpa-L }}$ does, even though it doesn't know the secret key. We let $\mathcal{L}_{\text {hyb- } h}$ designate the $h^{\text {th }}$ call to CHALLENGE as a special one to be handled by $\mathcal{L}_{\mathrm{pk}-\mathrm{ots}-\star} .$ This allows us to change the $h^{\text {th }}$ encryption from using $m_{L}$ to $m_{R}$
+In more detail, the $\mathcal{L}_{\text {hyb- } h}$ library can indeed obtain $p k$ from $\mathcal{L}_{\text {pk-ots }-\star .}$. It therefore has enough information to perform the encryptions for all calls to CHALLENGE. Indeed, you can think of $\mathcal{L}_{\text {hyb- } 0}$ as doing everything that $\mathcal{L}_{\text {pk-cpa-L }}$ does, even though it doesn't know the secret key. We let $\mathcal{L}_{\text {hyb-} h}$ designate the $\colorbox{lightgray}{\textit{h}}^{\text{th}}$ call to CHALLENGE as a special one to be handled by $\mathcal{L}_{\mathrm{pk}-\mathrm{ots}-\star} .$ This allows us to change the $h^{\text {th }}$ encryption from using $m_{L}$ to $m_{R}$
 
 
 ## 15.3 ElGamal Encryption
@@ -189,7 +191,7 @@ In more detail, the $\mathcal{L}_{\text {hyb- } h}$ library can indeed obtain $p
 ElGamal encryption is a public-key encryption scheme that is based on DHKA.
 
 **Construction 15.6 (ElGamal)**
-The public parameters are a choice of cyclic group $\mathbb{G}$ with n elements and generator $g$.
+*The public parameters are a choice of cyclic group $\mathbb{G}$ with n elements and generator $g$.*
 
 $$
 \def\arraystretch{1.5}
@@ -229,21 +231,21 @@ $$
 \end{aligned}
 $$
 ### Security
-Imagine an adversary who is interested in attacking an ElGamal scheme. This adversary sees the public key $A=g^{a}$ and a ciphertext $\left(g^{b}, M g^{a b}\right)$ go by. Intuitively, the Decisional Diffie-Hellman assumption says that the value $g^{a b}$ looks random, even to someone who has seen $g^{a}$ and $g^{b}$. Thus, the message $M$ is masked with a pseudorandom group element-as we've seen before, this is a lot like masking the message with a random pad as in one-time pad. The only change here is that instead of the xor operation, we are using the group operation in $\mathbb{G}$. 
+Imagine an adversary who is interested in attacking an ElGamal scheme. This adversary sees the public key $A=g^{a}$ and a ciphertext $\left(g^{b}, M g^{a b}\right)$ go by. Intuitively, the Decisional Diffie-Hellman assumption says that the value $g^{a b}$ looks random, even to someone who has seen $g^{a}$ and $g^{b}$. Thus, the message $M$ is masked with a pseudorandom group element-as we've seen before, this is a lot like masking the message with a random pad as in one-time pad. The only change here is that instead of the XOR operation, we are using the group operation in $\mathbb{G}$. 
 
 More formally, we can prove the security of ElGamal under the DDH assumption:
 
 **Claim 15.7**
-If the DDH assumption in group G is true, then ElGamal in group $\mathbb{G}$ is C P A $\varPhi$ -secure.
+*If the DDH assumption in group $\mathbb{G}$ is true, then ElGamal in group $\mathbb{G}$ is CPA$\varPhi$-secure.*
 
 **Proof**
-It suffices to show that ElGamal has pseudorandom ciphertexts when the calling program sees only a single ciphertext. In other words, we will show that $\mathcal{L}_{\mathrm{pk}\text {-ots}\varPhi-\text{real}}\approx\mathcal{L}_{\mathrm{pk}-\text {ots}\varphi\text{-rand }}$, where these libraries are the $\mathcal{L}_{\mathrm{pk}-\mathrm{cpas}-\star}$ libraries from Definition 15.2 but with the singleciphertext restriction used in Definition 15.4. It is left as an exercise to show that $\mathcal{L}_{\mathrm{pk}\text {-ots}\varPhi-\text{real}}\approx\mathcal{L}_{\mathrm{pk}-\text {ots}\varphi\text{-rand }}$ implies CPA$\varPhi$ security (which in turn implies CPA security); the proof is very similar to that of Claim 15.5 .
+It suffices to show that ElGamal has pseudorandom ciphertexts when the calling program sees only a single ciphertext. In other words, we will show that $\mathcal{L}_{\mathrm{pk}\text {-ots}\Phi-\text{real}}\approx\mathcal{L}_{\mathrm{pk}-\text {ots}\Phi\text{-rand }}$, where these libraries are the $\mathcal{L}_{\mathrm{pk}-\mathrm{cpas}-\star}$ libraries from Definition 15.2 but with the singleciphertext restriction used in Definition 15.4. It is left as an exercise to show that $\mathcal{L}_{\mathrm{pk}\text {-ots}\Phi-\text{real}}\approx\mathcal{L}_{\mathrm{pk}-\text {ots}\Phi\text{-rand }}$ implies CPA$\Phi$ security (which in turn implies CPA security); the proof is very similar to that of Claim 15.5 .
 
  The sequence of hybrid libraries is given below:
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-\qquad \quad \mathcal{L}_{\text{pk-ots}\varPhi-\text{real}} \\ \hline
+\qquad \quad \mathcal{L}_{\text{pk-ots}\Phi-\text{real}} \\ \hline
 a\leftarrow \mathbb{Z}_n\\
 A:=g^a\\
 \text{count}=0\\
@@ -257,62 +259,84 @@ A:=g^a\\
 \quad X:=M\cdot A^b\\
 \quad \text{return} (B,X)\\\hline
 \end{array}
-$$
-
-The starting point is the $\mathcal{L}_{\text{pk-ots}\varPhi-\text{real}}$ library, shown here with the details of ElGamal filled in.
-
-$$
-\def\arraystretch{1.5}
-\begin{array}{|l|} \hline
-a\leftarrow \mathbb{Z}_n;b\leftarrow \mathbb{Z}_n\\
-A:=g^a;B:=g^b;C:=A^b\\
-\text{count}=0\\
-\underline{\text{GETPK():}}\\
-\quad \text{return $A$}\\
-\underline{\text{QUERY}(M\in \mathbb{G}):}\\
-\quad \text{count : count+1}\\
-\quad \text{if count} > 1:\ \text{return null}\\
-\quad X:=M\cdot C\\
-\quad \text{return} (B,X)\\\hline
+\quad
+\begin{array}{l}
+\text{The starting point is the}\\
+\text{$\mathcal{L}_{\text{pk-ots}\varPhi-\text{real}}$ library, shown here}\\
+\text{with the details of ElGamal filled}\\
+\text{in.}\\
 \end{array}
 $$
 
-The main body of QUERY computes some intermediate values $B$ and $A^b$ . But since those lines are only reachable one time, it does not change anything to precompute them at initialization time.
+  
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-(A,B,C)\leftarrow \text{DHQUERY()}\\
-\text{count}=0\\
+a\leftarrow \mathbb{Z}_n;b\leftarrow \colorbox{Yellow}{$\mathbb{Z}_n$}\\
+A:=g^a;\colorbox{Yellow}{$B:=g^b;C:=A^b$}\\
+\textit{count}=0\\
 \underline{\text{GETPK():}}\\
 \quad \text{return $A$}\\
 \underline{\text{QUERY}(M\in \mathbb{G}):}\\
-\quad \text{count : count+1}\\
+\quad \textit{count : count}+1\\
 \quad \text{if count} > 1:\ \text{return null}\\
-\quad X:=M\cdot C\\
+\quad X:=M\cdot \colorbox{Yellow}{$C$}\\
 \quad \text{return} (B,X)\\\hline
 \end{array}
 \quad
+\begin{array}{l}
+\text{The main body of QUERY com-}\\
+\text{putes some intermediate values}\\
+\text{$B$ and $A^b$ . But since those lines}\\
+\text{are only reachable one time, it}\\
+\text{does not change anything to pre-}\\
+\text{compute them at initialization}\\
+\text{time.}\\
+\end{array}
+$$
+
+$$
+\def\arraystretch{1.5}
+\begin{array}{|l|} \hline
+\colorbox{Yellow}{$(A,B,C)\leftarrow \text{DHQUERY()}$}\\
+\textit{count}=0\\
+\underline{\text{GETPK():}}\\
+\quad \text{return $A$}\\
+\underline{\text{QUERY}(M\in \mathbb{G}):}\\
+\quad \text{count : count+1}\\
+\quad \text{if count} > 1:\ \text{return null}\\
+\quad X:=M\cdot C\\
+\quad \text{return} (B,X)\\\hline
+\end{array}
+\diamond
 \begin{array}{|l|} \hline
 \qquad\mathcal{L}_{\text{dh-real}}\\\hline
 \text{DHQUERY()}\\
 \quad a,b\leftarrow \mathbb{Z}_n\\
 \quad \text{return} (g^a,g^b,g^{ab})\\\hline
 \end{array}
+\quad
+\begin{array}{l}
+\text{We can factor out the genera-}\\
+\text{tion of $A, B, C$ in terms of the}\\
+\text{$\mathcal{L}_{\text{dh-real}}$ library from the De-}\\
+\text{cisional Diffie-Hellman security}\\
+\text{definition (Definition 14.5).}\\
+\end{array}
 $$
 
-We can factor out the generation of $A, B, C$ in terms of the $\mathcal{L}_{\text{dh-real}}$ library from the Decisional Diffie-Hellman security definition (Definition 14.5).
-
+ 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 (A,B,C)\leftarrow \text{DHQUERY()}\\
-\text{count}=0\\
+\textit{count}=0\\
 \underline{\text{GETPK():}}\\
 \quad \text{return $A$}\\
 \underline{\text{QUERY}(M\in \mathbb{G}):}\\
-\quad \text{count : count+1}\\
-\quad \text{if count} > 1:\ \text{return null}\\
+\quad \textit{count : count}+1\\
+\quad \text{if}\ \textit{count} > 1:\ \text{return null}\\
 \quad X:=M\cdot C\\
 \quad \text{return} (B,X)\\\hline
 \end{array}
@@ -320,74 +344,104 @@ $$
 \begin{array}{|l|} \hline
 \qquad\mathcal{L}_{\text{dh-rand}}\\\hline
 \text{DHQUERY()}\\
-\quad a,b,c\leftarrow \mathbb{Z}_n\\
-\quad \text{return} (g^a,g^b,g^{c})\\\hline
+\quad a,b,\colorbox{Yellow}c\leftarrow \mathbb{Z}_n\\
+\quad \text{return} (g^a,g^b,\colorbox{Yellow}{$g^{c}$})\\\hline
+\end{array}
+\quad
+\begin{array}{l}
+\text{Applying the security of DDH,} \\
+\text{we can replace $\mathcal{L}_{\text{dh-real}}$ with} \\
+\text{$\mathcal{L}_{\text{dh-rand}}$} \\
 \end{array}
 $$
-
-Applying the security of DDH, we can replace $\mathcal{L}_{\text{dh-real}}$ with $\mathcal{L}_{\text{dh-rand}}$
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-(a,b,c)\leftarrow \mathbb{Z}_n\\
-A:=g^a;B:=g^b;C:=g^c\\
-\text{count}=0\\
+\colorbox{Yellow}{$(a,b,c)\leftarrow \mathbb{Z}_n$}\\
+\colorbox{Yellow}{$A:=g^a;B:=g^b;C:=g^c$}\\
+\textit{count}=0\\
 \underline{\text{GETPK():}}\\
 \quad \text{return $A$}\\
 \underline{\text{QUERY}(M\in \mathbb{G}):}\\
-\quad \text{count : count+1}\\
-\quad \text{if count} > 1:\ \text{return null}\\
+\quad \textit{count : count}+1\\
+\quad \text{if}\ \textit{count} > 1:\ \text{return null}\\
 \quad X:=M\cdot C\\
 \quad \text{return} (B,X)\\\hline
 \end{array}
+\qquad \qquad \qquad \qquad
+\begin{array}{l}
+\text{The call to DHQUERY has been in-}\\
+\text{lined.}\\
+\end{array}
 $$
 
-The call to DHQUERY has been in lined.
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 a\leftarrow \mathbb{Z}_n\\
 A:=g^a\\
-\text{count}=0\\
+\textit{count}=0\\
 \underline{\text{GETPK():}}\\
 \quad \text{return $A$}\\
 \underline{\text{QUERY}(M\in \mathbb{G}):}\\
-\quad \text{count : count+1}\\
-\quad \text{if count} > 1:\ \text{return null}\\
-\quad b,c\leftarrow \mathbb{Z}_n\\
-\quad B:=g^b:C:=g^c\\
+\quad \textit{count : count}+1\\
+\quad \text{if}\ \textit{count} > 1:\ \text{return null}\\
+\quad \colorbox{Yellow}{$b,c\leftarrow \mathbb{Z}_n$}\\
+\quad \colorbox{Yellow}{$B:=g^b:C:=g^c$}\\
 \quad X:=M\cdot C\\
 \quad \text{return} (B,X)\\\hline
 \end{array}
+\qquad \qquad\qquad\qquad
+\begin{array}{l}
+\text{As before, since the main body of}\\
+\text{QUERY is only reachable once, we}\\
+\text{can move the choice of $B$ and $C$}\\
+\text{into that subroutine instead of at}\\
+\text{initialization time.}\\
+\end{array}
 $$
 
-As before, since the main body of QUERY is only reachable once, we can move the choice of $B$ and $C$ into that subroutine instead of at initialization time.
+    
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-\qquad \quad \mathcal{L}_{\text{pk-ots}\varPhi-\text{rand}} \\ \hline
+\qquad \quad \mathcal{L}_{\text{pk-ots}\Phi-\text{rand}} \\ \hline
 a\leftarrow \mathbb{Z}_n\\
 A:=g^a\\
-\text{count}=0\\
+\textit{count}=0\\
 \underline{\text{GETPK():}}\\
 \quad \text{return $A$}\\
 \underline{\text{QUERY}(M\in \mathbb{G}):}\\
-\quad \text{count : count+1}\\
-\quad \text{if count} > 1:\ \text{return null}\\
-\quad b,x\leftarrow \mathbb{Z}_n\\
-\quad B:=g^b:X:=g^x\\
+\quad \textit{count : count}+1\\
+\quad \text{if}\ \textit{count} > 1:\ \text{return null}\\
+\quad b, \colorbox{Yellow}{$x$}\leftarrow \mathbb{Z}_n\\
+\quad B:=g^b: \colorbox{Yellow}{$X:=g^x$}\\
 \quad \text{return} (B,X)\\\hline
+\end{array}
+\qquad \qquad\qquad\qquad
+\begin{array}{l}
+\text{When $b$ is sampled uniformly}\\
+\text{from $\mathbb{Z}n$, the expression $B = g^b$}\\
+\text{is a uniformly distributed ele-}\\
+\text{ment of $\mathbb{G}$. Also recall that when}\\
+\text{$C$ is a uniformly distributed el-}\\
+\text{ement of $\mathbb{G}$, then $M \cdot C$ is uni-}\\
+\text{formly distributed — this is anal-}\\
+\text{ogous to the one-time pad prop-}\\
+\text{erty (see Exercise 2.5). Applying}\\
+\text{this change gives the library to}\\
+\text{the left.}\\
 \end{array}
 $$
 
-When $b$ is sampled uniformly from $\mathbb{Z}n$, the expression $B = g^b$ is a uniformly distributed element of $\mathbb{G}$. Also recall that when $C$ is a uniformly distributed element of $\mathbb{G}$, then $M \cdot C$ is uniformly distributed — this is analogous to the one-time pad property (see Exercise 2.5). Applying this change gives the library to the left.
+     
 
-In the final hybrid, the response to QUERY is a pair of uniformly distributed group elements $(B, X) .$ Hence that library is exactly $\mathcal{L}_{\mathrm{pk}-\text { ots } \varPhi \text { -rand }},$ as desired.
+In the final hybrid, the response to QUERY is a pair of uniformly distributed group elements $(B, X) .$ Hence that library is exactly $\mathcal{L}_{\mathrm{pk}-\text{ots}\Phi\text { -rand }},$ as desired. $\qquad\blacksquare$
 
-### Hybrid Encryption
+## 15.4 Hybrid Encryption
 As a rule, public-key encryption schemes are much more computationally expensive than symmetric-key schemes. Taking ElGamal as a representative example, computing $g^{b}$ in a cryptographically secure cyclic group is considerably more expensive than one evaluation of AES. As the plaintext data increases in length, the difference in cost between public-key and symmetric-key techniques only gets worse.
 
 A clever way to minimize the cost of public-key cryptography is to use a method called **hybrid encryption**. The idea is to use the expensive public-key scheme to encrypt a *temporary key* for a symmetric-key scheme. Then use the temporary key to (cheaply) encrypt the large plaintext data.
