@@ -449,9 +449,9 @@ A clever way to minimize the cost of public-key cryptography is to use a method 
 To decrypt, one can use the decryption key of the public-key scheme to obtain the temporary key. Then the temporary key can be used to decrypt the main payload.
 
 **Construction 15.8 (Hybrid Enc)**
-Let $\Sigma_{\text {pub }}$ be a public-key encryption scheme, and let $\Sigma_{\text {sym }}$ be a symmetric-key encryption scheme, where $\Sigma_{\text {sym. }} \mathcal{K} \subseteq \Sigma_{\text {pub. }} \mathcal{M}-$ that is, the public-key scheme is capable of encrypting keys of the symmetric-key scheme. 
+*Let $\Sigma_{\text {pub }}$ be a public-key encryption scheme, and let $\Sigma_{\text {sym }}$ be a symmetric-key encryption scheme, where $\Sigma_{\text {sym. }} \mathcal{K} \subseteq \Sigma_{\text {pub. }} \mathcal{M}-$ that is, the public-key scheme is capable of encrypting keys of the symmetric-key scheme.* 
 
-Then we define $\Sigma_{\text {hvb }}$ to be the following construction:
+*Then we define $\Sigma_{\text {hvb }}$ to be the following construction:*
 
 $$
 \def\arraystretch{1.5}
@@ -460,18 +460,19 @@ $$
 \mathcal{M}=\Sigma_{sym}.\mathcal{M}\\
 \mathcal{C}=\Sigma_{pub}.\mathcal{C}\times \Sigma_{sym}.\mathcal{C}\\\\
 \underline{\text{KeyGen:}}\\
-\quad (pk,sk)\leftarrow\Sigma_{pub}.\text{KeyGen}\\
+\quad (pk,sk)\leftarrow\Sigma_{\text{pub}}.\text{KeyGen}\\
 \quad\text{return} (pk,sk)
 \end{array}
 &
 \begin{array}{l}
 \underline{\text{Enc}(pk,m):}\\
-\quad tk\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad c_{pub}\leftarrow \Sigma_{pub}.\text{Enc}(tk,m)\\
-\quad\text{return} (c_{pub},c_{sym})\\
-\underline{\text{Dec}(sk,(c_{pub},c_{sym})):}\\
-\quad tk:=\Sigma_{pub}.\text{Dec}(sk,c_{pub})\\
-\quad\text{return}\ \Sigma_{sym}.\text{Dec}(tk,c_{sym})
+\quad tk\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}\\
+\quad c_{\text{pub}}\leftarrow \Sigma_{\text{pub}}.\text{Enc}(pk,tk)\\
+\quad c_{\text{sym}}\leftarrow \Sigma_{\text{sym}}.\text{Enc}(tk,m)\\
+\quad\text{return} (c_{\text{pub}},c_{\text{sym}})\\
+\underline{\text{Dec}(sk,(c_{\text{pub}},c_{\text{sym}})):}\\
+\quad tk:=\Sigma_{\text{pub}}.\text{Dec}(sk,c_{\text{pub}})\\
+\quad\text{return}\ \Sigma_{\text{sym}}.\text{Dec}(tk,c_{\text{sym}})
 \end{array}\\\hline
 \end{array}
 $$
@@ -490,44 +491,55 @@ $$
 To show that hybrid encryption is a valid way to encrypt data, we prove that it provides CPA security, when its two components have appropriate security properties:
 
 **Claim 15.9**
-If $\Sigma_{\text {sym }}$ is a one-time-secret symmetric-key encryption scheme and $\Sigma_{\text {pub is }}$ a CPA-secure publickey encryption scheme, then the hybrid scheme $\Sigma_{\text {hyb }}$ (Construction 15.8) is also a CPA-secure public-key encryption scheme.
+*If $\Sigma_{sym}$ is a one-time-secret symmetric-key encryption scheme and $\Sigma_{pub}$ is a CPA-secure public-key encryption scheme, then the hybrid scheme $\Sigma_{hyb}$ (Construction 15.8) is also a CPA-secure public-key encryption scheme.*
 
 Note that $\Sigma_{\text {sym }}$ does not even need to be CPA-secure. Intuitively, one-time secrecy suffices because each temporary key $t k$ is used only once to encrypt just a single plaintext.
 
 **Proof**
-As usual, our goal is to show that $\mathcal{L}_{\mathrm{pk}-\text { cpa-L }}^{\Sigma_{\text {hyb }}} \approx \mathcal{L}_{\text {pk-cpa-R }}^{\Sigma_{\text {hyb }}},$ which we do in a standard sequence of hybrids:
+As usual, our goal is to show that $\mathcal{L}_{\mathrm{pk}-\text {cpa-L}}^{\Sigma_{\text {hyb }}} \approx \mathcal{L}_{\text {pk-cpa-R }}^{\Sigma_{\text {hyb }}},$ which we do in a standard sequence of hybrids:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 \qquad \qquad \mathcal{L}_{\text{pk-cpa-L}}^{\Sigma \text{hyb}} \\ \hline
-(pk,sk)\leftarrow\Sigma_{pub}.\text{KeyGen}\\
+(pk,sk)\leftarrow\Sigma_{\text{pub}}.\text{KeyGen}\\
 \underline{\text{GETPK():}}\\
 \quad \text{return $pk$}\\
 \underline{\text{CHALLENGE}(m_L,m_R):}\\
-\quad tk\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad c_{pub}\leftarrow \Sigma_{pub}.\text{Enc}(pk,tk)\\
-\quad c_{sym}\leftarrow \Sigma_{sym}.\text{Enc}(tk,m_L)\\
-\quad\text{return} (c_{pub},c_{sym})\\\hline
+\quad tk\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}\\
+\quad c_{\text{pub}}\leftarrow \Sigma_{\text{pub}}.\text{Enc}(pk,tk)\\
+\quad c_{\text{sym}}\leftarrow \Sigma_{\text{sym}}.\text{Enc}(tk,m_L)\\
+\quad\text{return} (c_{\text{pub}},c_{\text{sym}})\\\hline
+\end{array}
+\quad
+\begin{array}{l}
+\text{The starting point is $\mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{L}},$ shown here with the details} \\
+\text{of $\Sigma_{\text {hyb }}$ filled in.} \\
+\text{} \\
+\text{Our only goal is to somehow replace $m_{L}$ with $m_{R}$. Since $m_{L}$} \\
+\text{is only used as a plaintext for $\Sigma_{\text {sym }}$, it is tempting to simply} \\
+\text{apply the one-time-secrecy property of $\Sigma_{\text {sym }}$ to argue that} \\
+\text{$m_{L}$ can be replaced with $m_{R} .$ Unfortunately, this cannot} \\
+\text{work because the $key$ used for that ciphertext is $t k$, which} \\
+\text{is used elsewhere. In particular, it is used as an argument} \\
+\text{to $\Sigma_{\text {pub.}}$Enc.} \\
 \end{array}
 $$
-The starting point is $\mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{L}},$ shown here with the details of $\Sigma_{\text {hyb }}$ filled in.
 
-Our only goal is to somehow replace $m_{L}$ with $m_{R}$. Since $m_{L}$ is only used as a plaintext for $\Sigma_{\text {sym }}$, it is tempting to simply apply the one-time-secrecy property of $\Sigma_{\text {sym }}$ to argue that $m_{L}$ can be replaced with $m_{R} .$ Unfortunately, this cannot work because the key used for that ciphertext is $t k$, which is used elsewhere. In particular, it is used as an argument to $\Sigma_{\text {pub. }}$ Enc.
 
-However, using $t k$ as the plaintext argument to $\Sigma_{\text {pub }}$. Enc should hide $t k$ to the calling program, if $\Sigma_{\text {pub }}$ is CPA-secure. That is, the $\Sigma_{\text {pub }}$ -encryption of $t k$ should look like a $\Sigma_{\text {pub }}$ encryption of some unrelated dummy value. More formally, we can factor out the call to $\Sigma_{\text {pub. }}$ Enc in terms of the $\mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{L}}$ library, as follows:
+However, using $t k$ as the plaintext argument to $\Sigma_{\text {pub}}$.Enc should hide $t k$ to the calling program, if $\Sigma_{\text {pub }}$ is CPA-secure. That is, the $\Sigma_{\text {pub}}$-encryption of $t k$ should look like a $\Sigma_{\text {pub }}$ encryption of some unrelated dummy value. More formally, we can factor out the call to $\Sigma_{\text {pub.}}$Enc in terms of the $\mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{L}}$ library, as follows:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 \underline{\text{CHALLENGE}(m_L,m_R):}\\
-\quad tk\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad tk'\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad c_{pub}\leftarrow \text{CHALLENGE}'(tk,tk')\\
-\quad c_{sym}\leftarrow \Sigma_{sym}.\text{Enc}(tk,m_L)\\
-\quad\text{return} (c_{pub},c_{sym})\\\hline
+\quad tk\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}\\
+\quad \colorbox{Yellow}{$tk'\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}$}\\
+\quad c_{\text{pub}}\leftarrow \colorbox{Yellow}{\text{CHALLENGE}'($tk,tk'$)}\\
+\quad c_{\text{sym}}\leftarrow \Sigma_{\text{sym}}.\text{Enc}(tk,m_L)\\
+\quad\text{return} (c_{\text{pub}},c_{\text{sym}})\\\hline
 \end{array}
-\quad
+\diamond
 \begin{array}{|l|} \hline
 \qquad \qquad \mathcal{L}_{\text{pk-cpa-L}}^{\Sigma \text{pub}} \\ \hline
 (pk,sk)\leftarrow\Sigma_{pub}.\text{KeyGen}\\
@@ -538,26 +550,26 @@ $$
 \end{array}
 $$
 
-Here we have changed the variable names of the arguments of CHALLENGE$'$ to avoid unnecessary confusion. Note also that challenge now chooses *two* temporary keys — one which is actually used to encrypt $m_L$ and one which is not used anywhere. This is because syntactically we must have two arguments to pass into CHALLENGE$'$ .
+Here we have changed the variable names of the arguments of CHALLENGE$'$ to avoid unnecessary confusion. Note also that CHALLENGE now chooses *two* temporary keys — one which is actually used to encrypt $m_L$ and one which is not used anywhere. This is because syntactically we must have two arguments to pass into CHALLENGE$'$ .
 
 Now imagine replacing $\mathcal{L}_{\text{pk-cpa-L}}$ with $\mathcal{L}_{\text{pk-cpa-R}}$ then inlining subroutine calls. The result is:
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-(pk,sk)\leftarrow\Sigma_{pub}.\text{KeyGen}\\
+(pk,sk)\leftarrow\Sigma_{\text{pub}}.\text{KeyGen}\\
 \underline{\text{GETPK():}}\\
 \quad \text{return $pk$}\\
 \underline{\text{CHALLENGE}(m_L,m_R):}\\
-\quad tk\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad tk'\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad c_{pub}\leftarrow \Sigma_{pub}.\text{Enc}(pk,tk')\\
-\quad c_{sym}\leftarrow \Sigma_{sym}.\text{Enc}(tk,m_L)\\
-\quad\text{return} (c_{pub},c_{sym})\\\hline
+\quad tk\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}\\
+\quad tk'\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}\\
+\quad c_{\text{pub}}\leftarrow \Sigma_{\text{pub}}.\text{Enc}(pk,\colorbox{Yellow}{$tk'$})\\
+\quad c_{sym}\leftarrow \Sigma_{\text{sym}}.\text{Enc}(tk,m_L)\\
+\quad\text{return} (c_{\text{pub}},c_{\text{sym}})\\\hline
 \end{array}
 $$
 
-At this point, it does now work to factor out the call to $\Sigma_{sym}$.Enc in terms of the $\mathcal{L}_{\text{ots-L}}$ library. This is because the key $tk$ is not used anywhere else in the library. The result of factoring out in this way is:
+At this point, it *does* now work to factor out the call to $\Sigma_{\text{sym}}$.Enc in terms of the $\mathcal{L}_{\text{ots-L}}$ library. This is because the key $tk$ is not used anywhere else in the library. The result of factoring out in this way is:
 
 $$
 \def\arraystretch{1.5}
@@ -566,26 +578,26 @@ $$
 \underline{\text{GETPK():}}\\
 \quad \text{return $pk$}\\
 \underline{\text{CHALLENGE}(m_L,m_R):}\\
-\quad tk'\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad c_{pub}\leftarrow \Sigma_{pub}.\text{Enc}(pk,tk')\\
-\quad c_{sym}\leftarrow \text{CHALLENGE}'(m_L,m_R)\\
-\quad\text{return} (c_{pub},c_{sym})\\\hline
+\quad tk'\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}\\
+\quad c_{\text{pub}}\leftarrow \Sigma_{\text{pub}}.\text{Enc}(pk,tk')\\
+\quad \colorbox{Yellow}{$c_{\text{sym}}\leftarrow \text{CHALLENGE}'(m_L,m_R)$}\\
+\quad\text{return} (c_{\text{pub}},c_{\text{sym}})\\\hline
 \end{array}
 \diamond
 \begin{array}{|l|} \hline
 \qquad \qquad \mathcal{L}_{\text{ots-L}}^{\Sigma \text{sym}} \\ \hline
 \underline{\text{CHALLENGE}'(m_L,m_R):}\\
-\quad tk\leftarrow \Sigma_{sym}.\text{KeyGen}\\
-\quad \text{return} \ \Sigma_{pub}.\text{Enc}(tk,m_L)\\\hline
+\quad tk\leftarrow \Sigma_{\text{sym}}.\text{KeyGen}\\
+\quad \text{return} \ \Sigma_{\text{sym}}.\text{Enc}(tk,m_L)\\\hline
 \end{array}
 $$
 
-At this point, we can replace $\mathcal{L}_{\text {ots-L }}$ with $\mathcal{L}_{\text {ots-R. }}$ After this change the $\Sigma_{\text {sym }}$ -ciphertext encrypts $m_{R}$ instead of $m_{L} .$ This is the "half-way point" of the proof, and the rest of the steps are a mirror image of what has come before. In summary: we inline $\mathcal{L}_{\text {ots-R }},$ then we apply CPA security to replace the $\Sigma_{\text {pub }}$ -encryption of $t k^{\prime}$ with $t k$. The result is exactly $\mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{R}},$ as desired.
+At this point, we can replace $\mathcal{L}_{\text {ots-L }}$ with $\mathcal{L}_{\text {ots-R. }}$ After this change the $\Sigma_{\text {sym}}$-ciphertext encrypts $m_{R}$ instead of $m_{L} .$ This is the "half-way point" of the proof, and the rest of the steps are a mirror image of what has come before. In summary: we inline $\mathcal{L}_{\text {ots-R }},$ then we apply CPA security to replace the $\Sigma_{\text {pub}}$-encryption of $t k^{\prime}$ with $t k$. The result is exactly $\mathcal{L}_{\mathrm{pk}-\mathrm{cpa}-\mathrm{R}},$ as desired.  $\qquad\blacksquare$
 
 ### Exercises
 15.1. Prove Claim $15.3 .$
 
-15.2. Show that a 2 -message key-agreement protocol exists if and only if CPA-secure public-key encryption exists.
+15.2. Show that a 2-message key-agreement protocol exists if and only if CPA-secure public-key encryption exists.
 
 In other words, show how to construct a CPA-secure encryption scheme from any 2 message KA protocol, and vice-versa. Prove the security of your constructions.
 
