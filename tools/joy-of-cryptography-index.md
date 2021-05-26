@@ -5,15 +5,15 @@ One-time uniform ciphertexts for symmetric-key encryption (Definition 2.5):
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-\qquad \qquad \mathcal{L}_{\text{ots}\varPhi-\text{real}}^{\Sigma} \\ \hline
+\qquad \qquad \mathcal{L}_{\text{ots}\Phi-\text{real}}^{\Sigma} \\ \hline
 \underline{\text{CTXT}(m\in\Sigma.\mathcal{M}):}\\
 \quad k\leftarrow \Sigma.\text{KeyGen}\\
-\quad  c\leftarrow \Sigma.\text{KeyGen}(k,m)\\
+\quad  c\leftarrow \Sigma.\text{Enc}(k,m)\\
 \quad \text{return}\ c\\\hline
 \end{array}
 \quad
 \begin{array}{|l|} \hline
-\qquad \qquad \mathcal{L}_{\text{ots}\varPhi-\text{rand}}^{\Sigma} \\ \hline
+\qquad \qquad \mathcal{L}_{\text{ots}\Phi-\text{rand}}^{\Sigma} \\ \hline
 \underline{\text{CTXT}(m\in\Sigma.\mathcal{M}):}\\
 \quad  c\leftarrow \Sigma.C\\
 \quad \text{return}\ c\\\hline
@@ -27,7 +27,7 @@ $$
 \qquad \qquad \mathcal{L}_{\text{ots-L}}^{\Sigma} \\ \hline
 \underline{\text{EAVESDROP}(m_L,m_R\in\Sigma.\mathcal{M}):}\\
 \quad k\leftarrow \Sigma.\text{KeyGen}\\
-\quad  c\leftarrow \Sigma.\text{KeyGen}(k,m_L)\\
+\quad  c\leftarrow \Sigma.\text{Enc}(k,m_L)\\
 \quad \text{return}\ c\\\hline
 \end{array}
 \quad
@@ -35,7 +35,7 @@ $$
 \qquad \qquad \mathcal{L}_{\text{ots-R}}^{\Sigma} \\ \hline
 \underline{\text{EAVESDROP}(m_L,m_R\in\Sigma.\mathcal{M}):}\\
 \quad k\leftarrow \Sigma.\text{KeyGen}\\
-\quad  c\leftarrow \Sigma.\text{KeyGen}(k,m_R)\\
+\quad  c\leftarrow \Sigma.\text{Enc}(k,m_R)\\
 \quad \text{return}\ c\\\hline
 \end{array}
 $$
@@ -106,14 +106,14 @@ Pseudorandom permutation (Definition 6.6):
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \qquad\mathcal{L}_{\text{prf-real}}^F\\\hline
+\qquad \qquad\mathcal{L}_{\text{prp-real}}^F\\\hline
 k\leftarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda}\\\\
 \underline{\text{LOOKUP}(x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{return}\ F(k,x)\\\hline
 \end{array}
 \quad
 \begin{array}{|l|}\hline
-\qquad \qquad \quad\mathcal{L}_{\text{prf-rand}}^F\\\hline
+\qquad \qquad \quad\mathcal{L}_{\text{prp-rand}}^F\\\hline
 T:=\text{empty assoc. array}\\\\
 \underline{\text{LOOKUP}(x\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{if}\ T[x]\ \text{undefined:}\\
@@ -145,7 +145,7 @@ T,T_{inv}:=\text{empty assoc. arrays}\\\\
 \underline{\text{INVLOOKUP}(y\in\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}):}\\
 \quad \text{if}\ T_{inv}[y]\ \text{undefined}:\\
 \qquad x\leftarrow \{\textcolor{brown}{0},\textcolor{brown}{1}\}^{blen}\backslash T_{inv}.\text{values}\\
-\qquad T_{inv}[y]:=x:\quad T[x]:=y\\
+\qquad T_{inv}[y]:=x;\quad T[x]:=y\\
 \quad \text{return}\ T_{inv}[y]\\\hline
 \end{array}
 $$
@@ -157,26 +157,26 @@ $$
 \qquad\qquad \qquad \ \mathcal{L}_{\text{cpa-L}}^\Sigma\\\hline
 k\leftarrow\Sigma.\text{KeyGen}\\\\
 \underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
-\quad\text{if}\ |m_L|\neq |m_R| \text{return\textcolor{brown}{\texttt{err}}}\\
-\quad c:=\Sigma.\text{Enc}(l,\colorbox{yellow}{m}_L)\\
+\quad\text{if}\ |m_L|\neq |m_R|\ \text{return\ \textcolor{brown}{\texttt{err}}}\\
+\quad c:=\Sigma.\text{Enc}(k,{m}_L)\\
 \quad \text{return}\ c\\\hline
 \end{array}\quad
 \begin{array}{|l|}\hline
 \qquad\qquad \qquad \ \mathcal{L}_{\text{cpa-R}}^\Sigma\\\hline
 k\leftarrow\Sigma.\text{KeyGen}\\\\
 \underline{\text{EAVESDROP}(m_L,m_R\in \Sigma.\mathcal{M}):}\\
-\quad\text{if}\ |m_L|\neq |m_R| \text{return\textcolor{brown}{\texttt{err}}}\\
-\quad c:=\Sigma.\text{Enc}(l,\colorbox{yellow}{m}_R)\\
+\quad\text{if}\ |m_L|\neq |m_R|\ \text{return\ \textcolor{brown}{\texttt{err}}}\\
+\quad c:=\Sigma.\text{Enc}(k,{m}_R)\\
 \quad \text{return}\ c\\\hline
 \end{array}
 $$
 
-CPA$\varPhi$ security for symmetric-key encryption (Definition 7.2, Section 8.2):
+CPA$\Phi$ security for symmetric-key encryption (Definition 7.2, Section 8.2):
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad\ \ \mathcal{L}_{\text{cpa}\varPhi-\text{real}}^\Sigma\\\hline
+\qquad\ \ \mathcal{L}_{\text{cpa}\Phi-\text{real}}^\Sigma\\\hline
 k\leftarrow\Sigma.\text{KeyGen}\\\\
 \underline{\text{CHALLENGE}(m\in\Sigma.\mathcal{M}):}\\
 \quad c:=\Sigma.\text{Enc}(k,m)\\
@@ -184,7 +184,7 @@ k\leftarrow\Sigma.\text{KeyGen}\\\\
 \end{array}
 \quad
 \begin{array}{|l|}\hline
-\qquad\quad \ \mathcal{L}_{\text{cpa}\varPhi-\text{rand}}^\Sigma\\\hline
+\qquad\quad \ \mathcal{L}_{\text{cpa}\Phi-\text{rand}}^\Sigma\\\hline
 \underline{\text{CHALLENGE}(m\in\Sigma.\mathcal{M}):}\\
 \quad c:=\Sigma.\mathcal{C}(|m|)\\
 \quad \text{return}\ c\\\hline
@@ -204,7 +204,7 @@ S:=\emptyset\\\\
 \quad c:=\Sigma.\text{Enc}(k,m_L)\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{return}\ \Sigma.\text{Dec}(k,c)\\\hline
 \end{array}
@@ -218,38 +218,38 @@ S:=\emptyset\\\\
 \quad c:=\Sigma.\text{Enc}(k,m_R)\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{return}\ \Sigma.\text{Dec}(k,c)\\\hline
 \end{array}
 $$
 
-CCA$\varPhi$ security for symmetric-key encryption (Definition 9.2):
+CCA$\Phi$ security for symmetric-key encryption (Definition 9.2):
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|}\hline
-\qquad \qquad\mathcal{L}_{\text {cca}\varPhi-\text{real }}^{\Sigma}\\\hline
+\qquad \qquad\mathcal{L}_{\text {cca}\Phi-\text{real }}^{\Sigma}\\\hline
 k\leftarrow \Sigma.\text{KeyGen}\\
 S:=\emptyset\\\\
 \underline{\text{CTXT}(m\in \Sigma.\mathcal{M}):}\\
-\quad \colorbox{yellow}{c:=}\Sigma.\text{Enc}(k,m)\\
+\quad {c:=}\Sigma.\text{Enc}(k,m)\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{return}\ \Sigma.\text{Dec}(k,c)\\\hline
 \end{array}
 \quad
 \begin{array}{|l|}\hline
-\qquad \qquad \mathcal{L}_{\text {cca}\varPhi-\text{rand }}^{\Sigma}\\\hline
+\qquad \qquad \mathcal{L}_{\text {cca}\Phi-\text{rand }}^{\Sigma}\\\hline
 k\leftarrow \Sigma.\text{KeyGen}\\
 S:=\emptyset\\\\
 \underline{\text{CTXT}(m\in \Sigma.\mathcal{M}):}\\
-\quad \colorbox{yellow}{c:=}\Sigma.\text{Enc}(k,m)\\
+\quad {c}\leftarrow\Sigma.\textit{C}(|m|)\\
 \quad S:=S\cup\{c\}\\
 \quad\text{return}\ c\\\\
-\underline{\text{DECRYPT}}(c\in \Sigma.C):\\
+\underline{\text{DECRYPT}(c\in \Sigma.C):}\\
 \quad \text{if}\ c\in S\ \text{return}\ \textcolor{brown}{\texttt{err}}\\
 \quad \text{return}\ \Sigma.\text{Dec}(k,c)\\\hline
 \end{array}
@@ -290,8 +290,8 @@ s\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^\lambda\\
 \underline{\text{GETSALT():}}\\
 \quad \text{return}\ s\\
 \underline{\text{TEST}(x,x'\in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^*):}\\
-\quad \text{if $x \neq x'$ and $H(s, x) = H(s, x')$: return true}\\
-\quad \text{return false}\\\hline
+\quad \text{if $x \neq x'$ and $H(s, x) = H(s, x')$: return}\ \mathtt{true}\\
+\quad \text{return}\ \mathtt{false}\\\hline
 \end{array}\quad
 \begin{array}{|l|}\hline
 \qquad \qquad  \mathcal{L}_{\text{cr-fake}}^\mathcal{H}\\\hline
@@ -299,7 +299,7 @@ s\leftarrow \{\textcolor{brown}{0}, \textcolor{brown}{1}\}^\lambda\\
 \underline{\text{GETSALT():}}\\
 \quad \text{return}\ s\\
 \underline{\text{TEST}(x,x'\in\{\textcolor{brown}{0}, \textcolor{brown}{1}\}^*):}\\
-\quad \text{return false}\\\hline
+\quad \text{return}\ \mathtt{false}\\\hline
 \end{array}
 $$
 
@@ -308,10 +308,13 @@ Digital signatures (Definition 13.6):
 $$\begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{sig-real}}^\Sigma\\\hline
 (vk,sk)\leftarrow \Sigma.\text{KeyGen}\\
+\\
 \underline{\text{GETVK():}}\\
 \quad \text{return $vk$ }\\
+\\
 \underline{\text{GETSIG}(m):}\\
 \quad \text{return $\Sigma.$Sign }(sk,m)\\
+\\
 \underline{\text{VERSIG}(m,\sigma):}\\
 \quad \text{return $\Sigma.$Ver }(vk,m,\sigma)\\\hline
 \end{array}
@@ -319,13 +322,13 @@ $$\begin{array}{|l|}\hline
 \begin{array}{|l|}\hline
 \qquad \qquad\mathcal{L}_{\text{sig-fake}}^\Sigma\\\hline
 (vk,sk)\leftarrow \Sigma.\text{KeyGen}\\
-S:=\emptyset\\
+S:=\emptyset\\\\
 \underline{\text{GETVK():}}\\
-\quad \text{return $vk$ }\\
+\quad \text{return $vk$ }\\\\
 \underline{\text{GETSIG}(m):}\\
 \quad\sigma:=\Sigma.\text{Sign}(sk,m)\\
 \quad S:=S\cup\{(m,\sigma)\}\\
-\quad \text{return $\sigma$}\\
+\quad \text{return $\sigma$}\\\\
 \underline{\text{VERSIG}(m,\sigma):}\\
 \quad \text{return $(m,\sigma)\stackrel{?}{\in}S$}\\\hline
 \end{array}$$
@@ -336,7 +339,7 @@ $$
 \begin{array}{|l|}\hline
 \qquad \qquad \ \ \mathcal{L}_{\text{ka-real}}^\Sigma\\\hline
 \underline{\text{QUERY():}}\\
-\quad (t,k)\leftarrow \text{EXECPROT}(\Sigma)\\
+\quad (t,K)\leftarrow \text{EXECPROT}(\Sigma)\\
 \quad \text{return}\ (t,K)\\\hline
 \end{array}
 \quad
@@ -355,14 +358,14 @@ $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
 \qquad\mathcal{L}_{\text{dh-real}}^\mathbb{G}\\\hline
-\text{QUERY():}\\
+\underline{\text{QUERY():}}\\
 \quad a,b\leftarrow \mathbb{Z}_n\\
 \quad \text{return} (g^a,g^b,g^{ab})\\\hline
 \end{array}
 \quad
 \begin{array}{|l|} \hline
 \qquad\mathcal{L}_{\text{dh-rand}}^\mathbb{G}\\\hline
-\text{QUERY():}\\
+\underline{\text{QUERY():}}\\
 \quad a,b,c\leftarrow \mathbb{Z}_n\\
 \quad \text{return} (g^a,g^b,g^{c})\\\hline
 \end{array}
@@ -391,12 +394,12 @@ $$
 \end{array}
 $$
 
-CPA$\varPhi$ security for public-key encryption (Definition 15.2):
+CPA$\Phi$ security for public-key encryption (Definition 15.2):
 
 $$
 \def\arraystretch{1.5}
 \begin{array}{|l|} \hline
-\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\varPhi\text{-real}} \\ \hline
+\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\Phi\text{-real}} \\ \hline
 (pk, sk)  \leftarrow \Sigma.\text{KeyGen} \\
 \underline{\text{GETPK}():} \\
 \quad \text{return } pk \\
@@ -405,7 +408,7 @@ $$
 \end{array}
 \qquad
 \begin{array}{|l|} \hline
-\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\varPhi\text{-rand}} \\ \hline
+\qquad\qquad\mathcal{L}^{\Sigma}_{\text{pk-cpa}\Phi\text{-rand}} \\ \hline
 (pk, sk)  \leftarrow \Sigma.\text{KeyGen} \\
 \underline{\text{GETPK}():} \\
 \quad \text{return } pk \\

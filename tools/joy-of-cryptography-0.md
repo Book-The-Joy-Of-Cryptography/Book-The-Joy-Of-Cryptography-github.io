@@ -158,16 +158,107 @@ The following topics are shamefully missing from the book, but are planned or be
 
 # Contents
 
- 0. [Review of Concepts & Notation](#chapter0)
-	 0.1 [Logs & Exponents](#ch0section1) 
-	 0.2 [Modular Arithmetic](#ch0section2)  
-	 0.3 [Strings](#ch0section3)  	 
-	 0.4 [Functions](#ch0section4)  	 
-	 0.5 [Probability](#ch0section5) 
-	 0.6 [Notation in Pseudocode](#ch0section6) 
-	 0.7 [Asymptotics (Big-O)](#ch0section7) 	 	  	 	 	 
- 1. [One-Time Pad & Kerckhoffs’ Principle](#chapter1)
+ 0.  **[Review of Concepts & Notation](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-0/)**
+     0.1  Logs & Exponents
+     0.2  ModularArithmetic
+     0.3  Strings
+     0.4  Functions
+     0.5  Probability
+     0.6  Notation in Pseudocode
+     0.7  Asymptotics (Big-*O*)
+     
+1.  **[One-Time Pad & Kerckhoffs’ Principle](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-1/)**
+    1.1  What Is [Not] Cryptography?
+    1.2  Specifics of One-Time Pad
+    
+2.  **[The Basics of Provable Security](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-2/)**
+    2.1  How to Write a Security Definition
+    2.2  Formalisms for Security Definitions
+    2.3  How to Demonstrate Insecurity with Attacks
+    2.4  How to Prove Security with The Hybrid Technique
+    2.5  How to Compare/Contrast Security Definitions
 
+3.  **[Secret Sharing](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-3/)**
+    3.1  Definitions
+    3.2  A Simple 2-out-of-2 Scheme
+    3.3  Polynomial Interpolation
+    3.4  Shamir Secret Sharing
+    3.5  $\star$ VisualSecretSharing 
+
+4.  **[Basing Cryptography on Intractable](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-4/)** Computations
+    4.1  What Qualifies as a “Computationally Infeasible” Attack?
+    4.2  What Qualifies as a “Negligible” Success Probability?
+    4.3  Indistinguishability
+    4.4  Birthday Probabilities & Sampling With/out Replacement
+
+5.  **[Pseudorandom Generators](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-5/)**
+    5.1  Definitions
+    5.2  Pseudo random Generators in Practice
+    5.3  Application: Shorter Keys in One-Time-Secret Encryption
+    5.4  Extending the Stretch of a PRG
+    5.5  $\star$ Applications: Stream Cipher & Symmetric Ratchet
+
+6.  **[Pseudorandom Functions & Block Ciphers](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-6/)**
+    6.1  Definition
+    6.2  PRFs vs PRGs; Variable-Hybrid Proofs
+    6.3  Block Ciphers (Pseudorandom Permutations)
+    6.4  Relating PRFs and BlockCiphers
+    6.5  PRFs and Block Ciphers in Practice
+    6.6  $\star$ Strong Pseudorandom Permutations
+
+7.  **[Security Against Chosen Plaintext Attacks](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-7/)**
+    7.1  Limits of Deterministic Encryption
+    7.2  Pseudorandom Ciphertexts
+    7.3  CPA-Secure Encryption Based On PRFs
+
+8.  **[Block Cipher Modes of Operation](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-8/)**
+    8.1  A Tour of Common Modes
+    8.2  CPA Security and Variable-Length Plaintexts
+    8.3  Security of OFB Mode
+    8.4  Padding & Ciphertext Stealing
+
+9.  **[Chosen Ciphertext Attacks](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-9/)**
+    9.1  Padding Oracle Attacks 
+    9.2  What Went Wrong?
+    9.3  Defining CCA Security
+    9.4  $\star$ A Simple CCA-Secure Scheme
+
+10.  **[Message Authentication Codes](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-10/)**
+    10.1  Definition
+    10.2  $\star$ A PRF is a MAC
+    10.3  MACs for Long Messages
+    10.4  Encrypt-Then-MAC
+
+11.  **[Hash Functions](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-11/)**
+    11.1  Security Properties for Hash Functions
+    11.2  Merkle-Damgård Construction
+    11.3  Hash Functions vs. MACs: Length-Extension Attacks
+
+12.  **Authenticated Encryption & AEAD[enter link description here](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-12/)**
+    12.1  Definitions
+    12.2  Achieving AE/AEAD
+    12.3  Carter-Wegman MACs
+    12.4  Galois Counter Mode for AEAD
+
+13.  **[RSA & Digital Signatures](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-13/)**
+    13.1  “Dividing” Mod *n*
+    13.2  The RSA Function
+    13.3  Digital Signatures
+    13.4  Chinese Remainder Theorem
+    13.5 The Hardness of Factoring *N*
+
+14.  **[Diffie-Hellman Key Agreement](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-14/)**
+    14.1  Cyclic Groups
+    14.2  Diffie-Hellman Key Agreement
+    14.3  Decisional Diffie-Hellman Problem
+
+15.  **[Public-Key Encryption](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-15/)**
+    15.1 Security Definitions
+    15.2 One-Time Security Implies Many-Time Security
+    15.3 ElGamal Encryption
+    15.4 Hybrid Encryption
+    
+**[Index of Security Definitions](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-index/)**
 
 
 # 0.	Review of Concepts & Notation  <a name="chapter0"></a>
