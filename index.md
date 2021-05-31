@@ -9,6 +9,8 @@ permalink: /
 
 This is a mobile-friendly version of the [original Book](https://web.engr.oregonstate.edu/~rosulekm/crypto/crypto.pdf)
 
+![The Joy of Cryptography](https://statics.bsafes.com/images/joy-of-cryptography/TheJoyOfCryptography-cover.png)
+
 # The Joy of Cryptography 
 
 ## by Mike Rosulek 
