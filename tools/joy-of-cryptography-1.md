@@ -19,9 +19,7 @@ Let’s begin to formalize our scenario involving Alice, Bob, and Eve. Alice has
 use Enc to refer to the encryption algorithm. When Bob receives $c$, he runs a corresponding decryption algorithm Dec to recover the original plaintext $m$.
 We assume that the ciphertext may be observed by the eavesdropper Eve, so the (informal) goal is for the ciphertext to be meaningful to Bob but meaningless to Eve.
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![Bob but meaningless to Eve](https://statics.bsafes.com/images/joy-of-cryptography/Bob%20but%20meaningless%20to%20Eve.png)
 
 ### Secrets & Kerckhoffs’ Principle
 
@@ -37,9 +35,7 @@ The first person to articulate this problem was Auguste Kerckhoffs. In 1883 he f
 If the algorithms themselves are not secret, then there must be some other secret information in the system. That information is called the **(secret) key**. The key is just an extra piece of information given to both the Enc and Dec algorithms. Another way to interpret Kerckhoffs’ principle is that *all of the security of the system should be concentrated in the secrecy of the key*, not the secrecy of the algorithms. If a secret key gets compromised, you only need to choose a new one, not reinvent an entirely new encryption algorithm. Multiple users can all safely use the same encryption algorithm but with independently chosen secret keys.
 The process of choosing a secret key is called **key generation**, and we write KeyGen to refer to the (randomized) key generation algorithm. We call the collection of three algorithms (Enc, Dec, KeyGen) an **encryption scheme**. Remember that Kerckhoffs’ principle says that we should assume that an attacker knows the details of the KeyGen algorithm. But also remember that knowing the details (i.e., source code) of a randomized algorithm doesn’t mean you know the *specific output* it gave when the algorithm was executed.
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![algorithm was executed](https://statics.bsafes.com/images/joy-of-cryptography/the%20algorithm%20was%20executed.png)
 
 ### Excuses, Excuses
 

@@ -13,17 +13,16 @@ The most obvious way to use a block cipher to encrypt a long message is to just 
 
 **Construction 8.1 (ECB Mode)**
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![provide security of encryption](https://statics.bsafes.com/images/joy-of-cryptography/provide%20security%20of%20encryption.png)
+
 ### CBC: Cipher Block Chaining
 
 CBC (which stands for cipher block chaining) is the most common mode in practice. The CBC encryption of an $\ell-$block plaintext is $\ell+1$ blocks long. The first ciphertext block is called an **initialization vector (IV)**. Here we have described CBC mode as a *randomized* encryption, with the IV of each ciphertext being chosen uniformly. As you know, randomization is necessary (but not sufficient) for achieving CPA security, and indeed CBC mode provides CPA security.
 
 **Construction 8.2 (CBC Mode)**
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+
+![indeed CBC mode provides](https://statics.bsafes.com/images/joy-of-cryptography/indeed%20CBC%20mode%20provides.png)
+
 ### CTR: Counter
 The next most common mode in practice is counter mode (usually abbreviated as CTR mode). Just like CBC mode, it involves an additional IV block $r$ that is chosen uniformly. The idea is to then use the sequence
 
@@ -33,9 +32,9 @@ as a long one-time pad to mask the plaintext. Since $r$ is a block of bits, the 
 like $r + 1$ refer to addition modulo $2^{blen}$ (this is the typical behavior of unsigned addition in a processor).
 
 ### Construction 8.3 (CTR Mode)
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+
+![mode is rarely used in practice](https://statics.bsafes.com/images/joy-of-cryptography/mode%20is%20rarely%20used%20in%20practice.png)
+
 ### OFB: Output Feedback
 OFB (output feedback) mode is rarely used in practice. We’ll include it in our discussion because it has the easiest security proof. As with CBC and CTR modes, OFB starts with a random IV $r$ , and then uses the sequence:
 
@@ -44,9 +43,9 @@ $$F(k,r);\quad F(k,F(k,r));\quad F(k,F(k,F(k,r)));\quad \ldots$$
 as a one-time pad to mask the plaintext.
 
 **Construction 8.4 (OFB Mode)**
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+
+![one-time pad to mask the plaintext](https://statics.bsafes.com/images/joy-of-cryptography/one-time%20pad%20to%20mask%20the%20plaintext.png)
+
 ### Compare & Contrast
 CBC and CTR modes are essentially the only two modes that are ever considered in practice for CPA security. Both provide the same security guarantees, and so any comparison between the two must be based on factors outside of the CPA security definition. Here are a few properties that are often considered when choosing between these modes:
 
@@ -466,9 +465,7 @@ As an example, let's see ciphertext stealing as applied to $\mathrm{CBC}$ mode. 
 
 Now our goal is to identify $j$ bits of the CBC ciphertext that can be thrown away while still making decryption possible. In this case, the appropriate bits to throw away are **the last** $j$ **bits** of $c_{\ell-1}$ (the next-to-last block of the CBC ciphertext). The reason is illustrated in the figure below:
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![The reason is illustrated in the figure below](https://statics.bsafes.com/images/joy-of-cryptography/The%20reason%20is%20illustrated%20in%20the%20figure%20below.png)
 
 Suppose the receiver obtains this CBC ciphertext but the last $j$ bits of $c_{\ell-1}$ have been deleted. How can he/she decrypt? The important idea is that those missing $j$ bits were redundant, because there is another way to compute them. 
 
@@ -483,6 +480,8 @@ It is convenient in an implementation for the boundaries between blocks to be in
 $c_{0}\left\|c_{1}\right\| c_{2} \cdots c_{\ell-3}\left\|c_{\ell-2}\right\| c_{\ell} \| c_{\ell-1}^{\prime},$ where $c_{\ell-1}^{\prime}$ is the first $blen$ $-j$ bits of $c_{\ell-1}$
 
 That way, all ciphertext blocks except the last one are the full blen bits long, and the boundaries between blocks appear consistently every $blen$ bits. This “optimization” does add some significant edge cases to any implementation. One must also decide what to do when the plaintext is already an exact multiple of the blocklength — should the final two ciphertext blocks be swapped even in this case? Below we present an implementation of ciphertext stealing (CTS) that does *not* swap the final two blocks in this case. This means that it collapses to plain CBC mode when the plaintext is an exact multiple of the block length.
+
+### Construction 8.6 (CBC-CTS)
 
 $$
 \def\arraystretch{1.5}
@@ -705,9 +704,7 @@ Suppose the final plaintext block $m_{\ell}$ is $blen$ $-j$ bits long. Rather th
 
 If the final block of plaintext is already $blen$ bits long, then standard CBC mode is used.
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![then standard CBC mode is used](https://statics.bsafes.com/images/joy-of-cryptography/then%20standard%20CBC%20mode%20is%20used.png)
 
 Show that the scheme does **not** satisfy CPA$\Phi$ security. Describe a distinguisher and compute its advantage.
 >Hint: Ask for several encryptions of plaintexts whose last block is $blen - 1$ bits long.
@@ -719,9 +716,7 @@ Show that the scheme does **not** satisfy CPA$\Phi$ security. Describe a disting
 
 8.21. Propagating CBC (PCBC) mode refers to the following variant of CBC mode:
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![to the following variant of](https://statics.bsafes.com/images/joy-of-cryptography/to%20the%20following%20variant%20of.png)
 
 (a) Describe PCBC decryption.
 (b) Assuming that standard CBC mode has CPA$\Phi$-security (for plaintexts that are exact multiple of the block length), prove that PCBC mode also has CPA$\Phi$-security (for the

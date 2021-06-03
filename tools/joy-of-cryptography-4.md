@@ -438,9 +438,7 @@ This completes the proof. $\blacksquare$
 **Example**
 *This formula for BirthdayProb$(q, N)$ is not easy to understand at a glance. We can get a better sense of its behavior as a function of $q$ by plotting it. Below is a plot with $N = 365$, corresponding to the classic birthday problem:*
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![o the classic birthday problem](https://statics.bsafes.com/images/joy-of-cryptography/classic%20birthday%20problem.png)
 
 With only $q = 23$ people the probability of a shared birthday already exceeds 50%. The graph could be extended to the right (all the way to $q = 365)$, but even at $q = 70$ the probability exceeds 99.9%.
 
@@ -479,9 +477,9 @@ $$
  1-x\leqslant e^{-x}\leqslant 1-0.632x.
  $$
 This fact is illustrated below. The significance of 0.632 is that $1-\frac{1}{e}=0.63212\ldots$
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+
+![This fact is illustrated below](https://statics.bsafes.com/images/joy-of-cryptography/We%20can%20use%20both%20of%20these%20upper%20and%20lower.png)
+
 We can use both of these upper and lower bounds on $e^{-x}$ to show the following:
 $$
 \prod_{i=1}^{q-1}\left(1-\frac{i}{N}\right) \leqslant \prod_{i=1}^{q-1} e^{-\frac{i}{N}}=e^{-\sum_{i=1}^{q-1} \frac{i}{N}}=e^{-\frac{q(q-1)}{2 N}} \leqslant 1-0.632 \frac{q(q-1)}{2 N}
@@ -498,9 +496,7 @@ This completes the proof. $\blacksquare$
 
 **Example** *Below is a plot of these bounds compared to the actual value of* $\text{BirthdayProb}(q,N)$ (for $N=365$):
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![BirthdayProb](https://statics.bsafes.com/images/joy-of-cryptography/compared%20to%20the%20actual%20value%20of-1.png)
 
 *As mentioned previously, $\text{BirthdayProb}(q,N)$ grows roughly like $q^2/N$ within the range of values we care about ($q$ small relative to $N$).*
 

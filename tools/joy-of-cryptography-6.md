@@ -4,9 +4,7 @@ Imagine if Alice \& Bob had an *infinite* amount of shared randomness - not just
 
 Alice could encrypt by saying, "hey Bob, this message is encrypted with one-time pad using chunk $\# 674696273$ as key. Bob could decrypt by looking up location $\# 674696273$ in his copy of the shared randomness. As long as Alice doesn't repeat a key/chunk, an eavesdropper (who doesn't have the shared randomness) would learn nothing about the encrypted messages. Although Alice announces (publicly) *which* location/chunk was used as each one-time pad key, that information doesn't help the attacker know the *value* at that location.
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![It is silly to imagine an infinite](https://statics.bsafes.com/images/joy-of-cryptography/help%20the%20attacker%20know.png)
 
 It is silly to imagine an infinite amount of shared randomness. However, an exponential amount of something is often just as good as an infinite amount. A shared table containing "only" $2^{\lambda}$ one-time pad keys would be quite useful for encrypting as many messages as you could ever need.
 
@@ -470,9 +468,7 @@ This shows that $\mathcal{L}_{\text {prg-real }}^{G} \approx \mathcal{L}_{\text 
 ## $\star\quad$ A Theoretical Construction of a PRF from a PRG
 We have already seen that it is possible to feed the output of a PRG back into the PRG again, to extend its stretch (Claim 5.7). This is done by making a long chain (like a linked list) of PRGs. The trick to constructing a PRF from a PRG is to chain PRGs together in a **binary tree** (similar to Exercise $5.8(\mathrm{a})$ ). The leaves of the tree correspond to final outputs of the PRF. If we want a PRF with an exponentially large domain (*e.g., in $=\lambda$* ), the binary tree itself is exponentially large! However, it is still possible to compute any individual leaf efficiently by simply traversing the tree from root to leaf. This tree traversal itself is the PRF algorithm. This construction of a PRF is due to Goldreich, Goldwasser, and Micali, in the paper that defined the concept of a PRF.
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![Imagine a complete binary tree](https://statics.bsafes.com/images/joy-of-cryptography/Imagine%20a%20complete%20binary%20tree.png)
 
 Imagine a complete binary tree of height *in* (*in* will be the input length of the PRF). Every node in this tree has a *position* which can be written as a binary string. Think of a node's position as the directions to get there starting at the root, where a $\textcolor{brown}{0}$ means "go left" and $\textcolor{brown}{1}$ means "go right." For example, the root has position $\epsilon$ (the empty string), the right child of the root has position $\textcolor{brown}{1}$ , etc.
 
@@ -856,14 +852,11 @@ IBM cryptographer Horst Feistel).
 The main idea in the Feistel construction is to convert a not-necessarily-invertible function $F:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^n$ into an invertible function $F^*:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2n}\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2n}$. The function $F^*$ is called the **Feistel round with round function** $F$ and is defined as follows:
 
 **Construction 6.9 (Feistel round)**
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![**Construction 6.9**](https://statics.bsafes.com/images/joy-of-cryptography/No%20matter%20what%20F%20is.png)
 No matter what $F$ is, its Feistel round $F^*$ is invertible. Not only that, but its inverse is a kind of “mirror image” of $F^*$:
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![Note how both the forward](https://statics.bsafes.com/images/joy-of-cryptography/Note%20how%20both%20the%20forward.png)
+
 Note how both the forward and inverse Feistel rounds use $F$ in the forward direction!
 
 **Example**
@@ -890,9 +883,9 @@ $$
 We can also consider using a round function $F$ that has a key/seed. The result will be an $F^{*}$ that also takes a seed. For every seed $k, F^{*}(k, \cdot)$ will have an inverse (which looks like its mirror image).
 
 **Construction 6.10 (Keyed Feistel)**
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+
+![**Construction 6.10**](https://statics.bsafes.com/images/joy-of-cryptography/which%20looks%20like%20its%20mirror%20image.png)
+
 Now suppose $F$ is a secure PRF and we use it as a Feistel round function, to obtain a
 keyed function $F^*$. Since $F^*(k,\cdot)$ is invertible for every $k$, and since $F^*$ uses a secure PRF in some way, you might be tempted to claim that $F^*$ is a secure PRP. Unfortunately, it is not! The output of $F^*$ contains half of its input, making it quite trivial to break the PRP-security of $F^*$.
 
@@ -901,9 +894,7 @@ different key to the round function. If we use $k_1$ in the first round, $k_2$ i
 
 **Construction 6.11 (Feistel cipher)**
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![Because each round is invertible](https://statics.bsafes.com/images/joy-of-cryptography/Because%20each%20round%20is%20invertible.png)
 
 Because each round is invertible (given the appropriate round key), the overall Feistel cipher is also invertible. Note that the inverse of the Feistel cipher uses inverse Feistel rounds and reverses the order of the key schedule.
 

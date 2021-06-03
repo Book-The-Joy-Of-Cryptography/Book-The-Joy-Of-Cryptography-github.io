@@ -35,10 +35,9 @@ $$
 *The value $\ell$ is called the **stretch** of the PRG. The input to the PRG is typically called a **seed**.*
 
 Below is an illustration of the distributions sampled by these libraries, for a **length-doubling** $(\ell=\lambda)$ PRG (not drawn to scale) :
- 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+
+![distributions sampled by these libraries](https://statics.bsafes.com/images/joy-of-cryptography/illustration%20of%20the%20distributions%20sampled.png) 
+
  $\mathcal{L}_{\text{prg-real}}$ samples from distribution of red dots, by first sampling a uniform element of $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda$ and performing the action of $G$ on that value to get a red result in $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$. The other library  $\mathcal{L}_{\text{prg-rand}}$ directly samples the uniform distribution on $\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ (in green above). 
 
 To understand PRGs, you must simultaneously appreciate two ways to compare the PRG’s output distribution with the uniform distribution:
@@ -359,9 +358,8 @@ The *stretch* of a PRG measures how much longer its output is than its input. Ca
 ### Two Approaches to Increase Stretch
 Suppose $G:\{\textcolor{brown}{0},\textcolor{brown}{1}\}^\lambda\rightarrow\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{2\lambda}$ is a length-doubling PRG (*i.e*., a PRG with stretch $\lambda$). Below are two ideas for constructing a PRG with longer stretch:
 
- $$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![ideas for constructing a PRG with](https://statics.bsafes.com/images/joy-of-cryptography/Although%20the%20constructions%20are%20similar.png)
+
 Although the constructions are similar, only one of them is secure. Before reading any further, can you guess which of $H_1, H_2$ is a secure PRG and which is insecure? By carefully comparing these two approaches, I hope you develop a better understanding of the PRG security definition.
 
 ### A Security Proof
@@ -657,9 +655,7 @@ The PRG-feedback construction can be generalized in a natural way, by continuing
 **Claim 5.7**
 *If G is a secure length-doubling PRG, then for any $n$ (polynomial function of $\lambda$) the following construction $H_n$ is a secure PRG with stretch $n\lambda$:*
 
- $$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![The fact that this chain of PRGs](https://statics.bsafes.com/images/joy-of-cryptography/The%20fact%20that%20this%20chain%20of%20PRGs.png)
 
 The fact that this chain of PRGs can be extended indefinitely gives another useful functionality:
 
@@ -674,9 +670,7 @@ Because of the 2nd rule, you might want to think about a single infinitely long 
 
 The PRG-feedback construction can be used to construct a secure stream cipher in the natural way: given seed $s$ and length $\ell$, keep iterating the PRG-feedback main loop until $\ell$ bits have been generated.
 
- $$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![bits have been generated](https://statics.bsafes.com/images/joy-of-cryptography/bits%20have%20been%20generated.png)
 
 ### Symmetric Ratchet
 Suppose Alice & Bob share a symmetric key $k$ and are using a secure messaging app to exchange messages over a long period of time. Later in the course we will see techniques that Alice & Bob could use to securely encrypt many messages using a single key. However,
@@ -693,9 +687,7 @@ This way of using and forgetting a sequence of keys is called a **symmetric ratc
 
 **Construction 5.9 (Symm Ratchet)**
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![**Construction 5.9**](https://statics.bsafes.com/images/joy-of-cryptography/Suppose%20that%20an%20attacker%20compromises.png)
 Suppose that an attacker compromises Bob’s device after $n$ ciphertexts have been sent. The only value residing in memory is $s_n$, which the attacker learns. Since $G$ is deterministic, the attacker can now compute $t_{n+1}, t_{n+2},\ldots$ in the usual way and decrypt all future ciphertexts that are sent.
 
 However, we can show that the attacker learns no information about $t_1,\ldots, t_n$ from $s_n$, which implies that the previous ciphertexts remain safe. By compromising the key $s_n$, the adversary only compromises the security of *future* messages, but not past messages. Sometimes this property is called **forward secrecy**, meaning that messages in the present are protected against a key-compromise that happens in the future.
@@ -718,8 +710,10 @@ $$
 \qquad s_i\|t_i:=G(s_{i-1})\\
 \qquad c_i\leftarrow \Sigma.\text{Enc}(t_i,m_i)\\
 \quad \text{return}\ (c_i,\ldots,c_n,s_n)\\\hline
-\end{array}\quad \textcolor{red}{\text{Image screenshot here}}
+\end{array}
 $$
+
+![As we have seen, the shaded box](https://statics.bsafes.com/images/joy-of-cryptography/As%20we%20have%20seen,%20the%20shaded%20box.png)
 
 As we have seen, the shaded box (the process that computes $t_1,\ldots, t_n$ from $s_0$) is actually a PRG. Let us rewrite the library in terms of this PRG $H_n$:
 
@@ -732,8 +726,10 @@ $$
 \quad \text{for}\ i=1\ \text{to}\ n:\\
 \qquad c_i\leftarrow \Sigma.\text{Enc}(t_i,m_i)\\
 \quad \text{return}\ (c_i,\ldots,c_n,s_n)\\\hline
-\end{array}\quad \textcolor{red}{\text{Image screenshot here}}
+\end{array}
 $$
+
+![we can apply the PRG security](https://statics.bsafes.com/images/joy-of-cryptography/library%20in%20terms%20of%20this%20PRG.png)
 
 Now, we can apply the PRG security of $H_n$ and instead choose $t_1,\ldots, t_n$ and $s_n$ uniformly. This change is indistinguishable, by the security of the PRG. Note that we have not written out the standard explicit steps (factor out the first two lines of attack in terms of $\mathcal{L}_{\text{prg-real}}$, replace with $\mathcal{L}_{\text{prg-rand}}$, and inline).
 
@@ -949,9 +945,8 @@ $$
 $$
 $\star$ 5.10. Let $G$ be a secure length-doubling PRG. One of the following constructions is a secure PRG and one is not. Which is which? Give a security proof for one and an attack for the other.
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![Give a security proof for one and an attack](https://statics.bsafes.com/images/joy-of-cryptography/and%20an%20attack%20for%20the%20other.png)
+
 > Hint: Usually when something is insecure, it’s insecure for *any* choice of building block. In this case, the attack only works for certain $G$. Basically, you will need to construct a particular $G$, prove that it’s a secure PRG, and then prove that $H_1/H_2$ is not secure when using this $G$.
 
 5.11. A frequently asked question in cryptography forums is whether it’s possible to determine which PRG implementation was used by looking at output samples.

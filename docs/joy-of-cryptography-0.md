@@ -127,10 +127,9 @@ Extensive revisions; only the major ones listed here. Lots of homework problems 
 <li>DH-based socialist millionaires, PSI, PAKE, simple PIR, basic MPC concepts (low priority)</li>
 </ol>
 <h1 id="contents">Contents</h1>
-
-<ul>
+<ol start="0">
 <li>
-<p>0 <strong><a href="https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-0/">Review of Concepts &amp; Notation</a></strong><br>
+<p><strong><a href="https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-0/">Review of Concepts &amp; Notation</a></strong><br>
 0.1  Logs &amp; Exponents<br>
 0.2  ModularArithmetic<br>
 0.3  Strings<br>
@@ -139,8 +138,6 @@ Extensive revisions; only the major ones listed here. Lots of homework problems 
 0.6  Notation in Pseudocode<br>
 0.7  Asymptotics (Big-<em>O</em>)</p>
 </li>
-</ul>
-<ol start="0">
 <li>
 <p><strong><a href="https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-1/">One-Time Pad &amp; Kerckhoffs’ Principle</a></strong><br>
 1.1  What Is [Not] Cryptography?<br>
@@ -220,7 +217,7 @@ Extensive revisions; only the major ones listed here. Lots of homework problems 
 11.3  Hash Functions vs. MACs: Length-Extension Attacks</p>
 </li>
 <li>
-<p><strong>Authenticated Encryption &amp; AEAD<a href="https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-12/">enter link description here</a></strong><br>
+<p><strong><a href="https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-12/">Authenticated Encryption &amp; AEAD</a></strong><br>
 12.1  Definitions<br>
 12.2  Achieving AE/AEAD<br>
 12.3  Carter-Wegman MACs<br>
@@ -530,5 +527,6 @@ In other words, how many turns until my probability of getting snake-eyes exceed
 </body>
 
 </html>
+
 
 

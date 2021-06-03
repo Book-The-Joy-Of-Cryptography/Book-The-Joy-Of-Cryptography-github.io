@@ -1,6 +1,3 @@
-
-
-
 # 3. Secret Sharing
 DNS is the system that maps human-memorable Internet domains like $\textcolor{brown}{\texttt{irs.gov}}$ to machine-readable IP addresses like  $\textcolor{brown}{166.123.218.220}$. If an attacker can masquerade as the DNS system and convince your computer that $\textcolor{brown}{\texttt{irs.gov}}$ actually resides at some other IP address, it might result in a bad day for you.
 
@@ -27,9 +24,7 @@ _A t-**out-of**-n threshold secret-sharing scheme (TSSS) consists of the followi
 **Definition 3.2 (TSSS correctness)**
 _A t-out-of-n TSSS satisfies **correctness** if, for all authorized sets $U\subseteq \{1,\ldots,n\}$ (*i.e.,* $|U|\geqslant t$) and for all $s\leftarrow$ Share($m$), we have Reconstruct $(\{s_i|i\in U\})=m.$_
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![we have Reconstruct](https://statics.bsafes.com/images/joy-of-cryptography/we%20have%20Reconstruct.png)
 
 **Security Definition**
 We’d like a security guarantee that says something like:
@@ -541,9 +536,7 @@ $$
 
 *And indeed, $f$ gives the correct values:*
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![_gives the correct values](https://statics.bsafes.com/images/joy-of-cryptography/gives%20the%20correct%20values.png)
 
 $$
 \begin{array}{l}
@@ -589,9 +582,9 @@ $$
 The equality marked ($\star$) follows from the inductive hypothesis, since each of the terms involves a polynomial passing through a specified set of $k + 1$ points with distinct $x$-coordinates. $\blacksquare$
 
 **Example**
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+
+![points with distinct](https://statics.bsafes.com/images/joy-of-cryptography/Consider%20an%20example%20degree-2.png)
+
 ***What does a “polynomial mod $p$” look like?** Consider an example degree-2 polynomial:*
 
 $$f(x)=x^2+4x+7$$
@@ -600,9 +593,7 @@ $$f(x)=x^2+4x+7$$
 
 *Let’s see what this polynomial “looks like” modulo 11 (i.e., in $\mathbb{Z}_{11}$). Working mod 11 means to “wrap around” every time the polynomial crosses over a multiple of 11 along the y-axis. This results in the blue plot below:*
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![results in the blue plot below](https://statics.bsafes.com/images/joy-of-cryptography/This%20results%20in%20the%20blue%20plot%20below.png)
 
 This is a picture of a mod-11 parabola. In fact, since we care only about $\mathbb{Z}_{11}$ inputs to $f$, you could rightfully say that **just the 11 highlighted points alone** (not the blue curve) are a picture of a mod-11 parabola.
 
@@ -652,9 +643,7 @@ $$f(x)=1x^2+4x+7$$
 
 *This is the same polynomial illustrated in the previous example:*
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![_illustrated in the previous example_](https://statics.bsafes.com/images/joy-of-cryptography/illustrated%20in%20the%20previous%20example.png)
 
 *For each user $i \in \{1,\ldots, 5\}$, we distribute the share $(i, f(i)\%11).$  These shares correspond to the highlighted points in the mod-11 picture above.*
 
@@ -859,9 +848,7 @@ Here is a fun variant of 2-out-of-2 secret-sharing called **visual secret sharin
 
 More specifically, each share should be printed on transparent sheets. When the two shares are stacked on top of each other, the secret image is revealed visually. We will discuss a simple visual secret sharing scheme that is inspired by the following observations:
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![by the following observations](https://statics.bsafes.com/images/joy-of-cryptography/by%20the%20following%20observations.png)
 
 Importantly, when stacking shares on top of each other in the first two cases, the result is a $2 \times 2$ block that is half-black, half-white (let’s call it “gray”); while in the other cases the result is completely black.
 
@@ -870,18 +857,16 @@ The idea is to process each pixel of the source image independently, and to enco
 More formally:
 
 **Construction 3.14**
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+
+![**Construction 3.14**](https://statics.bsafes.com/images/joy-of-cryptography/a%20way%20that%20results%20in%20a%20black.png)
+
 It is not hard to see that share $s_1$ leaks no information about the secret image $m$, because it consists of uniformly chosen $2 \times 2$ blocks. In the exercises you are asked to prove that $s_2$ also individually leaks nothing about the secret image.
 
 Note that whenever the source pixel is white, the two shares have identical $2\times2$ blocks (so that when stacked, they make a “gray” block). Whenever a source pixel is black, the two shares have opposite blocks, so stack to make a black block.
 
 **Example**
 
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![so stack to make a black block](https://statics.bsafes.com/images/joy-of-cryptography/to%20make%20a%20black%20block.png)
 
 ### Exercises
 
@@ -948,9 +933,9 @@ $$
 3.8. Suppose there are 9 people on an important committee: Alice, Bob, Carol, David, Eve, Frank, Gina, Harold, & Irene. Alice, Bob & Carol form a subcommittee; David, Eve & Frank form another subcommittee; and Gina, Harold & Irene form another subcommittee.
 
   Suggest how a dealer can share a secret so that it can only be opened when a majority of each subcommittee is present. Describe why a 6-out-of-9 threshold secret-sharing scheme does **not** suffice.
-$$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+  
+![threshold secret-sharing](https://statics.bsafes.com/images/joy-of-cryptography/secret-sharing%20scheme%20does.png)
+
 $\star$ 3.9. (a) Generalize the previous exercise. A **monotone formula** is a boolean function $\phi:\{0,1\}^n\rightarrow\{0,1\}$ that when written as a formula uses only AND and OR operations (no NOTS). For a set $A\subseteq\{1,\ldots,n\}$, let $\mathcal{X}_A$ be the bitstring where whose $i$th bit is 1 if and only if $i\in A$.
 
  For every monotone formula $\phi:\{0,1\}^n\rightarrow \{0,1\}$, construct a secret-sharing scheme whose authorized sets are $\{A\subseteq \{1,\ldots,n\}|\phi(\mathcal{X}_A)=1\}$.  Prove that your scheme is secure.
@@ -964,8 +949,6 @@ How big are the shares, compared to the Shamir scheme?
 
 3.11. Using actual transparencies or with an image editing program, reconstruct the secret shared in these two images:
 
- $$
-\textcolor{red}{\text{Image screenshot here}}
-$$
+![secret shared in these two images](https://statics.bsafes.com/images/joy-of-cryptography/shared%20in%20these%20two%20images.png)
 
 $\star$ 3.12. Construct a 3-out-of-3 visual secret sharing scheme. Any two shares should together reveal nothing about the source image, but any three reveal the source image when stacked together.

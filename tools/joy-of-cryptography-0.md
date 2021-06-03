@@ -234,7 +234,7 @@ The following topics are shamefully missing from the book, but are planned or be
     11.2  Merkle-Damgård Construction
     11.3  Hash Functions vs. MACs: Length-Extension Attacks
 
-12.  **Authenticated Encryption & AEAD[enter link description here](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-12/)**
+12.  **[Authenticated Encryption & AEAD](https://book-the-joy-of-cryptography.bsafes.com/docs/joy-of-cryptography-12/)**
     12.1  Definitions
     12.2  Achieving AE/AEAD
     12.3  Carter-Wegman MACs
