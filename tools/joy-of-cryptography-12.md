@@ -236,9 +236,7 @@ $$
 $$
 Horner's rule can be expressed visually as follows:
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![The UHF construction is described formally](https://statics.bsafes.com/images/joy-of-cryptography/The%20UHF%20construction%20is%20described%20formally.png)
 The UHF construction is described formally below.
 
 **Construction 12.9 (Poly-UHF)**
@@ -530,9 +528,7 @@ Rather than using polynomials over $\mathbb{Z}_{p},$ GCM mode uses polynomials d
 **to-do**
 > *More information about GCM will go here. Again, be nice to have a crash co finite fields.*
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![Galois counter mode](https://statics.bsafes.com/images/joy-of-cryptography/Galois%20counter%20mode.png)
 
 ### Exercises
 **to-do**

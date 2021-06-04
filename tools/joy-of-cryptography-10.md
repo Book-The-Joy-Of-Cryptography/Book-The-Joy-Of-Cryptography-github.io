@@ -587,9 +587,7 @@ We have seen some insecure ways to construct a MAC for longer messages. Now let'
 **Construction 10.5 (CBC-MAC)**
 *Let $F$ be a PRF with *in* $=$ *out* $=\lambda .$ CBC-MAC refers to the following MAC scheme:*
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![Unlike CBC encryption](https://statics.bsafes.com/images/joy-of-cryptography/Unlike%20CBC%20encryption.png)
 
 Unlike CBC encryption, CBC-MAC uses no initialization vector (or, you can think of it as using the all-zeroes IV), and it outputs only the last block.
 
@@ -605,9 +603,7 @@ If $\mathrm{CBC}-\mathrm{MAC}$ is so fragile, is there a way to extend it to wor
 **Construction 10.7 (ECBC-MAC)**
 *Let $F$ be a PRF with in $=$ out $=\lambda .$ ECBC-MAC refers to the following scheme:*
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![More Robust CBC-MAC](https://statics.bsafes.com/images/joy-of-cryptography/More%20Robust%20CBC-MAC.png)
 
 **Theorem 10.8**
 *If $F$ is a secure PRF with *in* = *out* = $\lambda$, then ECBC-MAC is a secure MAC for message space $\mathcal{M}=(\{\textcolor{brown}{0},\textcolor{brown}{1}\}^{\lambda})^*$.*

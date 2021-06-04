@@ -127,9 +127,9 @@ CBC encryption provides CPA security, so why didn't it save us from padding orac
 
     In short, if an encryption scheme is malleable, then it allows information contained in one ciphertext to be "transferred" to another ciphertext.
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![Summary of padding oracle attack](https://statics.bsafes.com/images/joy-of-cryptography/Summary%20of%20padding%20oracle%20attack.png)
+
+**Figure 9.1**: *Summary of padding oracle attack.*
 
 2. Second, you may have noticed that the CPA security definition makes no mention of the Dec algorithm. The Dec algorithm shows up in our definition for correctness, but it is nowhere to be found in the $\mathcal{L}_{\text {cpa- } \star}$ libraries. Decryption has no impact on CPA security!
 

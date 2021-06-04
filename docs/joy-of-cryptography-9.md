@@ -113,9 +113,8 @@ For the other case, suppose the second-to-last byte of m is zero. Then <span cla
 <p>In short, if an encryption scheme is malleable, then it allows information contained in one ciphertext to be “transferred” to another ciphertext.</p>
 </li>
 </ol>
-<p><span class="katex--display"><span class="katex-display"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML" display="block"><semantics><mrow><mstyle mathcolor="red"><mtext>Image&nbsp;screenshot&nbsp;here</mtext></mstyle></mrow><annotation encoding="application/x-tex">
-\textcolor{red}{{\text{Image screenshot here}}}
-</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.88888em; vertical-align: -0.19444em;"></span><span class="mord" style="color: red;"><span class="mord text" style="color: red;"><span class="mord" style="color: red;">Image&nbsp;screenshot&nbsp;here</span></span></span></span></span></span></span></span></p>
+<p><img src="https://statics.bsafes.com/images/joy-of-cryptography/Summary%20of%20padding%20oracle%20attack.png" alt="Summary of padding oracle attack"></p>
+<p><strong>Figure 9.1</strong>: <em>Summary of padding oracle attack.</em></p>
 <ol start="2">
 <li>Second, you may have noticed that the CPA security definition makes no mention of the Dec algorithm. The Dec algorithm shows up in our definition for correctness, but it is nowhere to be found in the <span class="katex--inline"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi mathvariant="script">L</mi><mrow><mtext>cpa-&nbsp;</mtext><mo>⋆</mo></mrow></msub></mrow><annotation encoding="application/x-tex">\mathcal{L}_{\text {cpa- } \star}</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.969438em; vertical-align: -0.286108em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height: 0.175696em;"><span class="" style="top: -2.55em; margin-left: 0em; margin-right: 0.05em;"><span class="pstrut" style="height: 2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">cpa-&nbsp;</span></span><span class="mord mtight">⋆</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height: 0.286108em;"><span class=""></span></span></span></span></span></span></span></span></span></span> libraries. Decryption has no impact on CPA security!</li>
 </ol>
@@ -792,4 +791,5 @@ D:=\text{empty assoc. array}\\\\
 </body>
 
 </html>
+
 

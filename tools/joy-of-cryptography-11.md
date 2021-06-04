@@ -185,10 +185,11 @@ $$
 \quad \text{for}\ i=1\ \text{to}\ k+1\\
 \qquad y_i:=h(y_{i-1}\|x_i)\\
 \quad \text{output}\ y_{k+1}
-\end{array}\\
-\textcolor{red}{{\text{Image screenshot here}}}\\\hline
+\end{array}\\\hline
 \end{array}
 $$
+
+![The idea of the Merkle](https://statics.bsafes.com/images/joy-of-cryptography/The%20idea%20of%20the%20Merkle.png)
 
 The idea of the Merkle-Damgård construction is to split the input $x$ into blocks of size $t$. The end of the string is filled out with $\textcolor{Red}0$ s if necessary. A final block called the "padding block" is added, which encodes the (original) length of $x$ in binary.
 
@@ -206,9 +207,7 @@ $\underbrace{\textcolor{brown}{01100011\ 11001101}}_{x_{1}} \quad \underbrace{\t
 
 *The final hash of $x$ is computed as follows:*
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![We are presenting a simplified](https://statics.bsafes.com/images/joy-of-cryptography/We%20are%20presenting%20a%20simplified.png)
 
 We are presenting a simplified version, in which $\mathrm{MD}_{h}$ accepts inputs whose maximum length is $2^{t}-1$ bits (the length of the input must fit into $t$ bits). By using multiple padding blocks (when necessary) and a suitable encoding of the original string length, the construction can be made to accommodate inputs of arbitrary length (see the exercises).
 
@@ -258,9 +257,7 @@ This concept is best illustrated by example.
 
 *Suppose the MAC key is chosen as $k=\textcolor{brown}{01100011\ 11001101},$ and an attacker sees the MAC tag $t$ of the message $m=\textcolor{brown}{01000011\ 10010111\ 01010000} .$ Then $t=H(k \| m)$ corresponds exactly to the example from before:*
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![The only difference from before](https://statics.bsafes.com/images/joy-of-cryptography/The%20only%20difference%20from%20before.png)
 
 *The only difference from before is that the first block contains the MAC key, so its value is not known to the attacker. We have shaded it in gray here. The attacker knows all other inputs as well as the output tag $t$.*
 
@@ -270,9 +267,7 @@ $$
 
 *The correct MAC tag $t^{\prime}$ of this value would be computed by someone with the key as:*
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![The attacker can compute the](https://statics.bsafes.com/images/joy-of-cryptography/The%20attacker%20can%20compute%20the.png)
 
 *The attacker can compute the output $t^{\prime}$ in a different way, without knowing the key. In particular, the attacker knows all inputs to the last instance of $h .$ Since the h function itself is public, the attacker can compute this value herself as $t^{\prime}=h(t \| \textcolor{brown}{00000000\ 01000000})$. Since she can predict the tag of $m^{\prime}$, having seen only the tag of $m$, she has broken the MAC scheme.*
 
@@ -369,19 +364,7 @@ However, this intuition is not true when $H_{1}$ is a Merkle-Damgård hash. Show
 
 11.13. Let $H$ be a collision-resistant hash function with output length $n$. Let $H^*$ denote iterating $H$ in a manner similar to CBC-MAC:
 
-$$
-\def\arraystretch{1.5}
-\begin{array}{|ll|}\hline
-\begin{array}{l}
-\underline{H^*(x_1\cdots x^\ell):}\\
-\quad//\textit{each $x_i$ is n bits}\\
-\quad y_0:=\textcolor{brown}{0}^n\\
-\quad \text{for}\ i=1\ \text{to}\ \ell:\\
-\qquad y_i:=H(x_i\oplus y_{i-1})\\
-\quad \text{return}\ y_i\\
-\end{array} & \textcolor{red}{{\text{Image screenshot here}}}\\\hline
-\end{array}
-$$
+![Describe a successful attack](https://statics.bsafes.com/images/joy-of-cryptography/Describe%20a%20successful%20attack.png)
 
 Show that $H^{*}$ is **not** collision-resistant. Describe a successful attack.
 
