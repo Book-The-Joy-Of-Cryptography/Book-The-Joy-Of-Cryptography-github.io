@@ -1,4 +1,5 @@
 
+
 # 13 RSA & Digital Signatures
 
 RSA was among the first public-key cryptography developed. It was first described in $1978,$ and is named after its creators, Ron Rivest, Adi Shamir, and Len Adleman. [^1] RSA can be used as a building block for public-key encryption and digital signatures. In this chapter we discuss only the application of RSA for digital signatures.
@@ -224,9 +225,7 @@ The RSA function is defined as follows:
 
 Essentially, the RSA function (and its inverse) is a simple modular exponentiation. The most confusing thing to remember about RSA is that $e$ and $d$ "live" in $\mathbb{Z}_{\phi(N)}^{*},$ while $x$ and $y$ "live" in $\mathbb{Z}_{N}$.
 
-$$
-\textcolor{red}{{\text{Image screenshot here}}}
-$$
+![remember about RSA is that](https://statics.bsafes.com/images/joy-of-cryptography/remember%20about%20RSA%20is%20that.png)
 
 Let's make sure the function we called the "inverse RSA function" is actually an inverse of the RSA function. Let's start with an example:
 
@@ -504,6 +503,7 @@ Of course, this is not a formal proof. It is possible to formally prove the secu
 
 When doing arithmetic $\bmod\ N,$ we can sometimes use knowledge of the factors $N=p q$ to speed things up. This section discusses the math behind these speedups.
 
+![Sunzi Suanjing](https://statics.bsafes.com/images/joy-of-cryptography/Sunzi%20Suanjing.png)
 **History.** In the *Sunzi Suanjing*, written some time around the 4 th century $\mathrm{CE}$, Chinese mathematician Sunzi posed an interesting puzzle involving remainders:
 
 >*"We have a number of things, but we do not know exactly how many. If we count them by threes we have two left over. If we count them by fives we have three left over. If we count them by sevens we have two left over. How many things are there?* [^6]
@@ -889,6 +889,7 @@ Give an example $u, v, r, s,$ with $\operatorname{gcd}(r, s) \neq 1$ for which t
 
 13.13. Consider a rectangular grid of points, with width $w$ and height $h$. Starting in the lowerleft of the grid, start walking diagonally northeast. When you fall off end the grid, wrap around to the opposite side (i.e., Pac-Man topology). Below is an example of the first few steps you take on a grid with $w=3$ and $h=5$ :
 
+![steps you take on a grid](https://statics.bsafes.com/images/joy-of-cryptography/steps%20you%20take%20on%20a%20grid.png)
 Show that if $\operatorname{gcd}(w, h)=1$ then you will eventually visit every point in the grid.
 
 >Hint: Derive a formula for the coordinates of the point you reach after $n$ steps.
