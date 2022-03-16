@@ -35,7 +35,7 @@ Yes, I know that the title is ridiculous. All of the serious titles were already
 <h2 id="what-background-is-needed-to-understand-this-book">What Background Is Needed To Understand This Book?</h2>
 <p>You will get the most out of this book if you have a solid foundation in standard undergraduate computer science material:</p>
 <ul>
-<li>Discrete mathematics (of the kind you typically nd in year 2 or 3 of an undergraduate CS program) is <strong>required background</strong>. The book assumes that you are familiar with basic modular arithmetic, discrete probabilities, simple combinatorics, and especially proof techniques. Chapter 0 contains a brief review of some of these topics.</li>
+<li>Discrete mathematics (of the kind you typically find in year 2 or 3 of an undergraduate CS program) is <strong>required background</strong>. The book assumes that you are familiar with basic modular arithmetic, discrete probabilities, simple combinatorics, and especially proof techniques. Chapter 0 contains a brief review of some of these topics.</li>
 <li>Algorithms &amp; data structures background is <strong>highly recommended</strong>, and theory of computation (automata, formal languages &amp; computability) is also <strong>recommended</strong>. We deal with computations and algorithms at a high level of abstraction, and with mathematical rigor. Prior exposure to this style of thinking will be helpful.</li>
 </ul>
 <h2 id="why-is-cryptography-a-difficult-subject">Why Is Cryptography A Difficult Subject?</h2>
